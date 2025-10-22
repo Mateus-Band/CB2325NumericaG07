@@ -1,3 +1,3 @@
 '''
-Arquivo para inicializar o pacote CB2325NumericaG07.
+Arquivo para inicializar o pacote NumericaG07.
 '''

@@ -56,3 +56,5 @@ def ajuste_polinomial(valores_x:list, valores_y:list, grau:int):
     plt.margins(x=0.1, y=0.1)
     plt.grid(True)
     plt.show()
+
+ajuste_polinomial([0, 1, 2, 3, 4, 5], [2.2, 2.8, 3.6, 4.5, 5.1, 5.9], 2)
