@@ -22,8 +22,11 @@ def erro_relativo(valor_real,valor_aprox):
     Retorna:
         float: O erro relativo, dado por |valor_real - valor_aprox| / |valor_real|.
     """
+    if valor_real == 0:
+        if valor_aprox == 0:
+            return 0.0 #para 0/0
+        else:
+            return float('inf') #erro infinito se valor_real é 0 e valor_aprox não é 0
+
     return abs(valor_real-valor_aprox)/abs(valor_real)
-a=float(input("Digite um valor: "))
-b=float(input("Digite um valor aproximado para o valor anterior: "))
-print(f"Erro absoluto: {erro_absoluto(a,b):.6f}")
-print(f"Erro relativo: {erro_relativo(a,b):.8f}")
+
