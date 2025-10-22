@@ -35,7 +35,7 @@ Git é um sistema de controle de versão que ajuda a rastrear mudanças no seu c
     ```bash
     git commit -m "Sua mensagem clara sobre o que mudou (MUITO IMPORTANTE!)"
     ```
-    *PARTE MAISIMPORTANTE, SUA NOTA ESTÁ EM BOA PARTE AQUI!*
+    *PARTE MAIS IMPORTANTE, SUA NOTA ESTÁ EM BOA PARTE AQUI!*
 
 ### 4. Verificando o Status
 
