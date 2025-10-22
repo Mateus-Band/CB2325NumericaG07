@@ -1,0 +1,29 @@
+#ignora pasta gerada pelo setuptools teste
+/CB2325NumericaG07.egg-info
+#ignora pasta de cache da NumericaG07
+/NumericaG07/__pycache__/
+
+#Pedi pra ia ajudar:
+# setuptools egg-info
+*.egg-info/
+# build artifacts
+build/
+dist/
+# Python cache / bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+# virtual envs
+.venv/
+venv/
+env/
+# test cache
+.pytest_cache/
+# editor / OS
+.vscode/
+.idea/
+.DS_Store
+# Jupyter
+.ipynb_checkpoints/
+# environment files
+.env

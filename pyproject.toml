@@ -17,14 +17,16 @@ classifiers = [
 ]
 dependencies = [
     "matplotlib",
+    "pytest",
 ]
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["CB2325NumericaG07*"]
+include = ["NumericaG07*"]
 exclude = [
     "CB2325NumericaG07.notebooks_demos",
-    "CB2325NumericaG07.notebooks_demos.*"
+    "CB2325NumericaG07.notebooks_demos.*",
+    "CB2325NumericaG07.egg-info",
 ]
 
 [project.urls]
