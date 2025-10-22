@@ -2,15 +2,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import sympy as sp
 
-# Gerador de Pontos para Teste
-rng = np.random.default_rng()
-x = np.linspace(-5, 5, 30)
-y_true = 5*x - 2
-y = y_true + rng.normal(0, 2, size=x.shape)  # desvio padrão 2
-
-x_lista = x.tolist()
-y_lista = y.tolist()
-
 # Função de Ajuste Polinomial
 def ajuste_polinomial(valores_x:list, valores_y:list, grau:int):
 
@@ -65,6 +56,3 @@ def ajuste_polinomial(valores_x:list, valores_y:list, grau:int):
     plt.margins(x=0.1, y=0.1)
     plt.grid(True)
     plt.show()
-
-# Teste
-ajuste_polinomial(x_lista, y_lista, 1)
