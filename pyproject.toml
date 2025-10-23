@@ -23,7 +23,7 @@ dependencies = [
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["NumericaG07*"]
+include = ["CB2325NumericaG07*", "CB2325NumericaG07.*"]
 exclude = [
     "CB2325NumericaG07.notebooks_demos",
     "CB2325NumericaG07.notebooks_demos.*",
