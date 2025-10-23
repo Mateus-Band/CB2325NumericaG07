@@ -19,6 +19,8 @@ classifiers = [
 dependencies = [
     "matplotlib",
     "pytest",
+    "numpy",
+    "sympy",
 ]
 
 [tool.setuptools.packages.find]
