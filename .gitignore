@@ -27,3 +27,6 @@ env/
 .ipynb_checkpoints/
 # environment files
 .env
+#ignorar o package
+dist/
+build/
