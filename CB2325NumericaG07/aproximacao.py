@@ -2,7 +2,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import sympy as sp
 
+
 # Função de Ajuste Polinomial
+
 def ajuste_polinomial(valores_x:list, valores_y:list, grau:int):
     '''
     Marcela/Jarmando, adicionar docstring da função aqui, por favor.
@@ -61,7 +63,9 @@ def ajuste_polinomial(valores_x:list, valores_y:list, grau:int):
     plt.grid(True)
     plt.show()
 
+
 # Função de Ajuste Senoidal
+
 def ajuste_senoidal(valores_x, valores_y):
 
     # Plotagem dos dados fornecidos para que o usuário indique o período aproximado percebido na amostra
@@ -160,3 +164,40 @@ def ajuste_senoidal(valores_x, valores_y):
     plt.grid(True)
     plt.legend()
     plt.show()
+
+
+# Função de Ajuste Múltiplo
+
+def ajuste_multiplo(valores_variaveis:list, valores_z:list):
+
+    # Construção da Matriz de Valores das Variáveis
+
+    xm_temp = np.array(valores_variaveis)
+    x_matriz = np.insert(xm_temp, 0, 1, axis=1)
+    
+    
+    # Construção da Matriz dos Valores de z
+
+    z_matriz = np.array(valores_z)
+
+    if x_matriz.shape[0] != len(z_matriz):
+        raise ValueError("Número de linhas de X e número de valores de Z não coincidem.")
+
+    # Construção da Matriz de Coeficientes
+
+    matriz_T = x_matriz.T
+
+    coeficientes_list = np.linalg.solve(matriz_T @ x_matriz, matriz_T @ z_matriz)
+    coeficientes_list = coeficientes_list.ravel()
+
+    # Função Aproximadora para Regressão Múltipla
+
+    qtd_var = x_matriz.shape[1] - 1
+    ind_fin = qtd_var + 1
+    x = sp.symbols(f"x1:{ind_fin}")
+    expr = coeficientes_list[0]
+
+    for i in range(qtd_var):
+        expr += coeficientes_list[i + 1]*x[i]
+    
+    print(f"Função Aproximadora para Regressão Múltipla: {expr}")
