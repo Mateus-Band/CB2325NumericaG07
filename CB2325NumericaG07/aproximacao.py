@@ -4,6 +4,10 @@ import sympy as sp
 
 # Função de Ajuste Polinomial
 def ajuste_polinomial(valores_x:list, valores_y:list, grau:int):
+    '''
+    Marcela/Jarmando, adicionar docstring da função aqui, por favor.
+    
+    '''
 
     # Construção da Matriz de Vandermonde
     matriz_list = []
@@ -56,3 +60,5 @@ def ajuste_polinomial(valores_x:list, valores_y:list, grau:int):
     plt.margins(x=0.1, y=0.1)
     plt.grid(True)
     plt.show()
+
+print(ajuste_polinomial.__doc__)

@@ -1,13 +1,13 @@
-print('test')
-
-
 #vou precisar pra interpolação de hermite
 import numpy as np
 
 def diff_numerica(lista:zip) -> list:
-    ''' Recebe uma sequencia de pontos da forma: [(0, 0)] (pode se fazer zip() de duas arrays ou listas com os valores x e y dos pontos),
+    '''
+    Recebe uma sequencia de pontos da forma: [(0, 0)] (pode se fazer zip() de duas arrays ou listas com os valores x e y dos pontos),
     e retorna a derivada numerica em cada ponto,usando diferença central nos pontos centrais,
-    e diferença progressiva/regressiva nas pontas. '''
+    e diferença progressiva/regressiva nas pontas.
+    '''
+    
     lista = list(lista)
 
     diff_list = lista.copy()
@@ -29,3 +29,5 @@ def diff_numerica(lista:zip) -> list:
             diff_list[index] = (next_y - prev_y)/(next_x - prev_x)
     
     return diff_list
+
+print(diff_numerica.__doc__)
