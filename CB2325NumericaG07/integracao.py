@@ -50,16 +50,11 @@ def integral_trapezio(function, a, b, n : int, plotar = False) -> float:
             raise TypeError("function deve ser callable ou uma expressão/lambda do SymPy.")
         function = sp.lambdify(sym, expr, modules=["math"])
 
-    #preparação para plotagem
-    '''if plotar:
-        def plot():'''
-        
-
-
     a = float(a)
     b = float(b)
     h = (b - a) / n
-
+    
+    # Cálculo da integral (movido para fora do if/else para calcular sempre)
     def x(i):
         return a + i * h
     
@@ -67,12 +62,58 @@ def integral_trapezio(function, a, b, n : int, plotar = False) -> float:
     for i in range(1, n):
         soma_interna += function(x(i))
 
-    # x0 é a e xn é b
     integral = (h/2) * (function(a) + 2 * soma_interna + function(b))
 
-    return integral
+    if plotar:
+        # Função interna para plotar
+        def plot(f):
+            # 1. Pontos para a curva suave
+            num_pontos_smooth = 300 # Mais pontos para suavidade
+            x_smooth = []
+            y_smooth = []
+            delta_x_smooth = (b - a) / (num_pontos_smooth - 1)
+            for i in range(num_pontos_smooth):
+                x_val = a + i * delta_x_smooth
+                x_smooth.append(x_val)
+                y_smooth.append(f(x_val))
 
+            # 2. Pontos para os vértices dos trapézios
+            x_trap = []
+            y_trap = []
+            for i in range(n + 1):
+                x_val = a + i * h
+                x_trap.append(x_val)
+                y_trap.append(f(x_val))
 
+            # --- Criação do Gráfico ---
+            _, ax = plt.subplots(figsize=(10, 6))
+
+            #plot da função
+            func_label = 'f(x)'
+            ax.plot(x_smooth, y_smooth, label=func_label, color='blue', linewidth=2)
+
+            #plot dos trapézios
+            for i in range(n):
+                ax.plot([x_trap[i], x_trap[i+1]], [y_trap[i], y_trap[i+1]], color='red', linestyle='-', marker='o', markersize=4)
+
+            #sombreia a área sob os trapézios
+            ax.fill_between(x_trap, 0, y_trap, color='red', alpha=0.3, label=f'Área Aproximada ({n} trapézios)')
+
+            ax.set_title('Visualização da Regra do Trapézio')
+            ax.set_xlabel('x')
+            ax.set_ylabel('f(x)')
+            ax.legend()
+            ax.grid(True)
+            ax.axhline(0, color='black', linewidth=0.5)
+            plt.show()
+
+        plot(function)
+
+        #valor calculado da integral para print
+        return integral
+        
+    else:
+        return integral
 
 
 if __name__ == "__main__":

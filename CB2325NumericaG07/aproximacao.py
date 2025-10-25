@@ -67,7 +67,9 @@ def ajuste_polinomial(valores_x:list, valores_y:list, grau:int):
 # Função de Ajuste Senoidal
 
 def ajuste_senoidal(valores_x, valores_y):
-
+    '''
+    Marcela/Jarmando, adicionar docstring da função aqui, por favor.
+    '''
     # Plotagem dos dados fornecidos para que o usuário indique o período aproximado percebido na amostra
 
     plt.scatter(valores_x, valores_y, color="blue", marker="o", label="Dados Fornecidos")
@@ -169,6 +171,9 @@ def ajuste_senoidal(valores_x, valores_y):
 # Função de Ajuste Múltiplo
 
 def ajuste_multiplo(valores_variaveis:list, valores_z:list):
+    '''
+    Marcela/Jarmando, adicionar docstring da função aqui, por favor.
+    '''
 
     # Construção da Matriz de Valores das Variáveis
 
