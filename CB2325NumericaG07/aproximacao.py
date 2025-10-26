@@ -1,6 +1,60 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import sympy as sp
+from functools import reduce
+
+# Função de Ajuste Linear
+
+def ajuste_linear(valores_x:list, valores_y:list):
+    '''
+    Calcula o ajuste linear y = ax + b para os dados (valores_x, valores_y) pelo Método dos Mínimos Quadrados (MMQ).
+
+    Além disso, a função exibe um gráfico de dispersão dos pontos e da reta de ajuste.
+
+    Argumentos:
+        valores_x (list): Lista de valores da variável independente.
+        valores_y (list): Lista de valores da variável dependente.
+
+    Retorna:
+        tuple: (a, b), contendo o coeficiente angular (a) e o coeficiente linear (b) da reta de ajuste.
+    '''
+
+    # Cálculo do valor médio de x e y
+
+    x_medio = reduce(lambda x, y: x + y, valores_x)/len(valores_x)
+    y_medio = reduce(lambda x, y: x + y, valores_y)/len(valores_y)
+
+    # Cálculo da covariância de x e y e da variância de x para cálculo do coeficiente angular
+
+    cov_xy = 0
+    var_x = 0
+
+    for i in range(0, len(valores_x)):
+        cov_xy += (valores_x[i] - x_medio)*(valores_y[i] - y_medio)
+        var_x += (valores_x[i] - x_medio)**2
+
+    # Cálculo do coeficientes
+
+    a = cov_xy/var_x            # Angular
+    b = y_medio - a*x_medio     # Independente
+
+    # Plot do gráfico
+
+    x_func = np.linspace(min(valores_x), max(valores_x), 200)
+    y_func = a*x_func + b
+
+    plt.scatter(valores_x, valores_y, color="blue", marker="o", label="Dados Fornecidos")
+    plt.plot(x_func, y_func, color="black", linewidth=2, label="Reta de Ajuste Linear")
+
+    plt.title("Gráfico do Ajuste Linear")
+    plt.xlabel("Eixo x")
+    plt.ylabel("Eixo y")
+    plt.margins(x=0.1, y=0.1)
+    plt.grid(True)
+    plt.legend()
+    plt.show()
+
+    return a, b
 
 
 # Função de Ajuste Polinomial
