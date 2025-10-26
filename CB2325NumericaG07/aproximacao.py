@@ -2,10 +2,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 import sympy as sp
 from functools import reduce
+import math
 
 # Função de Ajuste Linear
 
-def ajuste_linear(valores_x:list, valores_y:list):
+def ajuste_linear(valores_x:list, valores_y:list, plt_grafico: bool = True):
     '''
     Calcula o ajuste linear y = ax + b para os dados (valores_x, valores_y) pelo Método dos Mínimos Quadrados (MMQ).
 
@@ -14,6 +15,7 @@ def ajuste_linear(valores_x:list, valores_y:list):
     Argumentos:
         valores_x (list): Lista de valores da variável independente.
         valores_y (list): Lista de valores da variável dependente.
+        plt_grafico (bool, opcional): True (padrão) se o gráfico deve ser plotado, False caso contrário
 
     Retorna:
         tuple: (a, b), contendo o coeficiente angular (a) e o coeficiente linear (b) da reta de ajuste.
@@ -40,19 +42,20 @@ def ajuste_linear(valores_x:list, valores_y:list):
 
     # Plot do gráfico
 
-    x_func = np.linspace(min(valores_x), max(valores_x), 200)
-    y_func = a*x_func + b
+    if plt_grafico:
+        x_func = np.linspace(min(valores_x), max(valores_x), 200)
+        y_func = a*x_func + b
 
-    plt.scatter(valores_x, valores_y, color="blue", marker="o", label="Dados Fornecidos")
-    plt.plot(x_func, y_func, color="black", linewidth=2, label="Reta de Ajuste Linear")
+        plt.scatter(valores_x, valores_y, color="blue", marker="o", label="Dados Fornecidos")
+        plt.plot(x_func, y_func, color="black", linewidth=2, label="Reta de Ajuste Linear")
 
-    plt.title("Gráfico do Ajuste Linear")
-    plt.xlabel("Eixo x")
-    plt.ylabel("Eixo y")
-    plt.margins(x=0.1, y=0.1)
-    plt.grid(True)
-    plt.legend()
-    plt.show()
+        plt.title("Gráfico do Ajuste Linear")
+        plt.xlabel("Eixo x")
+        plt.ylabel("Eixo y")
+        plt.margins(x=0.1, y=0.1)
+        plt.grid(True)
+        plt.legend()
+        plt.show()
 
     return a, b
 
@@ -221,6 +224,48 @@ def ajuste_senoidal(valores_x, valores_y):
     plt.legend()
     plt.show()
 
+# Função de Ajuste Exponencial
+
+def ajuste_exponencial(valores_x:list, valores_y:list, plt_grafico: bool = True):
+    '''
+    Calcula o ajuste exponencial y = b * e^(a*x) para os dados (valores_x, valores_y) pela linearização do modelo ln(y) = ln(b) + a*x e
+    aplica o Método dos Mínimos Quadrados sobre os dados transformados por meio da função de ajuste linear.
+
+    Além disso, a função exibe um gráfico de dispersão dos pontos e da curva de ajuste.
+
+    Argumentos:
+        valores_x (list): Lista de valores da variável independente.
+        valores_y (list): Lista de valores da variável dependente.
+        plt_grafico (bool, opcional): True (padrão) se o gráfico deve ser plotado, False caso contrário
+
+    Retorna:
+        tuple: (a, b), contendo o coeficiente do expoente (a) e o coeficiente multiplicativo (b) da curva de ajuste.
+    '''
+
+    # Transforma o ajuste exponencial em um ajuste linear
+
+    ln_valores_y = [math.log(y) for y in valores_y]
+    a, b_aux = ajuste_linear(valores_x, ln_valores_y, False)
+    b = math.exp(b_aux)
+
+    # Plot do gráfico
+
+    if plt_grafico:
+        x_func = np.linspace(min(valores_x), max(valores_x), 200)
+        y_func = b * np.exp(a * x_func)
+
+        plt.scatter(valores_x, valores_y, color="blue", marker="o", label="Dados Fornecidos")
+        plt.plot(x_func, y_func, color="black", linewidth=2, label="Curva de Ajuste Exponencial")
+
+        plt.title("Gráfico do Ajuste Exponencial")
+        plt.xlabel("Eixo x")
+        plt.ylabel("Eixo y")
+        plt.margins(x=0.1, y=0.1)
+        plt.grid(True)
+        plt.legend()
+        plt.show()
+
+    return a, b
 
 # Função de Ajuste Múltiplo
 
