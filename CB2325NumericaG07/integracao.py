@@ -116,7 +116,7 @@ def integral_trapezio(function, a, b, n : int, plotar = False) -> float:
     else:
         return integral
 
-def integral_simpson(f, a, b, n):
+def integral_simpson38(function, a, b, n : int, plotar = False) -> float:
     """
     Calcula a integral de f no intervalo [a, b] usando a regra de Simpson 3/8.
     Parâmetros:
@@ -129,52 +129,58 @@ def integral_simpson(f, a, b, n):
     """
     if n % 3 != 0:
         raise ValueError("n deve ser múltiplo de 3")
+
+    a = float(a)
+    b = float(b)
     h = (b - a) / n
-    soma = f(a) + f(b)
+    soma = function(a) + function(b)
     
     for i in range(1, n):
         x = a + i * h
         if i % 3 == 0:
-            soma += 2 * f(x)
+            soma += 2 * function(x)
         else:
-            soma += 3 * f(x)
-    return (3 * h / 8) * soma
+            soma += 3 * function(x)
+    
+    integral = (3 * h / 8) * soma
 
-#função a integrar
-f = lambda x: x**(3) - 2*x**2 + 1
-a, b = -10, 10
-n = 3
-area = integral_simpson(lambda x: f(x), a, b, n)
-print(f"Área ≈ {area:.3f}")
+    if plotar:
+        # Função para plotagem
+        def plot(f):
+            x_plot = np.linspace(a, b, 300)
+            y_plot = f(x_plot)
+            xi = np.linspace(a, b, n + 1)
+            yi = f(xi)
+            
+            # Aproximação Simpson 3/8 por blocos de 3 subintervalos
+            simpson_y = np.zeros_like(x_plot)
+            for k in range(0, n, 3):
+                x_block = xi[k:k+4]
+                y_block = yi[k:k+4]
+                # Interpolação cúbica
+                p = Polynomial.fit(x_block, y_block, 3) 
+                mask = (x_plot >= x_block[0]) & (x_plot <= x_block[-1])
+                simpson_y[mask] = p(x_plot[mask])
 
-#plotagem
-x_plot = np.linspace(a, b, 300)
-y_plot = f(x_plot)
-xi = np.linspace(a, b, n + 1)
-yi = f(xi)
-#Aproximação Simpson 3/8 por blocos de 3 subintervalos ---
-simpson_y = np.zeros_like(x_plot)
-for k in range(0, n, 3):
-    x_block = xi[k:k+4]
-    y_block = yi[k:k+4]
-    # Interpolação cúbica
-    p = Polynomial.fit(x_block, y_block, 3) 
-    mask = (x_plot >= x_block[0]) & (x_plot <= x_block[-1])
-    simpson_y[mask] = p(x_plot[mask])
+            plt.figure(figsize=(8,5))
+            plt.plot(x_plot, y_plot, 'b', label='f(x) escolhida')
+            plt.plot(x_plot, simpson_y, 'orange', label='Aproximação Simpson 3/8', linewidth=2)
+            plt.fill_between(x_plot, simpson_y, color='skyblue', alpha=0.3)
+            plt.vlines(xi, 0, yi, colors='gray', linestyles='dashed', alpha=0.7)
+            plt.scatter(xi, yi, color='red', zorder=5)
+            plt.title("Integração Numérica - Simpson 3/8 com polinômios cúbicos")
+            plt.xlabel("x")
+            plt.ylabel("f(x)")
+            plt.legend()
+            plt.grid(True)
+            plt.show()
 
-plt.figure(figsize=(8,5))
-plt.plot(x_plot, y_plot, 'b', label='f(x) escolhida')
-plt.plot(x_plot, simpson_y, 'orange', label='Aproximação Simpson 3/8', linewidth=2)
-plt.fill_between(x_plot, simpson_y, color='skyblue', alpha=0.3)
-plt.vlines(xi, 0, yi, colors='gray', linestyles='dashed', alpha=0.7)
-plt.scatter(xi, yi, color='red', zorder=5)
-plt.title("Integração Numérica - Simpson 3/8 com polinômios cúbicos")
-plt.xlabel("x")
-plt.ylabel("f(x)")
-plt.legend()
-plt.grid(True)
-plt.show()
+        plot(function)
+        return integral
+        
+    else:
+        return integral
 
 if __name__ == "__main__":
     print(integral_trapezio.__doc__)
-    print(integral_simpson.__doc__)
+    print(integral_simpson38.__doc__)
