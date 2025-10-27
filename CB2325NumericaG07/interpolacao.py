@@ -77,9 +77,7 @@ def ddfunc(Point_list:list,derivada,func)-> list:
         for i in range(len(P_list)-1):
             if subslist1[i] == subslist2[i]:
                 new_list.append(derivada(subslist1[i]))
-                print(f'derivada:{subslist1[i]} - {derivada(subslist1[i])}')
             else:
-                print(f'calculando: ({P_list[i+1]} - {P_list[i]})/({subslist1[i]} - {subslist2[i]})')
                 new_list.append((P_list[i+1] - P_list[i])/(subslist1[i] - subslist2[i]))
 
         return new_list
@@ -87,8 +85,6 @@ def ddfunc(Point_list:list,derivada,func)-> list:
     result_list = []
     while len(Point_list) != 1: #vai reduzindo a lista até sobrar apenas um elemento, e guarda apenas o topo na tabela, no caso o primeiro da lista
         result_list.append(Point_list[0]) 
-        print(f'result_list:{result_list}')
-        print(f'point_list:{Point_list}')
         Point_list = der(Point_list)
     result_list.append(Point_list[0])
     return result_list
