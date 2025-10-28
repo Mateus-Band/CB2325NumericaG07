@@ -1,4 +1,3 @@
-#vou precisar pra interpolação de hermite
 import numpy as np
 
 def diff_numerica(lista:zip) -> list:
@@ -32,7 +31,9 @@ def diff_numerica(lista:zip) -> list:
 
 
 def function_definer(lista_x,lista_y,exception=None):
-    '''Essa função recebe duas listas e as vincula, retornando uma função vinculo que ao receber um ponto da lista_x retorna um ponto da lista_x'''
+    '''
+    Essa função recebe duas listas e as vincula, retornando uma função vinculo que ao receber um ponto da lista_x retorna um ponto da lista_x
+    '''
 
     func_dicio = dict()
     for x,y in zip(lista_x,lista_y):
@@ -51,8 +52,10 @@ def function_definer(lista_x,lista_y,exception=None):
 
 
 def duplicate(lista) -> list:
-    '''Duplica cada elemento da lista e mantem a ordem, necessaria para o calculo por exemplo da interpolação de hermite,
-    recebe: [1,2,3,4] e retorna: [1,1,2,2,3,3,4,4]'''
+    '''
+    Duplica cada elemento da lista e mantem a ordem, necessaria para o calculo por exemplo da interpolação de hermite,
+    recebe: [1,2,3,4] e retorna: [1,1,2,2,3,3,4,4]
+    '''
 
 
     l = []
@@ -63,7 +66,8 @@ def duplicate(lista) -> list:
 
 
 def ddfunc(Point_list:list,derivada,func)-> list:
-    '''Recebe a lista de pontos, uma função que retorna as derivadas em cada ponto, e a função que queremos usar na interpolação,
+    '''
+    Recebe a lista de pontos, uma função que retorna as derivadas em cada ponto, e a função que queremos usar na interpolação,
     e retorna as f[] necessarias para o calculo da intepolação de hermite em ordem,
     por exemplo [f[x_0],f[x_0,x_0],f[x_0,x_0,x_1],...] .
     '''
@@ -89,7 +93,7 @@ def ddfunc(Point_list:list,derivada,func)-> list:
     result_list.append(Point_list[0])
     return result_list
 
-
-print(diff_numerica.__doc__)
-print(ddfunc.__doc__)
-print(duplicate.__doc__)
+if __name__ == '__main__':
+    print(diff_numerica.__doc__)
+    print(ddfunc.__doc__)
+    print(duplicate.__doc__)

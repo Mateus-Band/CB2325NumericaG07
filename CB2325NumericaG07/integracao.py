@@ -176,10 +176,8 @@ def integral_simpson38(function, a, b, n : int, plotar = False) -> float:
             plt.show()
 
         plot(function)
-        return integral
         
-    else:
-        return integral
+    return integral
 
 if __name__ == "__main__":
     print(integral_trapezio.__doc__)
