@@ -93,6 +93,34 @@ def ddfunc(Point_list:list,derivada,func)-> list:
     result_list.append(Point_list[0])
     return result_list
 
+def interpolação_de_hermite(x,y):
+    '''Essa função retorna, recebendo uma lista de valores de x e outra lista dos respectivos valores de f(x), uma função que interpola valores conforme a função'''
+
+    f = function_definer(x,y) #define a função que f(x) = y
+    d = diff_numerica(zip(x,y)) #gera a lista de derivadas de cada ponto de x
+    f_linha = function_definer(x,d,exception=0) # define a função 'derivada' f'(x) = y'
+    x_duplicated = duplicate(x)#prepara a lista para obter os coeficientes da função
+    coeficientes_hermite = ddfunc(x_duplicated,f_linha,f)#calcula os resultados dos f[x_0],f[x_0,x_0] ... necessários
+    
+    def interpolation(ponto): #função que será retornada
+        soma = 0 #para os (x - x_i), que crecem assim como os pontos da lista x_duplicate
+        hermite = 0 
+        for i in coeficientes_hermite:# para cadaf[x_i]
+            mult = 1
+            for j in x_duplicated[:soma]:#calcula os (x - x_i)
+                mult = mult*(ponto - j)
+
+
+            hermite += mult*i # + f[x_0,...,x_i]*(x-x_0)^2 * ... (x - x_i)
+            soma += 1
+        
+        return hermite
+
+    return interpolation
+
+
+
+
 if __name__ == '__main__':
     print(diff_numerica.__doc__)
     print(ddfunc.__doc__)
