@@ -3,7 +3,7 @@ import sympy as sp
 import matplotlib.pyplot as plt
 
 
-def interpolação_de_hermite(x,y,plot=False):
+def interpolacao_de_hermite(x,y,plot=False, grid=True):
     '''
     Essa função retorna, recebendo uma lista de valores de x e outra lista dos respectivos valores de f(x), uma função que interpola valores conforme f(x)
     
@@ -321,7 +321,7 @@ def interpolacao_polinomial(tupla_de_pontos, plotar = False) -> sp.Expr:
         return polinomio_simplificado
 
 if __name__ == '__main__':
-    print(interpolação_de_hermite.__doc__)
+    print(interpolacao_de_hermite.__doc__)
     print(interpolacao_polinomial.__doc__)
 
 
