@@ -30,3 +30,4 @@ env/
 #ignorar o package
 dist/
 build/
+trabalho_PROG.py
