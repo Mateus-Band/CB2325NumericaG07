@@ -93,8 +93,21 @@ def ddfunc(Point_list:list,derivada,func)-> list:
     result_list.append(Point_list[0])
     return result_list
 
-def interpolação_de_hermite(x,y):
-    '''Essa função retorna, recebendo uma lista de valores de x e outra lista dos respectivos valores de f(x), uma função que interpola valores conforme a função'''
+def interpolação_de_hermite(x,y,plot:bool = False,grid:bool = True):
+    '''Essa função retorna, recebendo uma lista de valores de x e outra lista dos respectivos valores de f(x), uma função que interpola valores conforme f(x)
+    
+    Parâmetros:
+        x (float): Lista de valores de x.
+        y (float): Lista de valores conhecidos de f(x).
+        (Ambos devem estar em ordem)
+        plot (bool): Determina se a função deve plotar as informações ou não
+        grid (bool): Determina se a função for plotar se a plotagem deve ter grid ou não
+        
+    Retorna:
+        Função: Essa nova função recebe valores de x e retorna os valores de f(x) interpolados.
+    
+    
+    '''
 
     f = function_definer(x,y) #define a função que f(x) = y
     d = diff_numerica(zip(x,y)) #gera a lista de derivadas de cada ponto de x
@@ -102,7 +115,20 @@ def interpolação_de_hermite(x,y):
     x_duplicated = duplicate(x)#prepara a lista para obter os coeficientes da função
     coeficientes_hermite = ddfunc(x_duplicated,f_linha,f)#calcula os resultados dos f[x_0],f[x_0,x_0] ... necessários
     
-    def interpolation(ponto): #função que será retornada
+    def interpolation(ponto,plt = plot): #função que será retornada
+        '''
+        Essa função esta diretamente ligada a função original interpolação_de_hermite que a gerou, e seu resultado depende diretamente da função original
+
+
+        Parâmetros:
+            ponto (float): ponto x que será calculado o f(x)
+            plt: Determina se a função deve ou não plotar o ponto x (só funciona se na função interpolação de hermite o parametro: plot = True)
+        
+        Retorna:
+            float: Valor f(x)
+        '''
+        
+        
         soma = 0 #para os (x - x_i), que crecem assim como os pontos da lista x_duplicate
         hermite = 0 
         for i in coeficientes_hermite:# para cadaf[x_i]
@@ -114,7 +140,44 @@ def interpolação_de_hermite(x,y):
             hermite += mult*i # + f[x_0,...,x_i]*(x-x_0)^2 * ... (x - x_i)
             soma += 1
         
+        if plt:
+            ax.scatter([ponto],[hermite],color = 'red')
+
+
+
+
+
         return hermite
+
+    if plot:
+            fig = plt.figure()
+            ax = fig.add_subplot()
+            ax.scatter(x,y,color = 'Black',label = 'Pontos Originais')
+            
+            a = min(x)
+            b = max(x)
+            c = 1
+            d = 100
+            e = 0
+            dist = b-a
+
+            if dist < 1:
+                print('A distância entre os pontos está bem pequena')
+                c =10
+                d = 1
+                e = 1
+                while (b-a)*c<10:
+                    c = c*10
+            
+            cred =lambda x: x/c
+            xval = np.linspace(int(a*c)-e,int(b*c)+e,int((b-a)*c)*d)
+            xval = np.array(list(map(cred,xval)))
+            plot = False
+            yval = np.array(list(map(lambda x: interpolation(x,plt=False),xval))) 
+            ax.plot(xval,yval)
+            ax.set_aspect('equal')
+            ax.grid(grid)
+
 
     return interpolation
 
