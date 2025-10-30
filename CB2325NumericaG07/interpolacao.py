@@ -3,9 +3,19 @@ import sympy as sp
 import matplotlib.pyplot as plt
 
 
-def interpolação_de_hermite(x,y,plotar=False):
+def interpolação_de_hermite(x,y,plot=False):
     '''
-    Essa função retorna, recebendo uma lista de valores de x e outra lista dos respectivos valores de f(x), uma função que interpola valores conforme a função
+    Essa função retorna, recebendo uma lista de valores de x e outra lista dos respectivos valores de f(x), uma função que interpola valores conforme f(x)
+    
+    Parâmetros:
+        x (float): Lista de valores de x.
+        y (float): Lista de valores conhecidos de f(x).
+        (Ambos devem estar em ordem)
+        plot (bool): Determina se a função deve plotar as informações ou não
+        grid (bool): Determina se a função for plotar se a plotagem deve ter grid ou não
+        
+    Retorna:
+        Função: Essa nova função recebe valores de x e retorna os valores de f(x) interpolados.
     '''
 
     def diff_numerica(lista:zip) -> list:
@@ -68,16 +78,32 @@ def interpolação_de_hermite(x,y,plotar=False):
             l.append(i)
         return l
     
+
+
     def ddfunc(Point_list:list,derivada,func)-> list:
         '''
         Recebe a lista de pontos, uma função que retorna as derivadas em cada ponto, e a função que queremos usar na interpolação,
         e retorna as f[] necessarias para o calculo da intepolação de hermite em ordem,
         por exemplo [f[x_0],f[x_0,x_0],f[x_0,x_0,x_1],...] .
+
+        Parâmetros:
+            Point_list (list): lista com os valores dos pontos na coordenada x
+            derivada (função): função que retorna a derivada de cada ponto da Point_list
+            func (função): função que retorna os valores dos pontos na coordenada y para cada ponto da coordenada y, func(x) = y
+
+        Retorna:
+            list: Lista com os valores de cada f[] necessária para calcular o polinomio de hermite na ordem que o f[x] aparece
+
+
         '''
         subslist1,subslist2 = Point_list.copy(),Point_list.copy()#sublist1 e sublist2 são listas que usarei para guardar quais valores serão subtraidos nos denomidaores
         Point_list = [func(p) for p in Point_list] #aplica na lista de pontos a função e retorna cada valor
         
         def der(P_list): #funciona com uma redução de lista, seja x_i o elemento da nova lista e x1_i o elemento da lista antiga de posição i, x_i = (x1_(i+1) - x1_i)/(sublist[i]-sublist2[i]), da mesma forma que seria calcular a interpolação por tabela,  
+            '''
+            Reduz uma lista usando o metodo de calcular os valores de f[], pelo método de tabela
+            '''
+
             new_list = [] #salva nessa lista
             subslist1.pop(0)
             subslist2.pop()
@@ -104,7 +130,22 @@ def interpolação_de_hermite(x,y,plotar=False):
     x_duplicated = duplicate(x)#prepara a lista para obter os coeficientes da função
     coeficientes_hermite = ddfunc(x_duplicated,f_linha,f)#calcula os resultados dos f[x_0],f[x_0,x_0] ... necessários
     
-    def interpolation(ponto): #função que será retornada
+    individual_color = 'red'
+
+    def interpolation(ponto,plt = plot): #função que será retornada
+        '''
+        Essa função esta diretamente ligada a função original interpolação_de_hermite que a gerou, e seu resultado depende diretamente da função original
+
+
+        Parâmetros:
+            ponto (float): ponto x que será calculado o f(x)
+            plt: Determina se a função deve ou não plotar o ponto x (só funciona se na função interpolação de hermite o parametro: plot = True)
+        
+        Retorna:
+            float: Valor f(x)
+        '''
+        
+        
         soma = 0 #para os (x - x_i), que crecem assim como os pontos da lista x_duplicate
         hermite = 0 
         for i in coeficientes_hermite:# para cadaf[x_i]
@@ -116,7 +157,45 @@ def interpolação_de_hermite(x,y,plotar=False):
             hermite += mult*i # + f[x_0,...,x_i]*(x-x_0)^2 * ... (x - x_i)
             soma += 1
         
+        if plt: # se for pra plotar plota o ponto
+             ax.scatter([ponto],[hermite],color = individual_color,zorder = 2)
+
+
+
+
+
         return hermite
+
+    if plot: #plotagem
+            fig = plt.figure()
+            ax = fig.add_subplot()
+            ax.scatter(x,y,color = 'Black',label = 'Pontos Originais',zorder = 3) #plota os pontos originais
+            
+            inicio = min(x)
+            fim = max(x)
+            arranjo = 1
+            pontos_unidades = 100
+            interval = fim-inicio
+
+            if interval < 1: #se o intervalo for menor que 1 o linspace precisa ser modificado
+                print('A distância entre os pontos está bem pequena')
+                arranjo =10
+                pontos_unidades = 5
+                while (fim-inicio)*arranjo<10: #calcula o arranjo para que o pseudo intervalo possa ser gerado no linpace
+                    arranjo = arranjo*10
+            
+            cred =lambda x: x/arranjo #serve apenas para consertar o intervalo
+            xval = np.linspace(int(inicio*arranjo),int(fim*arranjo),int((interval)*arranjo)*pontos_unidades) #gera uma sequencia de x pontos entre a e b
+            xval = np.array(list(map(cred,xval))) # calcula os valores de x para plotar
+            yval = np.array(list(map(lambda x: interpolation(x,plt=False),xval))) #calcula os valores de y para plotar
+            ax.plot(xval,yval,label = 'Curva de Interpolação') #plota a curva
+            
+            #configuações da plotagem
+            ax.set_aspect('equal')
+            ax.grid(grid)
+            ax.plot([],[],'o', color = individual_color,label = 'Pontos Calculados')
+            ax.legend()
+
 
     return interpolation
 
