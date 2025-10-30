@@ -1,6 +1,11 @@
 import matplotlib.pyplot as plt
 import numpy as np
-def metodo_newton_raphson(função, tol):
+
+def metodo_newton_raphson(função, tol, plotar = False):
+    '''
+    Rhuan adicionar docstring com explicação.
+    '''
+
     def estimar_raiz(função):
         estimativa0 = 1
         iterações = 0
@@ -34,31 +39,32 @@ def metodo_newton_raphson(função, tol):
             print(f"Derivada nula em x = {estimativa}")
             return estimativa  
     
-    def newton_raphson(função, tol):
-        estimativa = estimar_raiz(função)
-        erros = [tol+1]
-        estimativas_tentadas = [estimativa]
-        max_iter = 100
-        iterações = 0
-        while erros.pop() > tol and iterações < max_iter:
-            nova_estimativa = metodo_nr(função, estimativa, tol)
-            erro = abs(nova_estimativa - estimativa)
-            erros.append(erro)
-            estimativa = nova_estimativa
-            estimativas_tentadas.append(estimativa)
-            iterações += 1
-        if iterações == max_iter:
-            print("O método não convergiu")
+    
+    estimativa = estimar_raiz(função)
+    erros = [tol+1]
+    estimativas_tentadas = [estimativa]
+    max_iter = 100
+    iterações = 0
+    while erros.pop() > tol and iterações < max_iter:
+        nova_estimativa = metodo_nr(função, estimativa, tol)
+        erro = abs(nova_estimativa - estimativa)
+        erros.append(erro)
+        estimativa = nova_estimativa
+        estimativas_tentadas.append(estimativa)
+        iterações += 1
+    if iterações == max_iter:
+        print("O método não convergiu")
 
-            # --- Parte gráfica ---
+
+    x0 = estimativas_tentadas[0]
+    xf = estimativas_tentadas[-1]
+    raiz = xf
         
+    if plotar:
         f = função
         df = derivar(f, tol)
 
         # Ponto inicial e final
-        x0 = estimativas_tentadas[0]
-        xf = estimativas_tentadas[-1]
-        raiz = xf
         y0 = f(x0)
         yf = f(xf)
 
@@ -96,13 +102,9 @@ def metodo_newton_raphson(função, tol):
         plt.grid(True)
         plt.show()
 
-        return raiz
+    return raiz
+    
+if __name__ == '__main__':
+    print(metodo_newton_raphson.__doc__)
 
-    #testes
-
-    função = lambda x: x**2 - 9*x + 5
-    tol = 1/100
-    newton_raphson(função, tol)
-
-    return f'valor calculado foi {newton_raphson(função, tol)}'
 
