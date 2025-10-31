@@ -107,4 +107,22 @@ def metodo_newton_raphson(função, tol, plotar = False):
 if __name__ == '__main__':
     print(metodo_newton_raphson.__doc__)
 
+def bissecao(f, a, b, tol):
+    if f(a) * f(b) >= 0:
+        raise ValueError("f(a) e f(b) devem ter sinais opostos.")
+    iter = 0
+    while abs(a-b)>tol:
+        c = (a + b)/2
+        if f(c)*f(a)<0:
+            b = c
+        elif f(c)*f(b)<0:
+            a = c
+        else:
+            return c
+        iter += 1
+    return ((a+b)/2)
+# Exemplo de uso:
+f =  lambda x: x**3 - 9*x + 5
+raiz = bissecao(f, 0, 2, 10**(-6))
+print('A raiz encontrada pelo método da bisseção é: ', raiz)
 
