@@ -110,7 +110,6 @@ if __name__ == '__main__':
 def bissecao(f, a, b, tol):
     if f(a) * f(b) >= 0:
         raise ValueError("f(a) e f(b) devem ter sinais opostos.")
-    iter = 0
     while abs(a-b)>tol:
         c = (a + b)/2
         if f(c)*f(a)<0:
@@ -119,10 +118,27 @@ def bissecao(f, a, b, tol):
             a = c
         else:
             return c
-        iter += 1
     return ((a+b)/2)
+
 # Exemplo de uso:
 f =  lambda x: x**3 - 9*x + 5
 raiz = bissecao(f, 0, 2, 10**(-6))
 print('A raiz encontrada pelo método da bisseção é: ', raiz)
 
+def secante(f, x0, x1, tol):
+    while abs(x0-x1)>=tol:
+        if f(x1) != f(x0):
+            x2 = x1 - (f(x1)*(x1-x0))/(f(x1)-f(x0))
+            x0 = x1
+            x1 = x2
+        else:
+            if f(x1) == 0:
+                return x1
+            else:
+                print('f(x1) e f(x0) não podem ser iguais')
+    return x1
+
+# exemplo de uso
+f =  lambda x: x**3 - 9*x + 5
+raiz = secante(f, 0, 2, 10**(-6))
+print('A raiz encontrada pelo método da secante é: ', raiz)
