@@ -104,10 +104,13 @@ def metodo_newton_raphson(função, tol, plotar = False):
 
     return raiz
     
-if __name__ == '__main__':
-    print(metodo_newton_raphson.__doc__)
 
-def bissecao(f, a, b, tol):
+
+
+def bissecao(f, a, b, tol, plotar = False):
+    '''
+    Adicionar docstring explicativa
+    '''
     if f(a) * f(b) >= 0:
         raise ValueError("f(a) e f(b) devem ter sinais opostos.")
     while abs(a-b)>tol:
@@ -118,14 +121,19 @@ def bissecao(f, a, b, tol):
             a = c
         else:
             return c
+        
+    if plotar:
+        #adicionar código de plotagem
+        pass
+
+    
     return ((a+b)/2)
 
-# Exemplo de uso:
-f =  lambda x: x**3 - 9*x + 5
-raiz = bissecao(f, 0, 2, 10**(-6))
-print('A raiz encontrada pelo método da bisseção é: ', raiz)
 
-def secante(f, x0, x1, tol):
+def secante(f, x0, x1, tol, plotar= False):
+    '''
+    Adicionar docstring explicativa
+    '''
     while abs(x0-x1)>=tol:
         if f(x1) != f(x0):
             x2 = x1 - (f(x1)*(x1-x0))/(f(x1)-f(x0))
@@ -136,9 +144,15 @@ def secante(f, x0, x1, tol):
                 return x1
             else:
                 print('f(x1) e f(x0) não podem ser iguais')
+
+    if plotar:
+        #adicionar código de plotagem
+        pass
+
     return x1
 
-# exemplo de uso
-f =  lambda x: x**3 - 9*x + 5
-raiz = secante(f, 0, 2, 10**(-6))
-print('A raiz encontrada pelo método da secante é: ', raiz)
+
+if __name__ == '__main__':
+    print(metodo_newton_raphson.__doc__)
+    print(bissecao.__doc__)
+    print(secante.__doc__)
