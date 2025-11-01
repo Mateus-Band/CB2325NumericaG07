@@ -3,7 +3,6 @@ import matplotlib.pyplot as plt
 import sympy as sp
 from functools import reduce
 import math
-import copy
 
 # Função de Ajuste Linear
 
@@ -59,7 +58,6 @@ def ajuste_linear(valores_x:list, valores_y:list, plt_grafico: bool = True):
         plt.show()
 
     return a, b
-
 
 # Função de Ajuste Polinomial
 
@@ -131,7 +129,6 @@ def ajuste_polinomial(valores_x: list, valores_y: list, grau_pol: int, plt_grafi
     # Retornar os coeficientes (lista_coeficientes)
 
     return lista_coeficientes
-
 
 # Função de Ajuste Senoidal
 
@@ -345,7 +342,6 @@ def ajuste_multiplo(valores_variaveis:list, valores_z:list):
         expr += coeficientes_list[i + 1]*x[i]
     
     print(f"Função Aproximadora para Regressão Múltipla: {expr}")
-
 
 # Função de Melhor Ajuste
 
