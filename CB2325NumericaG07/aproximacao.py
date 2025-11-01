@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import sympy as sp
 from functools import reduce
 import math
+import copy
 
 # Função de Ajuste Linear
 
@@ -344,3 +345,165 @@ def ajuste_multiplo(valores_variaveis:list, valores_z:list):
         expr += coeficientes_list[i + 1]*x[i]
     
     print(f"Função Aproximadora para Regressão Múltipla: {expr}")
+
+
+# Função de Melhor Ajuste
+
+def melhor_ajuste(valores_x: list, valores_y: list, criterio: str, mostrar_todos: bool = True, plt_grafico: bool = True):
+
+    n = len(valores_x)
+
+    # Obter os parâmetros dos ajustes linear, polinomial (grau 2 a 10), senoidal e exponencial
+
+    funcs = dict()
+
+    funcs["linear"] = {"params": [par for par in ajuste_linear(valores_x, valores_y, plt_grafico=False)]}
+
+    for grau in range(2, 11):
+        funcs[f"polinomial grau {grau}"] = {"params": ajuste_polinomial(valores_x, valores_y, grau, plt_grafico=False, expr=False)}
+    
+    funcs["senoidal"] = {"params": ajuste_senoidal(valores_x, valores_y, plt_grafico=False, expr=False)}
+
+    funcs["exponencial"] = {"params": [par for par in ajuste_exponencial(valores_x, valores_y, plt_grafico=False)]}
+
+    # Calcular SST
+
+    valores_y = np.array(valores_y)
+    media_y = np.mean(valores_y)
+
+    copia_y = valores_y.copy()
+
+    SST = np.sum((copia_y - media_y)**2)
+
+    # Ajuste Linear
+
+    # Ajuste Linear - Calcular SSR
+
+    y_lin = np.array(funcs["linear"]["params"][0]*valores_x + funcs["linear"]["params"][1])
+
+    SSR_lin = np.sum((copia_y - y_lin)**2)
+
+    funcs["linear"]["SSR"] = SSR_lin
+
+    # Ajustes Polinomiais
+
+    x_sym = sp.Symbol("x")
+
+    for i in range(2, 11):
+
+        # Ajustes Polinomiais - Calcular SSR
+
+        func_aprox = 0
+
+        for j in range(i):
+            func_aprox += funcs[f"polinomial grau {i}"]["params"][j]*x_sym**j
+
+        f_pol = sp.lambdify(x_sym, func_aprox, "numpy")
+        y_pol = np.array(f_pol(valores_x))
+
+        # Ajustes Polinomiais - Calcular SSR
+
+        SSR_pol = np.sum((copia_y - y_pol)**2)
+        funcs[f"polinomial grau {i}"]["SSR"] = SSR_pol
+
+    # Ajuste Senoidal
+
+    A, B, C, D = funcs["senoidal"]["params"][0], funcs["senoidal"]["params"][1], funcs["senoidal"]["params"][2], funcs["senoidal"]["params"][3]
+
+    ff_sin = A*sp.sin(B*x_sym + D) + C
+    f_sin = sp.lambdify(x_sym, ff_sin, "numpy")
+
+    y_sin = np.array(f_sin(valores_x))
+
+    # Ajuste Senoidal - Calcular SSR
+
+    SSR_sin = np.sum((copia_y - y_sin)**2)
+
+    funcs["senoidal"]["SSR"] = SSR_sin
+
+    # Ajuste Exponencial
+
+    a, b = funcs["exponencial"]["params"][0], funcs["exponencial"]["params"][1]
+
+    y_exp = np.array(b*np.exp(a*valores_x))
+
+    # Ajuste Exponencial - Calcular SSR
+
+    SSR_exp = np.sum((copia_y - y_exp)**2)
+
+    funcs["exponencial"]["SSR"] = SSR_exp
+
+    # R^2, R^2 ajustado, AIC e BIC para Ajustes Linear, Senoidal, Exponencial e Polinomiais
+
+    lista_ajustes = ["linear", "senoidal", "exponencial"] + [f"polinomial grau {i}" for i in range(2, 11)]
+
+    for ajuste in lista_ajustes:
+
+        if ajuste == "linear" or ajuste == "exponencial":
+            p = 2
+        elif ajuste == "senoidal":
+            p = 3
+        else:
+            grau = int(ajuste.split()[-1])
+            
+            if grau !=0:
+                p = grau + 1
+            else:
+                p = 11
+        
+        # Calcular R^2
+
+        SSR = funcs[ajuste]["SSR"]
+
+        R2 = 1 - (SSR/SST)
+        funcs[ajuste]["R2"] = R2
+
+        # Calcular R^2 Ajustado
+
+        R2A = 1 - ((1 - R2) * (n - 1)/(n - 1 - p))
+        funcs[ajuste]["R2A"] = R2A
+
+        # Calcular AIC
+
+        AIC = n * np.log(SSR / n) + 2 * p
+        funcs[ajuste]["AIC"] = AIC
+
+        # Calcular BIC
+
+        BIC = n * np.log(SSR / n) + p*np.log(n)
+        funcs[ajuste]["BIC"] = BIC
+    
+    if criterio == "R2":
+        funcs_ordenadas = dict(sorted(funcs.items(), key=lambda item: item[1][criterio], reverse=True))
+    elif criterio == "R2A":
+        funcs_ordenadas = dict(sorted(funcs.items(), key=lambda item: item[1][criterio], reverse=True))
+    elif criterio == "AIC":
+        funcs_ordenadas = dict(sorted(funcs.items(), key=lambda item: item[1][criterio]))
+    elif criterio == "BIC":
+        funcs_ordenadas = dict(sorted(funcs.items(), key=lambda item: item[1][criterio]))
+    
+    aprox_escolhida = next(iter(funcs_ordenadas))
+    
+    print(f"A sugestão de aproximação para o critério escolhido é {aprox_escolhida}")
+
+    if mostrar_todos:
+        print(f"R2: {funcs[aprox_escolhida]['R2']}")
+        print(f"R2 Ajustado: {funcs[aprox_escolhida]['R2A']}")
+        print(f"AIC: {funcs[aprox_escolhida]['AIC']}")
+        print(f"BIC: {funcs[aprox_escolhida]['BIC']}")
+
+    if plt_grafico:
+        if aprox_escolhida == "linear":
+            ajuste_linear(valores_x, valores_y, plt_grafico=True)
+        elif aprox_escolhida == "senoidal":
+            ajuste_senoidal(valores_x, valores_y, plt_grafico=True, expr=False)
+        elif aprox_escolhida == "exponencial":
+            ajuste_exponencial(valores_x, valores_y, plt_grafico=True)
+        else:
+            if aprox_escolhida[-1] != "0":
+                grau = int(aprox_escolhida[-1])
+                ajuste_polinomial(valores_x, valores_y, grau, plt_grafico=True, expr=False)
+            else:
+                ajuste_polinomial(valores_x, valores_y, 10, plt_grafico=True, expr=False)
+    
+    return aprox_escolhida
