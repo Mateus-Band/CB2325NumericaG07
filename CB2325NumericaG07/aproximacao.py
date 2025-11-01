@@ -361,14 +361,11 @@ def melhor_ajuste(valores_x: list, valores_y: list, criterio: str, mostrar_todos
 
     for grau in range(2, 11):
         funcs[f"polinomial grau {grau}"] = {"params": ajuste_polinomial(valores_x, valores_y, grau, plt_grafico=False, expr=False)}
-    
-    funcs["senoidal"] = {"params": ajuste_senoidal(valores_x, valores_y, plt_grafico=False, expr=False)}
-
-    funcs["exponencial"] = {"params": [par for par in ajuste_exponencial(valores_x, valores_y, plt_grafico=False)]}
 
     # Calcular SST
 
     valores_y = np.array(valores_y)
+    valores_x = np.array(valores_x)
     media_y = np.mean(valores_y)
 
     copia_y = valores_y.copy()
@@ -406,43 +403,14 @@ def melhor_ajuste(valores_x: list, valores_y: list, criterio: str, mostrar_todos
         SSR_pol = np.sum((copia_y - y_pol)**2)
         funcs[f"polinomial grau {i}"]["SSR"] = SSR_pol
 
-    # Ajuste Senoidal
+    # R^2, R^2 ajustado, AIC e BIC para Ajustes e Polinomiais
 
-    A, B, C, D = funcs["senoidal"]["params"][0], funcs["senoidal"]["params"][1], funcs["senoidal"]["params"][2], funcs["senoidal"]["params"][3]
-
-    ff_sin = A*sp.sin(B*x_sym + D) + C
-    f_sin = sp.lambdify(x_sym, ff_sin, "numpy")
-
-    y_sin = np.array(f_sin(valores_x))
-
-    # Ajuste Senoidal - Calcular SSR
-
-    SSR_sin = np.sum((copia_y - y_sin)**2)
-
-    funcs["senoidal"]["SSR"] = SSR_sin
-
-    # Ajuste Exponencial
-
-    a, b = funcs["exponencial"]["params"][0], funcs["exponencial"]["params"][1]
-
-    y_exp = np.array(b*np.exp(a*valores_x))
-
-    # Ajuste Exponencial - Calcular SSR
-
-    SSR_exp = np.sum((copia_y - y_exp)**2)
-
-    funcs["exponencial"]["SSR"] = SSR_exp
-
-    # R^2, R^2 ajustado, AIC e BIC para Ajustes Linear, Senoidal, Exponencial e Polinomiais
-
-    lista_ajustes = ["linear", "senoidal", "exponencial"] + [f"polinomial grau {i}" for i in range(2, 11)]
+    lista_ajustes = ["linear"] + [f"polinomial grau {i}" for i in range(2, 11)]
 
     for ajuste in lista_ajustes:
 
-        if ajuste == "linear" or ajuste == "exponencial":
+        if ajuste == "linear":
             p = 2
-        elif ajuste == "senoidal":
-            p = 3
         else:
             grau = int(ajuste.split()[-1])
             
@@ -495,10 +463,6 @@ def melhor_ajuste(valores_x: list, valores_y: list, criterio: str, mostrar_todos
     if plt_grafico:
         if aprox_escolhida == "linear":
             ajuste_linear(valores_x, valores_y, plt_grafico=True)
-        elif aprox_escolhida == "senoidal":
-            ajuste_senoidal(valores_x, valores_y, plt_grafico=True, expr=False)
-        elif aprox_escolhida == "exponencial":
-            ajuste_exponencial(valores_x, valores_y, plt_grafico=True)
         else:
             if aprox_escolhida[-1] != "0":
                 grau = int(aprox_escolhida[-1])
