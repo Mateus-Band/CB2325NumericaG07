@@ -105,9 +105,7 @@ def metodo_newton_raphson(função, tol, plotar = False):
     return raiz
     
 
-
-
-def bissecao(f, a, b, tol, plotar = False):
+def metodo_bissecao(f, a, b, tol, plotar = False):
     '''
     Adicionar docstring explicativa
     '''
@@ -130,29 +128,45 @@ def bissecao(f, a, b, tol, plotar = False):
     return ((a+b)/2)
 
 
-def secante(f, x0, x1, tol, plotar= False):
+def metodo_secante(f, x0, x1, tol, plotar= False):
     '''
     Adicionar docstring explicativa
     '''
+    historico = [x0, x1]
     while abs(x0-x1)>=tol:
-        if f(x1) != f(x0):
-            x2 = x1 - (f(x1)*(x1-x0))/(f(x1)-f(x0))
-            x0 = x1
-            x1 = x2
+      if f(x1) != f(x0):
+        x2 = x1 - (f(x1)*(x1-x0))/(f(x1)-f(x0))
+        historico.append(x2)
+        x0 = x1
+        x1 = x2
+      else:
+        if f(x1) == 0:
+          return x1
         else:
-            if f(x1) == 0:
-                return x1
-            else:
-                print('f(x1) e f(x0) não podem ser iguais')
+          raise ValueError('f(x1) e f(x0) não podem ser iguais')
 
     if plotar:
-        #adicionar código de plotagem
-        pass
+      x_min = min(historico) - 0.5
+      x_max = max(historico) + 0.5
+      x_curva = np.linspace(x_min , x_max , 100)
+      y_curva = f(x_curva)
+      plt.plot(x_curva, y_curva, label="f(x)")
 
+      plt.axhline(0, color='black', linewidth=1)
+
+      y_historico = f(np.array(historico))
+      plt.scatter(historico, y_historico, color='red', zorder=5, label="Iterações")
+
+      plt.title("Método da Secante")
+      plt.xlabel("x")
+      plt.ylabel("f(x)")
+      plt.legend()
+      plt.grid(True)
+      plt.show()
     return x1
 
 
 if __name__ == '__main__':
     print(metodo_newton_raphson.__doc__)
-    print(bissecao.__doc__)
-    print(secante.__doc__)
+    print(metodo_bissecao.__doc__)
+    print(metodo_secante.__doc__)
