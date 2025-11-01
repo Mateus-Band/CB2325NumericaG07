@@ -380,6 +380,8 @@ def melhor_ajuste(valores_x: list, valores_y: list, criterio: str, mostrar_todos
 
     SSR_lin = np.sum((copia_y - y_lin)**2)
 
+    SSR_lin = max(SSR_lin, 1e-12)
+
     funcs["linear"]["SSR"] = SSR_lin
 
     # Ajustes Polinomiais
@@ -401,6 +403,7 @@ def melhor_ajuste(valores_x: list, valores_y: list, criterio: str, mostrar_todos
         # Ajustes Polinomiais - Calcular SSR
 
         SSR_pol = np.sum((copia_y - y_pol)**2)
+        SSR_pol = max(SSR_pol, 1e-12)
         funcs[f"polinomial grau {i}"]["SSR"] = SSR_pol
 
     # R^2, R^2 ajustado, AIC e BIC para Ajustes e Polinomiais
@@ -411,6 +414,7 @@ def melhor_ajuste(valores_x: list, valores_y: list, criterio: str, mostrar_todos
 
         if ajuste == "linear":
             p = 2
+
         else:
             grau = int(ajuste.split()[-1])
             
@@ -428,13 +432,18 @@ def melhor_ajuste(valores_x: list, valores_y: list, criterio: str, mostrar_todos
 
         # Calcular R^2 Ajustado
 
-        R2A = 1 - ((1 - R2) * (n - 1)/(n - 1 - p))
+        R2A = 1 - ((1 - R2) * (n - 1)/(n - p - 1))
         funcs[ajuste]["R2A"] = R2A
 
         # Calcular AIC
 
         AIC = n * np.log(SSR / n) + 2 * p
         funcs[ajuste]["AIC"] = AIC
+
+        # Calcular AICc
+
+        AICc = AIC + (2*p*(p+1))/(n - p - 1)
+        funcs[ajuste]["AICc"] = AICc
 
         # Calcular BIC
 
@@ -447,18 +456,23 @@ def melhor_ajuste(valores_x: list, valores_y: list, criterio: str, mostrar_todos
         funcs_ordenadas = dict(sorted(funcs.items(), key=lambda item: item[1][criterio], reverse=True))
     elif criterio == "AIC":
         funcs_ordenadas = dict(sorted(funcs.items(), key=lambda item: item[1][criterio]))
+    elif criterio == "AICc":
+        funcs_ordenadas = dict(sorted(funcs.items(), key=lambda item: item[1][criterio]))
     elif criterio == "BIC":
         funcs_ordenadas = dict(sorted(funcs.items(), key=lambda item: item[1][criterio]))
     
     aprox_escolhida = next(iter(funcs_ordenadas))
     
     print(f"A sugestão de aproximação para o critério escolhido é {aprox_escolhida}")
+    print(f"{criterio}: {funcs[aprox_escolhida][criterio]}")
 
     if mostrar_todos:
-        print(f"R2: {funcs[aprox_escolhida]['R2']}")
-        print(f"R2 Ajustado: {funcs[aprox_escolhida]['R2A']}")
-        print(f"AIC: {funcs[aprox_escolhida]['AIC']}")
-        print(f"BIC: {funcs[aprox_escolhida]['BIC']}")
+        lista_criterios = [c for c in ["R2", "R2A", "AIC", "AICc", "BIC"] if c != criterio]
+        for crit in lista_criterios:
+            if crit == "R2A":
+                print(f"R2 Ajustado: {funcs[aprox_escolhida][crit]}")
+            else:
+                print(f"{crit}: {funcs[aprox_escolhida][crit]}")
 
     if plt_grafico:
         if aprox_escolhida == "linear":
