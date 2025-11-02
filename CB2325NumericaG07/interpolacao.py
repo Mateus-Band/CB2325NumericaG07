@@ -325,6 +325,76 @@ if __name__ == '__main__':
     print(interpolacao_polinomial.__doc__)
 
 
+def interpolacao_linear_por_partes(x_vals:list, y_vals:list, plotar = False, x_test= None):
+    """
+    Função que recebe uma lista x de abscissas, uma lista y de ordenadas, um
+    possível True para plotar um gráfico com os pontos recebidos e a interpolação 
+    linear por partes e um possível valor x_test para descobrir o valor de f(x_test)
+    a partir da interpolação. E retorna uma lista com os polinômios lineares,
+    podendo também plotar o gráfico e retornar o valor de f(x_text) junto aos
+    polinômios se receber True para plotar e algum valor para x_text.
+    """
+
+    n = len(x_vals)
+    tuplas = [(x_vals[i], y_vals[i]) for i in range(n)] 
+    tuplas_ord = sorted(tuplas, key=lambda x: x[0]) 
+    # É feita a ordenação das coordenadas recebidas em ordem crescente considerando
+    # as abscissas, pois não se sabe se o usuário indicará nesta ordem. 
+    x_vals = [tuplas_ord[i][0] for i in range(n)]
+    y_vals = [tuplas_ord[i][1] for i in range(n)]
+    lista_poli = []
+
+    x_sym = sympy.Symbol('x')
+    for i in range(n - 1):
+        poli = y_vals[i] + ((y_vals[i+1] - y_vals[i])/(x_vals[i+1] - x_vals[i])) * (x_sym - x_vals[i]) #Calcula o polinômio linear entre dois pontos consecutivos.
+        lista_poli.append(poli)
+
+    def p(x):
+        '''
+        Função que recebe um valor x e retorna o valor de f(x) a partir da interpolação se 
+        ele não for nem menor do que o primeiro e nem maior do que o último porque não é
+        possível calcular nestes casos.
+        '''
+        if x < x_vals[0] or x > x_vals[n-1]:
+            return "Fora do intervalo. Tente outro valor!"
+        else:
+            for i in range(n - 1):
+                if x >= x_vals[i] and x <= x_vals[i+1]:
+                    return y_vals[i] + ((y_vals[i+1] - y_vals[i])/(x_vals[i+1] - x_vals[i])) * (x - x_vals[i])
+
+    if plotar: #Plota o gráfico com os pontos recebidos e a interpolação linear por partes se plotar = True. 
+        plt.figure(figsize=(10, 6))
+        plt.plot(x_vals, y_vals, 'o', label='Pontos Originais')
+
+        x_sym = sympy.Symbol('x')
+        for i in range(n - 1):
+            poli = lista_poli[i]
+            poli_func = sympy.lambdify(x_sym, poli, 'numpy')
+            x_values = np.linspace(x_vals[i], x_vals[i+1], 100)
+            y_values = poli_func(x_values)
+            plt.plot(x_values, y_values, label=f'Polinômio linear {i+1}')
+
+        plt.xlabel('x')
+        plt.ylabel('y')
+        plt.title('Interpolação Linear por Partes')
+        plt.legend()
+        plt.grid(True)
+        plt.show()
+
+    if x_test: # Calcula f(x_test) e o retorna junto com os polinômios se receber algum valor para x_test.
+        return lista_poli, p(x_test)
+    
+    return lista_poli #Caso não receba um valor para x_test, retorna apenas a lista de polinômios.
+
+if __name__ == '__main__':
+    print(interpolacao_linear_por_partes.__doc__ + '\n')
+    
+    x = [2, 4, 10, 9, 7]
+    y = [1, 5, 4, 2, 3]
+    pols, y = interpolacao_linear_por_partes(x, y, True, 3)
+
+    print(f'Polinômios lineares encontrados: {pols}. \nf do ponto especificado: {y}')
+
 
 
 
