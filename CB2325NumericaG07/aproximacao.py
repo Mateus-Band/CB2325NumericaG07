@@ -507,7 +507,7 @@ def melhor_ajuste(valores_x: list[float], valores_y: list[float], criterio: str,
     print(f"Modelo sugerido: Aproximação {aprox_escolhida}")
     print(f"{criterio}: {funcs[aprox_escolhida][criterio]:.6f}\n")
 
-    # Exibir todos o valor de todos os critérios da aproximação escolhida
+    # Exibir todos o valores de todos os critérios da aproximação escolhida
 
     if exibir_todos:
         lista_criterios = [c for c in ["R2", "R2A", "AIC", "AICc", "BIC"] if c != criterio]
