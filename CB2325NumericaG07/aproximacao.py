@@ -319,7 +319,7 @@ def ajuste_multiplo(valores_var: list[list[float]], valores_z: list[float], expr
         expr (bool, opcional): Se True (padrão), exibe a função simbólica aproximadora; se False, não exibe.
 
     Retorna:
-        NDArray[np.float64]: array_coeficientes, contendo os coeficientes da função múltipla na ordem em que as variáveis foram apresentadas em valores_var.
+        numpy.ndarray: array_coeficientes, contendo os coeficientes da função múltipla na ordem em que as variáveis foram apresentadas em valores_var.
     """
 
     # Construir a matriz de valores das variáveis (x_matriz)
