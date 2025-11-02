@@ -491,15 +491,9 @@ def melhor_ajuste(valores_x: list[float], valores_y: list[float], criterio: str,
     
     # Encontrar a aproximação mais adequada com base no critério escolhido
     
-    if criterio == "R2":
+    if criterio == "R2" or criterio == "R2A":
         funcs_ordenadas = dict(sorted(funcs.items(), key=lambda item: item[1][criterio], reverse=True))
-    elif criterio == "R2A":
-        funcs_ordenadas = dict(sorted(funcs.items(), key=lambda item: item[1][criterio], reverse=True))
-    elif criterio == "AIC":
-        funcs_ordenadas = dict(sorted(funcs.items(), key=lambda item: item[1][criterio]))
-    elif criterio == "AICc":
-        funcs_ordenadas = dict(sorted(funcs.items(), key=lambda item: item[1][criterio]))
-    elif criterio == "BIC":
+    elif criterio == "AIC" or criterio == "AICc" or criterio == "BIC":
         funcs_ordenadas = dict(sorted(funcs.items(), key=lambda item: item[1][criterio]))
     
     aprox_escolhida = next(iter(funcs_ordenadas))
