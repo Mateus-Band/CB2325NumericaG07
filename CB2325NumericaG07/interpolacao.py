@@ -320,10 +320,6 @@ def interpolacao_polinomial(tupla_de_pontos, plotar = False) -> sp.Expr:
         # para a forma padrão de um polinômio (e.g., a_n*x^n + a_{n-1}*x^{n-1} + . . . + a_1*x + a_0).
         return polinomio_simplificado
 
-if __name__ == '__main__':
-    print(interpolacao_de_hermite.__doc__)
-    print(interpolacao_polinomial.__doc__)
-
 
 def interpolacao_linear_por_partes(x_vals:list, y_vals:list, plotar = False, x_test= None):
     """
@@ -344,7 +340,7 @@ def interpolacao_linear_por_partes(x_vals:list, y_vals:list, plotar = False, x_t
     y_vals = [tuplas_ord[i][1] for i in range(n)]
     lista_poli = []
 
-    x_sym = sympy.Symbol('x')
+    x_sym = sp.Symbol('x')
     for i in range(n - 1):
         poli = y_vals[i] + ((y_vals[i+1] - y_vals[i])/(x_vals[i+1] - x_vals[i])) * (x_sym - x_vals[i]) #Calcula o polinômio linear entre dois pontos consecutivos.
         lista_poli.append(poli)
@@ -366,10 +362,10 @@ def interpolacao_linear_por_partes(x_vals:list, y_vals:list, plotar = False, x_t
         plt.figure(figsize=(10, 6))
         plt.plot(x_vals, y_vals, 'o', label='Pontos Originais')
 
-        x_sym = sympy.Symbol('x')
+        x_sym = sp.Symbol('x')
         for i in range(n - 1):
             poli = lista_poli[i]
-            poli_func = sympy.lambdify(x_sym, poli, 'numpy')
+            poli_func = sp.lambdify(x_sym, poli, 'numpy')
             x_values = np.linspace(x_vals[i], x_vals[i+1], 100)
             y_values = poli_func(x_values)
             plt.plot(x_values, y_values, label=f'Polinômio linear {i+1}')
@@ -387,13 +383,9 @@ def interpolacao_linear_por_partes(x_vals:list, y_vals:list, plotar = False, x_t
     return lista_poli #Caso não receba um valor para x_test, retorna apenas a lista de polinômios.
 
 if __name__ == '__main__':
-    print(interpolacao_linear_por_partes.__doc__ + '\n')
-    
-    x = [2, 4, 10, 9, 7]
-    y = [1, 5, 4, 2, 3]
-    pols, y = interpolacao_linear_por_partes(x, y, True, 3)
-
-    print(f'Polinômios lineares encontrados: {pols}. \nf do ponto especificado: {y}')
+    print(interpolacao_de_hermite.__doc__ + '\n')
+    print(interpolacao_polinomial.__doc__ + '\n')
+    print(interpolacao_linear_por_partes.__doc__)
 
 
 
