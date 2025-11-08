@@ -21,6 +21,11 @@ def ajuste_linear(valores_x:list, valores_y:list, plt_grafico: bool = True):
         tuple: (a, b), contendo o coeficiente angular (a) e o coeficiente linear (b) da reta de ajuste.
     '''
 
+    # Verifica se o tamanho da lista dos valores de x e valores de y é igual
+
+    if len(valores_x) != len(valores_y):
+        raise ValueError("As listas 'valores_x' e 'valores_y' devem ter o mesmo tamanho.")
+
     # Cálculo do valor médio de x e y
 
     x_medio = reduce(lambda x, y: x + y, valores_x)/len(valores_x)
@@ -279,6 +284,17 @@ def ajuste_exponencial(valores_x:list, valores_y:list, plt_grafico: bool = True)
         tuple: (a, b), contendo o coeficiente do expoente (a) e o coeficiente multiplicativo (b) da curva de ajuste.
     '''
 
+    # Verifica se o tamanho da lista dos valores de x e valores de y é igual
+
+    if len(valores_x) != len(valores_y):
+        raise ValueError("As listas 'valores_x' e 'valores_y' devem ter o mesmo tamanho.")
+    
+    # Verifica se os valores de y são positivos
+
+    for y in valores_y:
+        if y <= 0:
+            raise ValueError("A lista de valores de y possui valor(es) não postivos(s).")
+
     # Transforma o ajuste exponencial em um ajuste linear
 
     ln_valores_y = [math.log(y) for y in valores_y]
@@ -295,6 +311,61 @@ def ajuste_exponencial(valores_x:list, valores_y:list, plt_grafico: bool = True)
         plt.plot(x_func, y_func, color="black", linewidth=2, label="Curva de Ajuste Exponencial")
 
         plt.title("Gráfico do Ajuste Exponencial")
+        plt.xlabel("Eixo x")
+        plt.ylabel("Eixo y")
+        plt.margins(x=0.1, y=0.1)
+        plt.grid(True)
+        plt.legend()
+        plt.show()
+
+    return a, b
+
+# Função de Ajuste Logaritimo
+
+def ajuste_logaritmo(valores_x:list, valores_y:list, plt_grafico: bool = True):
+    '''
+    Calcula o ajuste logaritmo y = a + b * ln(x) para os dados (valores_x, valores_y) pela linearização do modelo (y = a + b*x', onde x' = ln(x)) e
+    aplica o Método dos Mínimos Quadrados sobre os dados transformados por meio da função de ajuste linear.
+
+    Além disso, a função exibe um gráfico de dispersão dos pontos e da curva de ajuste.
+
+    Argumentos:
+        valores_x (list): Lista de valores da variável independente.
+        valores_y (list): Lista de valores da variável dependente.
+        plt_grafico (bool, opcional): True (padrão) se o gráfico deve ser plotado, False caso contrário
+
+    Retorna:
+        tuple: (a, b), contendo o coeficiente (a) e o coeficiente logarítmico (b) da curva de ajuste.
+    '''
+
+    # Verifica se o tamanho da lista dos valores de x e valores de y é igual
+
+    if len(valores_x) != len(valores_y):
+        raise ValueError("As listas 'valores_x' e 'valores_y' devem ter o mesmo tamanho.")
+    
+    # Verifica se os valores de x são positivos
+
+    for x in valores_x:
+        if x <= 0:
+            raise ValueError("A lista de valores de x possui valor(es) não positivos(s).")
+
+    # Transforma o ajuste logaritmo em um ajuste linear
+
+    ln_valores_x = [math.log(x) for x in valores_x]
+    b, a = ajuste_linear(ln_valores_x, valores_y, False)
+
+    # Plot do gráfico
+
+    if plt_grafico:
+        plt.figure()
+        
+        x_func = np.linspace(min(valores_x), max(valores_x), 200)
+        y_func = a + b * np.log(x_func)
+
+        plt.scatter(valores_x, valores_y, color="blue", marker="o", label="Dados Fornecidos")
+        plt.plot(x_func, y_func, color="black", linewidth=2, label="Curva de Ajuste Logaritmo")
+
+        plt.title("Gráfico do Ajuste Logaritmo")
         plt.xlabel("Eixo x")
         plt.ylabel("Eixo y")
         plt.margins(x=0.1, y=0.1)
