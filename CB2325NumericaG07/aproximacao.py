@@ -575,22 +575,21 @@ def avaliar_ajuste(
 
 # Função de Melhor Ajuste
 
-def melhor_ajuste(valores_x: list[float], valores_y: list[float], criterio: str, exibir_todos: bool = False, plt_grafico: bool = False):
+def melhor_ajuste(valores_x: list[float], valores_y: list[float], criterio: str, exibir_todos: bool = False, plt_grafico: bool = False, expr: bool = False):
     """
     Fornece o melhor ajuste (linear ou polinomial) para a variável dependente valores_y a partir dos dados valores_x.
 
-    A função calcula a Soma dos Quadrados Totais (SST) e encontra os ajustes linear e polinomial (grau 2 a 10)
-    a partir das funções ajuste_linear e ajuste_polinomial. Além disso, calcula seus respectivos valores de 
-    Soma dos Quadrados dos Resíduos (SSE).
+    A função encontra os ajustes linear e polinomial (grau 2 a 10) a partir das funções ajuste_linear e ajuste_polinomial. 
+    Além disso, calcula seus respectivos valores de Soma dos Quadrados dos Resíduos (SSE).
 
-    Após esses processos, a função calcula o R^2, R^2 ajustado, AIC, AICc e BIC, considerando que os resíduos do modelo seguem
-    uma distribuição normal com variância constante.
+    Após esses processos, a função calcula o R^2, R^2 ajustado, AIC, AICc e BIC através da função avaliar_ajuste,
+    considerando que os resíduos do modelo seguem uma distribuição normal com variância constante.
 
     Por fim, ela retorna o ajuste mais apropriado quanto ao critério escolhido e o valor deste para essa aproximação.
         Nesse sentido, se o critério é R^2 ou R^2 ajustado, é retornado o ajuste cujo valor para o critério é o maior.
         Já se o critério é AIC, AICc ou BIC, é retornado o ajuste cujo valor para o critério é o menor.
 
-    Opcionalmente, a função também exibe um gráfico de dispersão dos pontos com o polinômio/reta de ajuste junto à 
+    Opcionalmente, a função também exibe um gráfico de dispersão dos pontos com o polinômio/reta de ajuste e a 
     forma simbólica da expressão polinomial resultante (func_aprox). 
     Além disso, há também a opção de retornar os valores dos outros critérios para o ajuste sugerido.
 
@@ -600,6 +599,7 @@ def melhor_ajuste(valores_x: list[float], valores_y: list[float], criterio: str,
         criterio (str): Critério escolhido dentre as opções "R2", "R2A" (R^2 ajustado), "AIC", "AICc" e "BIC" para sugestão do modelo.
         exibir_todos (bool, opcional): Se True, exibe os valores dos outros critérios para o modelo sugerido; se False (padrão), não exibe.
         plt_grafico (bool, opcional): Se True, exibe o gráfico de ajuste; se False (padrão), não exibe.
+        expr (bool, opcional): Se True, exibe a função simbólica aproximadora sugerida; se False (padrão), não exibe.
 
     Retorna:
         str: aprox_escolhida, representando o nome do modelo escolhido ("linear" ou "polinomial grau N").
@@ -623,15 +623,10 @@ def melhor_ajuste(valores_x: list[float], valores_y: list[float], criterio: str,
     for grau in range(2, 11):
         funcs[f"polinomial grau {grau}"] = {"params": ajuste_polinomial(valores_x, valores_y, grau, plt_grafico=False, expr=False)}
 
-    # Calcular SST
+    # Encontrar os valores dos critérios
 
     valores_y = np.array(valores_y)
     valores_x = np.array(valores_x)
-
-    media_y = np.mean(valores_y)
-    copia_y = valores_y.copy()
-
-    SST = np.sum((copia_y - media_y)**2)
 
     # Ajuste Linear
 
@@ -639,7 +634,7 @@ def melhor_ajuste(valores_x: list[float], valores_y: list[float], criterio: str,
 
     y_lin = np.array(funcs["linear"]["params"][0]*valores_x + funcs["linear"]["params"][1])
 
-    SSE_lin = np.sum((copia_y - y_lin)**2)
+    SSE_lin = np.sum((valores_y - y_lin)**2)
     SSE_lin = max(SSE_lin, 1e-12) # Evita problemas no cálculo do log(SSE_lin / n) durante a obtenção dos valores dos critérios
 
     funcs["linear"]["SSE"] = SSE_lin
@@ -652,55 +647,25 @@ def melhor_ajuste(valores_x: list[float], valores_y: list[float], criterio: str,
 
         y_pol = np.polynomial.polynomial.polyval(valores_x, funcs[f"polinomial grau {i}"]["params"])
 
-        SSE_pol = np.sum((copia_y - y_pol)**2)
+        SSE_pol = np.sum((valores_y - y_pol)**2)
         SSE_pol = max(SSE_pol, 1e-12) # Evita problemas no cálculo do log(SSE_pol / n) durante a obtenção dos valores dos critérios
 
         funcs[f"polinomial grau {i}"]["SSE"] = SSE_pol
 
-    # Calcular R^2, R^2 ajustado, AIC, AICc e BIC para Ajustes Linear e Polinomiais
-
-    n = len(valores_x)
+    # Obter R^2, R^2 ajustado, AIC, AICc e BIC para Ajustes Linear e Polinomiais
 
     lista_ajustes = ["linear"] + [f"polinomial grau {i}" for i in range(2, 11)]
 
     for ajuste in lista_ajustes:
 
-        if ajuste == "linear":
-            p = 2
-
-        else:
-            grau = int(ajuste.split()[-1])     
-            p = grau + 1
+        mod = "linear" if ajuste == "linear" else "polinomial"
         
-        # Calcular R^2
-
-        SSE = funcs[ajuste]["SSE"]
-
-        R2 = 1 - (SSE/SST)
+        R2, R2A, AIC, AICc, BIC = avaliar_ajuste(valores_x, valores_y, "all", mod, funcs[ajuste]["params"])
+        
         funcs[ajuste]["R2"] = R2
-
-        # Calcular R^2 Ajustado
-
-        R2A = 1 - ((1 - R2) * (n - 1)/(n - p - 1))
         funcs[ajuste]["R2A"] = R2A
-
-        # Calcular AIC
-
-        AIC = n * np.log(SSE / n) + 2 * p
         funcs[ajuste]["AIC"] = AIC
-
-        # Calcular AICc
-
-        if n - p - 1 > 0:
-            AICc = AIC + (2*p*(p+1))/(n - p - 1)
-        else:
-            AICc = np.inf
-
         funcs[ajuste]["AICc"] = AICc
-
-        # Calcular BIC
-
-        BIC = n * np.log(SSE / n) + p*np.log(n)
         funcs[ajuste]["BIC"] = BIC
     
     # Encontrar a aproximação mais adequada com base no critério escolhido
@@ -727,12 +692,14 @@ def melhor_ajuste(valores_x: list[float], valores_y: list[float], criterio: str,
 
     # Plotar o gráfico e exibir a expressão simbólica da aproximação escolhida
 
-    if plt_grafico:
-        if aprox_escolhida == "linear":
-            ajuste_linear(valores_x, valores_y, plt_grafico=True)
-        else:
-            grau = int(aprox_escolhida.split()[-1])
-            ajuste_polinomial(valores_x, valores_y, grau, plt_grafico=True)
+    graf = True if plt_grafico else False
+    ff = True if expr else False
+
+    if aprox_escolhida == "linear":
+        ajuste_linear(valores_x, valores_y, plt_grafico=graf)
+    else:
+        grau = int(aprox_escolhida.split()[-1])
+        ajuste_polinomial(valores_x, valores_y, grau, plt_grafico=graf, expr=ff)   
     
     # Retornar a aproximação escolhida e seu dicionário de informações
     
