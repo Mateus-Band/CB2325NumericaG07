@@ -307,14 +307,14 @@ def interpolação_de_newton(x,y,plot:bool = False,grid:bool = True):
 
 
 
+"""
+A função abaixo calcula o Polinômio Interpolador de Lagrange para um
+conjunto de pontos (x_i, f(x_i)) dados, retornando a expressão polinomial
+simplificada e simbólica usando a biblioteca SymPy.
+"""
 def interpolacao_polinomial(tupla_de_pontos, plotar = False) -> sp.Expr:
-    """
-    A função calcula o Polinômio Interpolador de Lagrange para um
-    conjunto de pontos (x_i, f(x_i)) dados, retornando a expressão polinomial
-    simplificada e simbólica usando a biblioteca SymPy.
-    """
     
-    # Aplicamos um tste de entrada, mais precisamente verificamos se a lista de entrada está vazia. Se estiver, retorna uma mensagem de erro.
+    # Aplicamos um teste de entrada, mais precisamente verificamos se a lista de entrada está vazia. Se estiver, retorna uma mensagem de erro.
     if not tupla_de_pontos:
         return "Lista de pontos vazia"
     
@@ -379,16 +379,16 @@ def interpolacao_polinomial(tupla_de_pontos, plotar = False) -> sp.Expr:
                 polinomio_simplificado (sympy.Expr): O polinômio P(x) retornado pela função.
             """
             
-            # 1. Preparação dos Dados Originais (para plotagem dos marcadores)
+            # Preparamos dos Dados Originais (para plotagem dos marcadores)
             X_pontos = np.array([p[0] for p in pontos])
             Y_pontos = np.array([p[1] for p in pontos])
             
-            # 2. Convertemos a expressão simbólica para uma função numérica
+            # Convertemos a expressão simbólica para uma função numérica
             # sp.lambdify converte a expressão SymPy (em 'x') para uma função NumPy rápida.
             x_simbolico = sp.Symbol('x')
             P_x_numerico = sp.lambdify(x_simbolico, polinomio_simplificado, 'numpy')
             
-            # 3. Geração do Espaço Amostral para a Curva
+            # Geração do Espaço Amostral para a Curva
             # Define o intervalo de plotagem ligeiramente maior que os pontos dados.
             x_min = np.min(X_pontos) - 0.5
             x_max = np.max(X_pontos) + 0.5
@@ -396,10 +396,10 @@ def interpolacao_polinomial(tupla_de_pontos, plotar = False) -> sp.Expr:
             # Gera 1000 pontos uniformemente espaçados para a curva
             X_curva = np.linspace(x_min, x_max, 1000)
             
-            # 4. Avaliação do Polinômio
+            # Avaliamos do Polinômio
             Y_curva = P_x_numerico(X_curva)
             
-            # 5. Plotagem com Matplotlib
+            # Plotagem via Matplotlib
             plt.figure(figsize=(10, 6))
             
             # Plota a curva do Polinômio (linha contínua)
@@ -427,6 +427,128 @@ def interpolacao_polinomial(tupla_de_pontos, plotar = False) -> sp.Expr:
         # Retorna a expressão final simplificada, expandindo e combinando os termos 
         # para a forma padrão de um polinômio (e.g., a_n*x^n + a_{n-1}*x^{n-1} + . . . + a_1*x + a_0).
         return polinomio_simplificado
+    
+
+
+"""
+A função abaixo faz a interpolação Polinomial via Matriz de Vandermonde para um
+conjunto de pontos (x_i, f(x_i)) dados, retornando a expressão polinomial
+simplificada e simbólica usando a biblioteca SymPy.
+"""
+
+def interp_vand(tupla_de_pontos, plotar=False):
+
+    # Aplicamos um teste de entrada, mais precisamente verificamos se a lista de entrada está vazia. Se estiver, retorna uma mensagem de erro.
+    if not tupla_de_pontos:
+        return "Lista de pontos vazia"
+    
+    # Quebramos a lista de tuplas [(x_0, f(x_0)), (x_1, f(x_1)), ...] em dois arrays separados.
+    # O dtype=float converte os elementos do array para float.
+    X = np.array([p[0] for p in tupla_de_pontos], dtype=float)
+    Y = np.array([p[1] for p in tupla_de_pontos], dtype=float)
+    n = len(X) # número de pontos
+
+    # Construímos a Matriz de Vandermonde (V)
+    # A matriz V tem a forma:
+    # | 1  x_0  x_0^2 ... x_0^(n-1) |
+    # | 1  x_1  x_1^2 ... x_1^(n-1) |
+    # | ...                        |
+    # | 1 x_(n-1) ... x_(n-1)^(n-1)|
+
+
+    # A função np.vander() constrói esta matriz. Por padrão, ele coloca a maior potência 
+    # na primeira coluna. O argumento 'increasing=True' garante a ordem crescente 
+    # de potências (da 0-ésima à (n-1)-ésima), que é a convenção padrão para a 
+    # equação do polinômio P(x) = a_0 + a_1*x + ...
+    V = np.vander(X, n, increasing=True)
+
+    # Agora precisamos resolver o Sistema Linear V * a = Y
+    # Para isso utilizamos a função np.linalg.solve(A, b) que resolve o sistema A * x = b para x.
+    # Nessa situação V é A, Y é b e os coeficientes 'a' são a solução 'x'.
+    try:
+        coeficientes = np.linalg.solve(V, Y)
+    except np.linalg.LinAlgError:
+        # Temos um erro caso a matriz seja singular (determinante próximo de zero),
+        # o que geralmente ocorre caso haja valores de X duplicados.
+        return "A matriz de Vandermonde é singular (pontos x duplicados ou erro de precisão). Não é possível resolver tal sistema"
+
+    # Vamos construir o polinômio simbólico
+
+    # Definimos 'x' como variável simbólica via SymPy
+    x = sp.Symbol('x')
+
+    # Inicializamos o Polinômio P(x)
+    P_x = 0
+
+    # P(x) = a_0 * x^0 + a_1 * x^1 + a_2 * x^2 + ... + a_(n-1) * x^(n-1)
+    for i in range(n):
+        # O coeficiente[i] corresponde a a_i, e o termo é x^i
+        P_x += coeficientes[i] * (x**i)
+        
+    polinomio_simplificado = sp.simplify(P_x)
+
+    # ====================================================================================
+    # ====================================================================================
+
+    # A parte de plotagem e retorno é idêntica à sua, garantindo a mesma funcionalidade.
+    if plotar:
+        # Definimos uma função interna que plotará os pontos e o Polinômio Interpolador
+        def plotar_interpolacao(pontos, polinomio_simplificado):
+            """
+            Esta função gera o gráfico do polinômio interpolador e dos pontos originais.
+            
+            Argumentos:
+                pontos (lista de tupla): Lista de pontos originais (x_i, f(x_i)).
+                polinomio_simplificado (sympy.Expr): O polinômio P(x) retornado pela função.
+            """
+            
+            # Preparação dos Dados Originais (para plotagem dos marcadores)
+            X_pontos = np.array([p[0] for p in pontos])
+            Y_pontos = np.array([p[1] for p in pontos])
+            
+            # Convertemos a expressão simbólica para uma função numérica
+            # sp.lambdify converte a expressão SymPy (em 'x') para uma função NumPy rápida.
+            x_simbolico = sp.Symbol('x')
+            P_x_numerico = sp.lambdify(x_simbolico, polinomio_simplificado, 'numpy')
+            
+            # Geração do Espaço Amostral para a Curva
+            # Define o intervalo de plotagem ligeiramente maior que os pontos dados.
+            x_min = np.min(X_pontos) - 0.5
+            x_max = np.max(X_pontos) + 0.5
+            
+            # Gera 1000 pontos uniformemente espaçados para a curva
+            X_curva = np.linspace(x_min, x_max, 1000)
+            
+            # Avaliamos do Polinômio
+            Y_curva = P_x_numerico(X_curva)
+            
+            # Plotagem via Matplotlib
+            plt.figure(figsize=(10, 6))
+            
+            # Plota a curva do Polinômio (linha contínua)
+            plt.plot(X_curva, Y_curva, label=f'$P(x) = {polinomio_simplificado}$', color='blue')
+            
+            # Plota os Pontos Originais (marcadores vermelhos)
+            plt.scatter(X_pontos, Y_pontos, label='Pontos de Interpolação', color='red', marker='o', zorder=5)
+            
+            # Adicionando rótulos e título
+            plt.title('Interpolação Polinomial via Matriz de Vandermonde')
+            plt.xlabel('Eixo X')
+            plt.ylabel('Eixo Y')
+            plt.axhline(0, color='gray', linestyle='--', linewidth=0.5)
+            plt.axvline(0, color='gray', linestyle='--', linewidth=0.5)
+            plt.legend()
+            plt.grid(True, linestyle=':', alpha=0.6)
+            plt.show()
+
+        plotar_interpolacao(tupla_de_pontos, polinomio_simplificado)
+
+        # Retorna a expressão final simplificada
+        return polinomio_simplificado
+    else:
+        # Retorna a expressão final simplificada
+        return polinomio_simplificado
+    
 
 
 def interpolacao_linear_por_partes(x_vals:list, y_vals:list, plotar = False, x_test= None):
