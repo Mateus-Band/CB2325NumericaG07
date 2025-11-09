@@ -430,6 +430,102 @@ def ajuste_multiplo(valores_var: list[list[float]], valores_z: list[float], expr
 
     return array_coeficientes
 
+# Função de Avaliação do Ajuste
+
+def avaliar_ajuste(valores_x: list[float], valores_y: list[float], criterio: str, modelo: str, coeficientes: tuple | np.ndarray):
+    """Avalia um modelo de ajuste por meio de um ou mais critérios
+
+    Argumentos:
+        valores_x (list): Lista de valores da variável independente.
+        valores_y (list): Lista de valores da variável dependente.
+        criterio (str): Critério de avaliação ("R2", "R2A", "AIC", "AICc", "BIC", "all")
+        modelo (str): Modelo utilizado ("linear", "polinomial", "exponencial", "logaritmo", "senoidal")
+        coeficientes (tuple | np.ndarray): Coeficientes do modelo
+
+    Retorna:
+        float | tuple: Valor do critério (float) ou uma tupla com todos os critérios (caso criterio="all")
+    """
+
+    # Verifica se o tamanho da lista dos valores de x e valores de y é igual
+
+    if len(valores_x) != len(valores_y):
+        raise ValueError("As listas 'valores_x' e 'valores_y' devem ter o mesmo tamanho.")
+    
+    # Verifica se o critério é válido
+
+    if criterio not in ("R2", "R2A", "AIC", "AICc", "BIC", "all"):
+        raise ValueError("Critério desconhecido. Use R2, R2A , AIC, AICc, BIC, all")
+    
+    # Verifica se o modelo é válido
+
+    if modelo not in ("linear", "polinomial", "exponencial", "logaritmo", "senoidal"):
+        raise ValueError("Modelo desconhecido. Use linear, polinomial, exponencial, logaritmo, senoidal")
+
+    # Transforma os valores em arrays
+
+    valores_x = np.array(valores_x)
+    valores_y = np.array(valores_y)
+    n = len(valores_x)
+
+    # Adquire os valores de y que a aproximação forneceu
+
+    if modelo == "linear":
+        qtd_coeficientes = 2
+        y_modelo = coeficientes[0] * valores_x + coeficientes[1]
+
+    elif modelo == "polinomial":
+        qtd_coeficientes = len(coeficientes)
+        y_modelo = np.polynomial.polynomial.polyval(valores_x, coeficientes)
+
+    elif modelo == "exponencial":
+        qtd_coeficientes = 2
+        y_modelo =  coeficientes[1] * np.exp(coeficientes[0] * valores_x)
+
+    elif modelo == "logaritmo":
+        qtd_coeficientes = 2
+        y_modelo = coeficientes[0] + coeficientes[1] * np.log(valores_x)
+
+    elif modelo == "senoidal":
+        qtd_coeficientes = 4
+        y_modelo = coeficientes[0] * np.sin(coeficientes[1] * valores_x + coeficientes[3]) + coeficientes[2]
+
+    # Calcula o resíduo quadrático e o resíduo total (tratando o caso igual a 0)
+
+    media_y = np.mean(valores_y)
+    RST = 1e-12 if np.sum((valores_y - media_y)**2) == 0 else np.sum((valores_y - media_y)**2)
+    RSS = max(np.sum((valores_y - y_modelo)**2), 1e-12) # Evita problemas no log
+
+    R2 = 1 - (RSS/RST)
+
+    # Calcula os critérios
+
+    if (n - qtd_coeficientes - 1) <= 0 and criterio in ("R2A", "AICc", "all"):
+        raise ZeroDivisionError("Não é possível calcular o critério solicitado.")
+
+    if criterio == "R2":
+        return R2
+    
+    elif criterio == "R2A":
+            return 1 - ((1- R2) * (n - 1) / (n - qtd_coeficientes - 1))
+            
+    elif criterio == "AIC":
+        return n * np.log(RSS / n) + 2 * qtd_coeficientes
+    
+    elif criterio == "AICc":
+        AIC = n * np.log(RSS / n) + 2 * qtd_coeficientes
+        return AIC + (2* qtd_coeficientes * (qtd_coeficientes + 1)) / (n - qtd_coeficientes - 1)
+
+    elif criterio == "BIC":
+        return n * np.log(RSS / n) + qtd_coeficientes * np.log(n)
+    
+    elif criterio == "all":
+        AIC = n * np.log(RSS / n) + 2 * qtd_coeficientes
+        BIC = n * np.log(RSS / n) + qtd_coeficientes * np.log(n)
+        R2A = 1 - ((1- R2) * (n - 1) / (n - qtd_coeficientes - 1))
+        AICc = AIC + (2* qtd_coeficientes * (qtd_coeficientes + 1)) / (n - qtd_coeficientes - 1)
+
+        return (R2, R2A, AIC, AICc, BIC)
+
 # Função de Melhor Ajuste
 
 def melhor_ajuste(valores_x: list[float], valores_y: list[float], criterio: str, exibir_todos: bool = True, plt_grafico: bool = True):
