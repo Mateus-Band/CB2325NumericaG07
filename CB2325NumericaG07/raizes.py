@@ -105,10 +105,33 @@ def metodo_newton_raphson(função, tol, plotar = False):
     return raiz
     
 
-def metodo_bissecao(f, a, b, tol, max_inter = 100, plotar = False):
-    '''
-    Adicionar docstring explicativa
-    '''
+def metodo_bissecao(f, a, b, tol=1e-6, max_inter = 100, plotar = False):
+    """Encontra a raiz de uma função pelo Método da Bisseção.
+
+    O método localiza uma raiz da função 'f' dentro do intervalo [a, b],
+    desde que f(a) e f(b) tenham sinais opostos. A busca é
+    interrompida quando a largura do intervalo é menor que 'tol' ou
+    'max_inter' é atingido.
+
+    Args:
+        f (callable): A função para a qual a raiz está sendo procurada
+            (deve receber um float e retornar um float).
+        a (float): O início do intervalo.
+        b (float): O fim do intervalo.
+        tol (float, optional): A tolerância (critério de parada). O loop para
+            quando abs(a - b) < tol. Default é 1e-6.
+        max_inter (int, optional): O número máximo de iterações.
+            Default é 100.
+        plotar (bool, optional): Se True, exibe um gráfico das
+            iterações ao final. Default é False.
+
+    Returns:
+        float: A aproximação da raiz da função.
+        None: Se o método atingir 'max_inter' antes de convergir.
+
+    Raises:
+        ValueError: Se f(a) e f(b) tiverem o mesmo sinal.
+    """
     inter = 0
     if f(a) * f(b) >= 0:
         raise ValueError("f(a) e f(b) devem ter sinais opostos.")
@@ -128,15 +151,37 @@ def metodo_bissecao(f, a, b, tol, max_inter = 100, plotar = False):
     if plotar:
         #adicionar código de plotagem
         pass
-
     
     return ((a+b)/2)
 
 
-def metodo_secante(f, x0, x1, tol, max_inter = 100, plotar= False):
-    '''
-    Adicionar docstring explicativa
-    '''
+def metodo_secante(f, x0, x1, tol = 1e-6, max_inter = 100, plotar= False):
+    """Encontra a raiz de uma função pelo Método da Secante.
+
+    O método localiza uma raiz da função 'f' usando aproximações
+    sucessivas baseadas na reta secante definida pelos dois pontos
+    anteriores. Começa com x0 e x1.
+
+    Args:
+        f (callable): A função para a qual a raiz está sendo procurada
+            (deve receber um float e retornar um float).
+        x0 (float): O primeiro ponto inicial.
+        x1 (float): O segundo ponto inicial.
+        tol (float, optional): A tolerância (critério de parada). O loop para
+            quando abs(x1 - x0) < tol. Default é 1e-6.
+        max_inter (int, optional): O número máximo de iterações.
+            Default é 100.
+        plotar (bool, optional): Se True, exibe um gráfico das
+            iterações ao final. Default é False.
+
+    Returns:
+        float: A aproximação da raiz da função.
+        None: Se o método atingir 'max_inter' antes de convergir.
+
+    Raises:
+        ValueError: Se f(x1) e f(x0) forem iguais em alguma iteração,
+            o que causaria uma divisão por zero.
+    """
     inter = 0
     historico = [x0, x1]
     while abs(x0-x1)>=tol and inter<max_inter:
@@ -174,6 +219,7 @@ def metodo_secante(f, x0, x1, tol, max_inter = 100, plotar= False):
         plt.grid(True)
         plt.show()
     return x1
+
 
 
 if __name__ == '__main__':
