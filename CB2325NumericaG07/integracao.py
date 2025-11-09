@@ -180,6 +180,61 @@ def integral_simpson38(function, a, b, n : int, plotar = False) -> float:
         
     else:
         return integral
+    
+
+def integracao_de_montecarlo(func,a:float,b:float, c:int = None,d:int=None,qte = 100,plot = False):
+    '''
+        Parâmetros:
+           func : função que será integrada
+           a: inicio do intervalo de integração
+           b: fim do intervalo de integraço
+           c: limite superior do quadrado em que os pontos serão gerados
+           d: limite inferior do quadrado em que os pontos serão gerados
+           qte: quantidade de pontos que serão gerados para calcular a integral, quanto mais pontos mais precisa mas mais tempo gasto.
+           plot: plota a integração
+
+           obs: a função no intervalo de integração deve estar contida no quadrado formado por a,b,c,d. 
+        
+        Retorna:
+            Float: retorna o valor calculado da integral.
+            
+    '''
+    
+    x_list =np.random.uniform(a,b,qte)
+
+    #calculando o intervalo em y
+    test = np.linspace(a,b,100)
+    nums = func(test)
+    c = np.max(nums)
+    d = np.min(nums)
+    k = c-d
+    c += k*0.2
+    d -= k*0.2
+    c,d = np.int64(c), np.int64(d)
+
+    y_list = np.random.uniform(d,c,qte)
+
+    dots = zip(x_list,y_list)
+
+    I = 0
+    for x,y in dots:
+        if func(x) > y:
+            I += 1
+
+
+    if plot:
+        fig = plt.figure()
+        ax = fig.add_subplot()
+        ax.scatter(x_list,y_list,alpha = 0.25,color = 'yellow')
+        ax.set_aspect('equal')
+        ax.plot(test,nums)
+
+        ax.text(-0.2,d-k*0.3,f'Pontos a baixo da função:{I} , Pontos totais : {qte}')
+
+    return (c-d)*(b-a)*(I/qte)
+
+
+
 
 if __name__ == "__main__":
     print(integral_trapezio.__doc__)
