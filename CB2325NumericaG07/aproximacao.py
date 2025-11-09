@@ -1,55 +1,63 @@
-import numpy as np
-import matplotlib.pyplot as plt
-import sympy as sp
-from functools import reduce
 import math
+from functools import reduce
+
+import matplotlib.pyplot as plt
+import numpy as np
+import sympy as sp
+
 
 # Função de Ajuste Linear
 
-def ajuste_linear(valores_x:list, valores_y:list, plt_grafico: bool = True):
-    '''
-    Calcula o ajuste linear y = ax + b para os dados (valores_x, valores_y) pelo Método dos Mínimos Quadrados (MMQ).
+def ajuste_linear(valores_x: list, valores_y: list, plt_grafico: bool = True):
+    """
+    Calcule o ajuste linear y = ax + b pelo Método dos Mínimos Quadrados (MMQ).
 
-    Além disso, a função exibe um gráfico de dispersão dos pontos e da reta de ajuste.
+    Além disso, a função exibe um gráfico de dispersão dos pontos e da 
+    reta de ajuste.
 
     Argumentos:
         valores_x (list): Lista de valores da variável independente.
         valores_y (list): Lista de valores da variável dependente.
-        plt_grafico (bool, opcional): True (padrão) se o gráfico deve ser plotado, False caso contrário
+        plt_grafico (bool, opcional): True (padrão) se o gráfico deve 
+        ser plotado, False caso contrário.
 
     Retorna:
-        tuple: (a, b), contendo o coeficiente angular (a) e o coeficiente linear (b) da reta de ajuste.
-    '''
+        tuple: (a, b), contendo o coeficiente angular (a) e o 
+        coeficiente linear (b) da reta de ajuste.
 
-    # Verifica se o tamanho da lista dos valores de x e valores de y é igual
+    Raises:
+        ValueError: Se a lista de valores x e y tiverem tamanhos 
+        diferentes ou a variância dos valores de x for 0.
+    """
 
     if len(valores_x) != len(valores_y):
         raise ValueError("As listas 'valores_x' e 'valores_y' devem ter o mesmo tamanho.")
 
-    # Cálculo do valor médio de x e y
+    x_medio = reduce(lambda x, y: x + y, valores_x) / len(valores_x)
+    y_medio = reduce(lambda x, y: x + y, valores_y) / len(valores_y)
 
-    x_medio = reduce(lambda x, y: x + y, valores_x)/len(valores_x)
-    y_medio = reduce(lambda x, y: x + y, valores_y)/len(valores_y)
-
-    # Cálculo da covariância de x e y e da variância de x para cálculo do coeficiente angular
+    # Cálculo da covariância de x e y e da variância
 
     cov_xy = 0
     var_x = 0
 
-    for i in range(0, len(valores_x)):
-        cov_xy += (valores_x[i] - x_medio)*(valores_y[i] - y_medio)
-        var_x += (valores_x[i] - x_medio)**2
+    for i in range(len(valores_x)):
+        cov_xy += (valores_x[i] - x_medio) * (valores_y[i] - y_medio)
+        var_x += (valores_x[i] - x_medio) ** 2
+
+    if var_x == 0:
+        raise ValueError("A variância de valores_x é zero. Não é possível calcular o ajuste.")
 
     # Cálculo do coeficientes
 
-    a = cov_xy/var_x            # Angular
-    b = y_medio - a*x_medio     # Independente
+    a = cov_xy / var_x           
+    b = y_medio - a * x_medio  
 
     # Plot do gráfico
 
     if plt_grafico:
         x_func = np.linspace(min(valores_x), max(valores_x), 200)
-        y_func = a*x_func + b
+        y_func = a * x_func + b
 
         plt.scatter(valores_x, valores_y, color="blue", marker="o", label="Dados Fornecidos")
         plt.plot(x_func, y_func, color="black", linewidth=2, label="Reta de Ajuste Linear")
@@ -268,28 +276,33 @@ def ajuste_senoidal(valores_x: list[float], valores_y: list[float], plt_grafico:
 
 # Função de Ajuste Exponencial
 
-def ajuste_exponencial(valores_x:list, valores_y:list, plt_grafico: bool = True):
-    '''
-    Calcula o ajuste exponencial y = b * e^(a*x) para os dados (valores_x, valores_y) pela linearização do modelo ln(y) = ln(b) + a*x e
-    aplica o Método dos Mínimos Quadrados sobre os dados transformados por meio da função de ajuste linear.
-
-    Além disso, a função exibe um gráfico de dispersão dos pontos e da curva de ajuste.
+def ajuste_exponencial(valores_x: list, valores_y: list, plt_grafico: bool = True):
+    """
+    Calcule o ajuste exponencial y = b * e^(a*x)
+     
+    Isso é feito pela linearização do modelo ln(y) = ln(b) + a*x e 
+    aplicando o Método dos Mínimos Quadrados sobre os dados 
+    transformados por meio da função de ajuste linear. Além disso, a 
+    função exibe um gráfico de dispersão dos pontos e da curva de 
+    ajuste.
 
     Argumentos:
         valores_x (list): Lista de valores da variável independente.
         valores_y (list): Lista de valores da variável dependente.
-        plt_grafico (bool, opcional): True (padrão) se o gráfico deve ser plotado, False caso contrário
+        plt_grafico (bool, opcional): True (padrão) se o gráfico deve 
+        ser plotado, False caso contrário
 
     Retorna:
-        tuple: (a, b), contendo o coeficiente do expoente (a) e o coeficiente multiplicativo (b) da curva de ajuste.
-    '''
-
-    # Verifica se o tamanho da lista dos valores de x e valores de y é igual
+        tuple: (a, b), contendo o coeficiente do expoente (a) e o 
+        coeficiente multiplicativo (b) da curva de ajuste.
+    
+    Raises:
+        ValueError: Se a lista de valores x e y tiverem tamanhos 
+        diferentes ou a lista de valores y tiver valores não positivos.
+    """
 
     if len(valores_x) != len(valores_y):
         raise ValueError("As listas 'valores_x' e 'valores_y' devem ter o mesmo tamanho.")
-    
-    # Verifica se os valores de y são positivos
 
     for y in valores_y:
         if y <= 0:
@@ -324,26 +337,31 @@ def ajuste_exponencial(valores_x:list, valores_y:list, plt_grafico: bool = True)
 
 def ajuste_logaritmo(valores_x:list, valores_y:list, plt_grafico: bool = True):
     '''
-    Calcula o ajuste logaritmo y = a + b * ln(x) para os dados (valores_x, valores_y) pela linearização do modelo (y = a + b*x', onde x' = ln(x)) e
-    aplica o Método dos Mínimos Quadrados sobre os dados transformados por meio da função de ajuste linear.
-
-    Além disso, a função exibe um gráfico de dispersão dos pontos e da curva de ajuste.
+    Calcula o ajuste logaritmo y = a + b * ln(x) 
+    
+    Isso é feito pela linearização do modelo 
+    (y = a + b*x', onde x' = ln(x)) e aplica o Método dos Mínimos 
+    Quadrados sobre os dados transformados por meio da função de 
+    ajuste linear. Além disso, a função exibe um gráfico de dispersão
+    dos pontos e da curva de ajuste.
 
     Argumentos:
         valores_x (list): Lista de valores da variável independente.
         valores_y (list): Lista de valores da variável dependente.
-        plt_grafico (bool, opcional): True (padrão) se o gráfico deve ser plotado, False caso contrário
+        plt_grafico (bool, opcional): True (padrão) se o gráfico deve
+            ser plotado, False caso contrário.
 
     Retorna:
-        tuple: (a, b), contendo o coeficiente (a) e o coeficiente logarítmico (b) da curva de ajuste.
-    '''
+        tuple: (a, b), contendo o coeficiente (a) e o coeficiente 
+            logarítmico (b) da curva de ajuste.
 
-    # Verifica se o tamanho da lista dos valores de x e valores de y é igual
+    Raises:
+        ValueError: Se a lista de valores x e y tiverem tamanhos 
+            diferentes ou a lista de valores x tiver valores não positivos.
+    '''
 
     if len(valores_x) != len(valores_y):
         raise ValueError("As listas 'valores_x' e 'valores_y' devem ter o mesmo tamanho.")
-    
-    # Verifica se os valores de x são positivos
 
     for x in valores_x:
         if x <= 0:
@@ -432,36 +450,44 @@ def ajuste_multiplo(valores_var: list[list[float]], valores_z: list[float], expr
 
 # Função de Avaliação do Ajuste
 
-def avaliar_ajuste(valores_x: list[float], valores_y: list[float], criterio: str, modelo: str, coeficientes: tuple | np.ndarray):
-    """Avalia um modelo de ajuste por meio de um ou mais critérios
+def avaliar_ajuste(
+        valores_x: list[float], 
+        valores_y: list[float], 
+        criterio: str, 
+        modelo: str, 
+        coeficientes: tuple | np.ndarray
+    ):
+    """
+    Avalie um modelo de ajuste por meio de um ou mais critérios
 
     Argumentos:
         valores_x (list): Lista de valores da variável independente.
         valores_y (list): Lista de valores da variável dependente.
-        criterio (str): Critério de avaliação ("R2", "R2A", "AIC", "AICc", "BIC", "all")
-        modelo (str): Modelo utilizado ("linear", "polinomial", "exponencial", "logaritmo", "senoidal")
-        coeficientes (tuple | np.ndarray): Coeficientes do modelo
+        criterio (str): Critério de avaliação ("R2", "R2A", "AIC", 
+            "AICc", "BIC", "all").
+        modelo (str): Modelo utilizado ("linear", "polinomial", 
+            "exponencial", "logaritmo", "senoidal").
+        coeficientes (tuple | np.ndarray): Coeficientes do modelo.
 
     Retorna:
-        float | tuple: Valor do critério (float) ou uma tupla com todos os critérios (caso criterio="all")
+        float | tuple: Valor do critério (float) ou uma tupla com 
+            todos os critérios (caso criterio="all").
+    
+    Raises:
+        ValueError: Se as listas de valores x e y tiverem tamanho
+            diferente ou os o criterio ou modelo forem desconhecidos.
+        ZeroDivisionError: Se for impossível calcular R2A ou AICc.
     """
 
-    # Verifica se o tamanho da lista dos valores de x e valores de y é igual
 
     if len(valores_x) != len(valores_y):
         raise ValueError("As listas 'valores_x' e 'valores_y' devem ter o mesmo tamanho.")
-    
-    # Verifica se o critério é válido
 
     if criterio not in ("R2", "R2A", "AIC", "AICc", "BIC", "all"):
         raise ValueError("Critério desconhecido. Use R2, R2A , AIC, AICc, BIC, all")
-    
-    # Verifica se o modelo é válido
 
     if modelo not in ("linear", "polinomial", "exponencial", "logaritmo", "senoidal"):
         raise ValueError("Modelo desconhecido. Use linear, polinomial, exponencial, logaritmo, senoidal")
-
-    # Transforma os valores em arrays
 
     valores_x = np.array(valores_x)
     valores_y = np.array(valores_y)
@@ -479,7 +505,7 @@ def avaliar_ajuste(valores_x: list[float], valores_y: list[float], criterio: str
 
     elif modelo == "exponencial":
         qtd_coeficientes = 2
-        y_modelo =  coeficientes[1] * np.exp(coeficientes[0] * valores_x)
+        y_modelo = coeficientes[1] * np.exp(coeficientes[0] * valores_x)
 
     elif modelo == "logaritmo":
         qtd_coeficientes = 2
@@ -492,10 +518,10 @@ def avaliar_ajuste(valores_x: list[float], valores_y: list[float], criterio: str
     # Calcula o resíduo quadrático e o resíduo total (tratando o caso igual a 0)
 
     media_y = np.mean(valores_y)
-    RST = 1e-12 if np.sum((valores_y - media_y)**2) == 0 else np.sum((valores_y - media_y)**2)
-    RSS = max(np.sum((valores_y - y_modelo)**2), 1e-12) # Evita problemas no log
+    RST = 1e-12 if np.sum((valores_y - media_y) ** 2) == 0 else np.sum((valores_y - media_y) ** 2)
+    RSS = max(np.sum((valores_y - y_modelo) ** 2), 1e-12) # Evita problemas no log
 
-    R2 = 1 - (RSS/RST)
+    R2 = 1 - (RSS / RST)
 
     # Calcula os critérios
 
@@ -506,14 +532,14 @@ def avaliar_ajuste(valores_x: list[float], valores_y: list[float], criterio: str
         return R2
     
     elif criterio == "R2A":
-            return 1 - ((1- R2) * (n - 1) / (n - qtd_coeficientes - 1))
+        return 1 - ((1- R2) * (n - 1) / (n - qtd_coeficientes - 1))
             
     elif criterio == "AIC":
         return n * np.log(RSS / n) + 2 * qtd_coeficientes
     
     elif criterio == "AICc":
         AIC = n * np.log(RSS / n) + 2 * qtd_coeficientes
-        return AIC + (2* qtd_coeficientes * (qtd_coeficientes + 1)) / (n - qtd_coeficientes - 1)
+        return AIC + (2 * qtd_coeficientes * (qtd_coeficientes + 1)) / (n - qtd_coeficientes - 1)
 
     elif criterio == "BIC":
         return n * np.log(RSS / n) + qtd_coeficientes * np.log(n)
@@ -521,8 +547,8 @@ def avaliar_ajuste(valores_x: list[float], valores_y: list[float], criterio: str
     elif criterio == "all":
         AIC = n * np.log(RSS / n) + 2 * qtd_coeficientes
         BIC = n * np.log(RSS / n) + qtd_coeficientes * np.log(n)
-        R2A = 1 - ((1- R2) * (n - 1) / (n - qtd_coeficientes - 1))
-        AICc = AIC + (2* qtd_coeficientes * (qtd_coeficientes + 1)) / (n - qtd_coeficientes - 1)
+        R2A = 1 - ((1 - R2) * (n - 1) / (n - qtd_coeficientes - 1))
+        AICc = AIC + (2 * qtd_coeficientes * (qtd_coeficientes + 1)) / (n - qtd_coeficientes - 1)
 
         return (R2, R2A, AIC, AICc, BIC)
 
