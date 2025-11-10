@@ -1,3 +1,4 @@
+import math
 import matplotlib.pyplot as plt
 import sympy as sp
 import numpy as np
@@ -181,6 +182,125 @@ def integral_simpson38(function, a, b, n : int, plotar = False) -> float:
     else:
         return integral
     
+def integral_boole(function, a, b, n: int, plotar=False) -> float:
+    """
+    Calcula a integral de f no intervalo [a, b] usando a Regra de Boole (Newton–Cotes de 4ª ordem).
+
+    Parâmetros
+    ----------
+    function : callable
+        Função a ser integrada.
+    a, b : float
+        Limites de integração.
+    n : int
+        Número de subintervalos (deve ser múltiplo de 4).
+    plotar : bool, opcional
+        Se True, exibe um gráfico da função e das subdivisões.
+
+    Retorna
+    -------
+    float
+        Valor aproximado da integral.
+
+    Fórmula:
+        ∫[a,b] f(x) dx ≈ (2h/45) * [7f(x0) + 32f(x1) + 12f(x2) + 32f(x3) + 7f(x4)]
+        onde h = (b - a) / 4
+    """
+    if n % 4 != 0:
+        raise ValueError("n deve ser múltiplo de 4 para a Regra de Boole.")
+
+    a = float(a)
+    b = float(b)
+    h = (b - a) / n
+    soma = 0
+
+    for k in range(0, n, 4):
+        x0 = a + k * h
+        x1 = x0 + h
+        x2 = x0 + 2 * h
+        x3 = x0 + 3 * h
+        x4 = x0 + 4 * h
+
+        soma += (2 * h / 45) * (7 * function(x0) + 32 * function(x1) +
+                                12 * function(x2) + 32 * function(x3) +
+                                7 * function(x4))
+
+    if plotar:
+        import numpy as np
+        import matplotlib.pyplot as plt
+        x = np.linspace(a, b, 400)
+        y = function(x)
+        xi = np.linspace(a, b, n + 1)
+        yi = function(xi)
+
+        plt.figure(figsize=(8, 5))
+        plt.plot(x, y, label="f(x)", color="blue")
+        plt.vlines(xi, 0, yi, colors='gray', linestyles='dashed', alpha=0.7)
+        plt.fill_between(x, y, color='lightgreen', alpha=0.3, label='Área Boole')
+        plt.scatter(xi, yi, color='red', zorder=5)
+        plt.title("Integração Numérica - Regra de Boole (Newton–Cotes 4ª ordem)")
+        plt.xlabel("x")
+        plt.ylabel("f(x)")
+        plt.legend()
+        plt.grid(True)
+        plt.show()
+
+    return soma
+
+def integral_gauss_legendre(function, a, b, n: int = 3, plotar=False) -> float:
+    """
+    Calcula a integral de f(x) no intervalo [a, b] usando a Quadratura de Gauss-Legendre.
+
+    Parâmetros
+    ----------
+    function : callable
+        Função a ser integrada.
+    a, b : float
+        Limites de integração.
+    n : int, opcional
+        Número de pontos da quadratura (grau do polinômio de Legendre). Padrão: 3.
+    plotar : bool, opcional
+        Se True, exibe o gráfico da função e os pontos de amostragem da quadratura.
+
+    Retorna
+    -------
+    float
+        Valor aproximado da integral.
+
+    Fórmula:
+        ∫[a,b] f(x) dx ≈ (b - a)/2 * Σ [ w_i * f( (b - a)/2 * x_i + (a + b)/2 ) ]
+
+    Observação:
+        Este método é exato para polinômios de grau até (2n - 1).
+    """
+
+    # Nós e pesos da quadratura de Legendre
+    xi, wi = np.polynomial.legendre.leggauss(n)
+
+    # Mapeamento dos pontos de [-1, 1] → [a, b]
+    x_mapped = 0.5 * (b - a) * xi + 0.5 * (b + a)
+    f_vals = function(x_mapped)
+
+    # Soma ponderada
+    integral = 0.5 * (b - a) * np.sum(wi * f_vals)
+
+    # Gráfico opcional
+    if plotar:
+        x = np.linspace(a, b, 400)
+        y = function(x)
+        plt.figure(figsize=(8, 5))
+        plt.plot(x, y, label="f(x)", color="blue")
+        plt.fill_between(x, y, color="lightcoral", alpha=0.3)
+        plt.scatter(x_mapped, function(x_mapped), color="red", zorder=5, label="Nós de Gauss-Legendre")
+        plt.title(f"Quadratura de Gauss–Legendre (n={n})")
+        plt.xlabel("x")
+        plt.ylabel("f(x)")
+        plt.legend()
+        plt.grid(True)
+        plt.show()
+
+    return integral
+
 
 def integral_de_montecarlo(func,a:float,b:float, c:int = None,d:int=None,qte = 100,plot = False):
     '''
@@ -237,6 +357,34 @@ def integral_de_montecarlo(func,a:float,b:float, c:int = None,d:int=None,qte = 1
 
 
 if __name__ == "__main__":
+
+    print("=== Documentação dos Métodos ===\n")
     print(integral_trapezio.__doc__)
     print(integral_simpson38.__doc__)
-    print(integral_de_montecarlo.__doc__)
+    print(integracao_de_montecarlo.__doc__)
+    print(integral_boole.__doc__)
+    print(integral_gauss_legendre.__doc__)
+
+    print("\n=== Exemplos de Uso ===\n")
+
+    f = lambda x: np.sin(x)
+
+    print("→ Regra dos Trapézios:")
+    area_t = integral_trapezio(f, 0, math.pi, n=100, plotar=True)
+    print(f"Resultado: {area_t:.6f}\n")
+
+    print("→ Regra de Simpson 3/8:")
+    area_s = integral_simpson38(f, 0, math.pi, n=99, plotar=True)
+    print(f"Resultado: {area_s:.6f}\n")
+
+    print("→ Regra de Boole:")
+    area_b = integral_boole(f, 0, math.pi, n=8, plotar=True)
+    print(f"Resultado: {area_b:.6f}\n")
+
+    print("→ Integração de Monte Carlo:")
+    area_m = integracao_de_montecarlo(f, 0, math.pi, qte=5000, plot=True)
+    print(f"Resultado: {area_m:.6f}")
+
+    print("→ Quadratura de Gauss–Legendre:")
+    area_g = integral_gauss_legendre(f, 0, np.pi, n=3, plotar=True)
+    print(f"Resultado: {area_g:.6f}")
