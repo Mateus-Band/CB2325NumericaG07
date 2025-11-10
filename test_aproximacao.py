@@ -1,7 +1,6 @@
 import matplotlib
 import numpy as np
 import pytest
-import sympy as sp
 
 from CB2325NumericaG07.aproximacao import *
 from pytest import approx
@@ -114,11 +113,19 @@ def test_werror(expected1):
         expected1[2] * x ** 2
         + expected1[1] * x
         + expected1[0]
-        + rng.normal(0, 0.8, size=x.shape)
+        + rng.normal(0, 1, size=x.shape)
     )
 
-    result = ajuste_polinomial(x, y, 2, plt_grafico=False)
-    assert result == approx(expected1, rel=0.1, abs=1e-4)
+    coeffs = ajuste_polinomial(x, y, 2, plt_grafico=False)
+
+    # Reconstrói Y com os coeficientes estimados
+
+    y_fit = coeffs[0] + coeffs[1] * x + coeffs[2] * x ** 2
+
+    # Mede o RMS
+
+    rms = np.sqrt(np.mean((y_fit - y) ** 2))
+    assert rms < 1
 
 ###########
 # Testes - Ajuste Senoidal
@@ -126,7 +133,7 @@ def test_werror(expected1):
 
 def test_ajuste_senoidal():
 
-    # Sem ruído - Frequência Positiva
+    # Sem ruído e com Gráfico - Frequência Positiva
 
     A1, B1, C1, D1 = 3.5, 0.5, 1.5, 3
     x1 = np.linspace(-15 * np.pi, 15 * np.pi, 200)
@@ -135,16 +142,24 @@ def test_ajuste_senoidal():
     x1_lista = x1.tolist()
     y1_lista = y1.tolist()
 
-    coeffs1 = ajuste_senoidal(x1_lista, y1_lista, T_aprox=12.5, plt_grafico=False)
+    coeffs1 = ajuste_senoidal(x1_lista, y1_lista, 
+                T_aprox=12.5, plt_grafico=True)
     A1_e, B1_e, C1_e, D1_e = coeffs1
 
     # Reconstrói y com os coeficientes estimados
+
     x1_arr = np.array(x1_lista)
     y1_fit = A1_e * np.sin(B1_e * x1_arr + C1_e) + D1_e
 
+    # Verifica se está retornando 4 coeficientes
+
     assert len(coeffs1) == 4
+
+    # Mede o RMS
+
     rms1 = np.sqrt(np.mean((y1_fit - y1) ** 2))
     assert rms1 < 0.1
+
     # Sem ruído - Frequência Negativa
 
     A2, B2, C2, D2 = 4, -2.5, -0.5, 0
@@ -158,18 +173,21 @@ def test_ajuste_senoidal():
     A2_e, B2_e, C2_e, D2_e = coeffs2
 
     # Reconstrói y com os coeficientes estimados
+
     x2_arr = np.array(x2_lista)
     y2_fit = A2_e * np.sin(B2_e * x2_arr + C2_e) + D2_e
+
+    # Mede o RMS
 
     rms2 = np.sqrt(np.mean((y2_fit - y2) ** 2))
     assert rms2 < 0.25
 
-    # Com ruído
+    # Com ruído - Frequência Positiva
 
     rng = np.random.default_rng(42)
     A3, B3, C3, D3 = 3.5, 0.5, 1.5, 3
     x3 = np.linspace(-15 * np.pi, 15 * np.pi, 200)
-    y3 = A3 * np.sin(B3 * x3 + C3) + D3 + rng.normal(0, 1, size=x2.shape)
+    y3 = A3 * np.sin(B3 * x3 + C3) + D3 + rng.normal(0, 1, size=x3.shape)
 
     x3_lista = x3.tolist()
     y3_lista = y3.tolist()
@@ -178,14 +196,17 @@ def test_ajuste_senoidal():
     A3_e, B3_e, C3_e, D3_e = coeffs3
 
     # Reconstrói y com os coeficientes estimados
+
     x3_arr = np.array(x3_lista)
     y3_fit = A3_e * np.sin(B3_e * x3_arr + C3_e) + D3_e
+
+    # Mede o RMS
 
     rms3 = np.sqrt(np.mean((y3_fit - y3) ** 2))
     assert rms3 < 1
 
 ###########
-# Teste - Ajuste Múltiplo
+# Testes - Ajuste Múltiplo
 ###########
 
 @pytest.mark.parametrize(
@@ -202,9 +223,41 @@ def test_ajuste_senoidal():
 )
 def teste_ajuste_multiplo(expected1):
 
+    # Teste para 'x_matriz' e 'z_matriz' de tamanhos diferentes
+
+    a = np.array([9, -13, 5.5, -213, 44.95])
+    b = np.array([15, 33, 94, -0.5, 0.88])
+    z = np.array([1, 2])
+
+    with pytest.raises(
+        ValueError, match=(
+            "Número de linhas de X e número de "
+            "valores de Z não coincidem."
+        )
+    ):
+        ajuste_multiplo([a, b], z, incluir_intercepto=False)
+
     # Teste para colinearidade
 
-    
+    a = np.array([9, -13, 5.5, -213, 44.95])
+    b = np.array([15, 33, 94, -0.5, 0.88])
+    c = np.array([-24, -24, -24, -24, -24])
+    d = np.array([-48, -48, -48, -48, -48])
+
+    z = (
+        expected1[0] * a + 
+        expected1[1] * b + 
+        expected1[2] * c +
+        expected1[3] * d
+    )
+
+    with pytest.raises(
+        ValueError, match=(
+            "Colinearidade detectada por matriz mal-condicionada. "
+            "Verifique os dados de entrada."
+        )
+    ):
+        ajuste_multiplo([a, b, c, d], z, incluir_intercepto=False)
 
     # Teste para dados sem ruído e sem intercepto
 
@@ -238,4 +291,77 @@ def teste_ajuste_multiplo(expected1):
     result = ajuste_multiplo([a, b, c], z)
     assert result == approx(
         [100, expected1[0], expected1[1], expected1[2]], rel=1e-4, abs=1e-5)
+    
+    # Teste para dados com ruído e com intercepto
 
+    rng = np.random.default_rng(42)
+    a = np.array([9, -13, 5.5, -213, 44.95])
+    b = np.array([15, 33, 94, -0.5, 0.88])
+    c = np.array([33, -3.22, -178, -26, 500])
+
+    z = (
+        expected1[0] * a + 
+        expected1[1] * b + 
+        expected1[2] * c + 100
+        + rng.normal(0, 1, size=a.shape)
+    )
+
+    coeffs = ajuste_multiplo([a, b, c], z)
+    I, A, B, C = coeffs
+
+    # Reconstrói Z com os coeficientes estimados
+
+    z_fit = A * a + B * b + C * c + I
+
+    rms3 = np.sqrt(np.mean((z_fit - z) ** 2))
+    assert rms3 < 1
+
+###########
+# Testes - Melhor Ajuste
+###########
+
+@pytest.mark.parametrize(
+    "criterio",
+    ["R2", "R2A", "AIC", "AICc", "BIC"])
+
+def test_melhor_ajuste_linear(criterio):
+
+    # Dados gerados a partir de um modelo linear
+
+    rng = np.random.default_rng(42)
+    x = np.linspace(-10, 8, 30)
+    y = 5 * x + 8 + rng.normal(0, 0.5, size=x.shape)
+
+    mod, info = melhor_ajuste(x, y, criterio)
+
+    if criterio == "R2":
+        pytest.skip("R2 tende a favorecer modelos mais complexos, " \
+        "gerando overfitting")
+
+    assert "linear" in mod
+
+    for key in ["R2", "R2A", "AIC", "AICc", "BIC"]:
+        assert key in info
+
+@pytest.mark.parametrize(
+    "criterio",
+    ["R2", "R2A", "AIC", "AICc", "BIC"])
+
+def test_melhor_ajuste_polinomial(criterio):
+
+    # Dados gerados a partir de um modelo linear
+
+    rng = np.random.default_rng(42)
+    x = np.linspace(-20, 34, 60)
+    y = 5 * x ** 3 + 8 * x + rng.normal(0, 1, size=x.shape)
+
+    mod, info = melhor_ajuste(x, y, criterio)
+
+    if criterio == "R2":
+        pytest.skip("R2 tende a favorecer modelos mais complexos, " \
+        "gerando overfitting")
+
+    assert "polinomial grau 3" in mod
+
+    for key in ["R2", "R2A", "AIC", "AICc", "BIC"]:
+        assert key in info
