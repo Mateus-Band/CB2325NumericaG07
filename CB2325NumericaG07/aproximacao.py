@@ -58,7 +58,12 @@ def plotar_grafico(
 
 # Função de Ajuste Linear
 
-def ajuste_linear(valores_x: list, valores_y: list, plt_grafico: bool = True):
+def ajuste_linear(
+        valores_x: list, 
+        valores_y: list, 
+        plt_grafico: bool = True, 
+        expr: bool = False
+) -> tuple:
     """
     Calcule o ajuste linear y = ax + b pelo Método dos Mínimos Quadrados (MMQ).
 
@@ -69,15 +74,17 @@ def ajuste_linear(valores_x: list, valores_y: list, plt_grafico: bool = True):
         valores_x (list): Lista de valores da variável independente.
         valores_y (list): Lista de valores da variável dependente.
         plt_grafico (bool, opcional): True (padrão) se o gráfico deve 
-        ser plotado, False caso contrário.
+            ser plotado, False caso contrário.
+        expr (bool, opcional): True se a expressão deve ser mostrada,
+            False (padrão), caso contrário
 
     Retorna:
         tuple: (a, b), contendo o coeficiente angular (a) e o 
-        coeficiente linear (b) da reta de ajuste.
+            coeficiente linear (b) da reta de ajuste.
 
     Raises:
         ValueError: Se a lista de valores x e y tiverem tamanhos 
-        diferentes ou a variância dos valores de x for 0.
+            diferentes ou a variância dos valores de x for 0.
     """
 
     if len(valores_x) != len(valores_y):
@@ -101,24 +108,25 @@ def ajuste_linear(valores_x: list, valores_y: list, plt_grafico: bool = True):
     # Cálculo do coeficientes
 
     a = cov_xy / var_x           
-    b = y_medio - a * x_medio  
+    b = y_medio - a * x_medio 
+
+    # Print da expressão
+
+    if expr:
+        print(f"Função linear aproximadora: y = {a:.4f}x + {b:.4f}") 
 
     # Plot do gráfico
 
     if plt_grafico:
-        x_func = np.linspace(min(valores_x), max(valores_x), 200)
-        y_func = a * x_func + b
+        x_sym = sp.Symbol("x")
+        y_func = a * x_sym + b
 
-        plt.scatter(valores_x, valores_y, color="blue", marker="o", label="Dados Fornecidos")
-        plt.plot(x_func, y_func, color="black", linewidth=2, label="Reta de Ajuste Linear")
-
-        plt.title("Gráfico do Ajuste Linear")
-        plt.xlabel("Eixo x")
-        plt.ylabel("Eixo y")
-        plt.margins(x=0.1, y=0.1)
-        plt.grid(True)
-        plt.legend()
-        plt.show()
+        plotar_grafico(
+            valores_x,
+            valores_y,
+            y_func,
+            "Gráfico do Ajuste Linear"
+        )
 
     return a, b
 
@@ -364,7 +372,12 @@ def ajuste_senoidal(
 
 # Função de Ajuste Exponencial
 
-def ajuste_exponencial(valores_x: list, valores_y: list, plt_grafico: bool = True):
+def ajuste_exponencial(
+        valores_x: list, 
+        valores_y: list, 
+        plt_grafico: bool = True, 
+        expr: bool = False
+) -> tuple:
     """
     Calcule o ajuste exponencial y = b * e^(a*x)
      
@@ -378,15 +391,16 @@ def ajuste_exponencial(valores_x: list, valores_y: list, plt_grafico: bool = Tru
         valores_x (list): Lista de valores da variável independente.
         valores_y (list): Lista de valores da variável dependente.
         plt_grafico (bool, opcional): True (padrão) se o gráfico deve 
-        ser plotado, False caso contrário
-
+            ser plotado, False caso contrário
+        expr (bool, opcional): True se a expressão deve ser mostrada,
+            False (padrão), caso contrário
     Retorna:
         tuple: (a, b), contendo o coeficiente do expoente (a) e o 
-        coeficiente multiplicativo (b) da curva de ajuste.
+            coeficiente multiplicativo (b) da curva de ajuste.
     
     Raises:
         ValueError: Se a lista de valores x e y tiverem tamanhos 
-        diferentes ou a lista de valores y tiver valores não positivos.
+            diferentes ou a lista de valores y tiver valores não positivos.
     """
 
     if len(valores_x) != len(valores_y):
@@ -402,9 +416,25 @@ def ajuste_exponencial(valores_x: list, valores_y: list, plt_grafico: bool = Tru
     a, b_aux = ajuste_linear(valores_x, ln_valores_y, False)
     b = math.exp(b_aux)
 
+    # Print da expressão
+
+    if expr:
+        print(f"Função exponencial aproximadora: y = {b:.4f} * e^({a:.4f}x)")
+
     # Plot do gráfico
 
     if plt_grafico:
+        x_sym = sp.Symbol("x")
+        y_func = b * sp.exp(a * x_sym)
+
+        plotar_grafico(
+            valores_x,
+            valores_y,
+            y_func,
+            "Gráfico do Ajuste Exponencial"
+        )
+
+        '''
         x_func = np.linspace(min(valores_x), max(valores_x), 200)
         y_func = b * np.exp(a * x_func)
 
@@ -417,14 +447,19 @@ def ajuste_exponencial(valores_x: list, valores_y: list, plt_grafico: bool = Tru
         plt.margins(x=0.1, y=0.1)
         plt.grid(True)
         plt.legend()
-        plt.show()
+        plt.show()'''
 
     return a, b
 
 
 # Função de Ajuste Logaritimo
 
-def ajuste_logaritmo(valores_x:list, valores_y:list, plt_grafico: bool = True):
+def ajuste_logaritmo(
+        valores_x: list, 
+        valores_y: list, 
+        plt_grafico: bool = True, 
+        expr: bool = False
+) -> tuple:
     '''
     Calcula o ajuste logaritmo y = a + b * ln(x) 
     
@@ -439,6 +474,8 @@ def ajuste_logaritmo(valores_x:list, valores_y:list, plt_grafico: bool = True):
         valores_y (list): Lista de valores da variável dependente.
         plt_grafico (bool, opcional): True (padrão) se o gráfico deve
             ser plotado, False caso contrário.
+        expr (bool, opcional): True se a expressão deve ser mostrada,
+            False (padrão), caso contrário
 
     Retorna:
         tuple: (a, b), contendo o coeficiente (a) e o coeficiente 
@@ -461,24 +498,23 @@ def ajuste_logaritmo(valores_x:list, valores_y:list, plt_grafico: bool = True):
     ln_valores_x = [math.log(x) for x in valores_x]
     b, a = ajuste_linear(ln_valores_x, valores_y, False)
 
+    # Print da expressão
+
+    if expr:
+        print(f"Função logaritmo aproximadora: y = {a:.4f} + {b:.4f} * ln(x)")
+
     # Plot do gráfico
 
     if plt_grafico:
-        plt.figure()
-        
-        x_func = np.linspace(min(valores_x), max(valores_x), 200)
-        y_func = a + b * np.log(x_func)
+        x_sym = sp.Symbol("x")
+        y_func = a + b * sp.ln(x_sym)
 
-        plt.scatter(valores_x, valores_y, color="blue", marker="o", label="Dados Fornecidos")
-        plt.plot(x_func, y_func, color="black", linewidth=2, label="Curva de Ajuste Logaritmo")
-
-        plt.title("Gráfico do Ajuste Logaritmo")
-        plt.xlabel("Eixo x")
-        plt.ylabel("Eixo y")
-        plt.margins(x=0.1, y=0.1)
-        plt.grid(True)
-        plt.legend()
-        plt.show()
+        plotar_grafico(
+            valores_x,
+            valores_y,
+            y_func,
+            "Gráfico do Ajuste Logaritmo"
+        )
 
     return a, b
 
@@ -596,7 +632,7 @@ def avaliar_ajuste(
         criterio: str, 
         modelo: str, 
         coeficientes: tuple | np.ndarray
-    ):
+    ) -> float | tuple:
     """
     Avalie um modelo de ajuste por meio de um ou mais critérios
 
