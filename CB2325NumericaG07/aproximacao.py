@@ -35,7 +35,9 @@ def plotar_grafico(
     # Gerar os pontos
 
     x_func = np.linspace(min(valores_x), max(valores_x), qtd_pontos)
-    y_func = f(x_func)
+    y_func = np.array(f(x_func))
+    if y_func.shape == ():
+            y_func = np.full_like(x_func, y_func)
 
     # Plotar os gráficos
 
@@ -208,7 +210,7 @@ def ajuste_polinomial(
 def ajuste_senoidal(
         valores_x: list[float], 
         valores_y: list[float], 
-        T_aprox: float,
+        T_aprox: float | None = None,
         plt_grafico: bool = True, 
         expr: bool = False
 ) -> np.ndarray:
@@ -216,14 +218,17 @@ def ajuste_senoidal(
     Realiza o ajuste senoidal pelo Método dos Mínimos Quadrados (MMQ).
 
     Modelo adotado:
-        y = A * sin(B*x + D) + C. 
+        y = A * sin(B * x + C) + D. 
 
     Forma linearizada:
-        y = a * sin(B*x) + b * cos(B*x) + c
-        onde a = A * cos(D), b = A * sin(D), c = C.
+        y = a * sin(B*x) + b * cos(B*x) + d
+        onde a = A * cos(C), b = A * sin(C), d = D.
 
     A função estima a frequência B inicialmente 
-    pela aproximação do período fornecida pelo usuário. 
+    pela aproximação do período pelo usuário. Este é inserido opcionalmente
+    como parâmetro da função ou, no caso em que não o é, é captado
+    via input. Nesse caso, será exibido o gráfico com os dados fornecidos, 
+    em que o usuário deve indicar o período aproximado visualmente. 
     Em seguida, ela testa diversas frequências 
     em torno da frequência inicial pelo MMQ
 
@@ -238,6 +243,9 @@ def ajuste_senoidal(
     Argumentos:
         valores_x (list): Lista de valores da variável independente.
         valores_y (list): Lista de valores da variável dependente.
+        T_aprox (float | None, opcional): Período aproximado da senóide. 
+            - Se for fornecido (float), será usado diretamente.  
+            - Se for None (padrão), o período será solicitado ao usuário via input().
         plt_grafico (bool, opcional): Se True (padrão), exibe o gráfico de ajuste; 
         se False, não exibe.
         expr (bool, opcional): Se True, exibe a função senoidal simbólica aproximadora; 
@@ -250,10 +258,24 @@ def ajuste_senoidal(
 
     if len(valores_x) != len(valores_y):
         raise ValueError("As listas 'valores_x' e 'valores_y' devem ter o mesmo tamanho.")
-    
-    # Identificar a frequência aproximada
 
-    freq_aprox = (2 * np.pi) / T_aprox
+     # Plotar o gráfico de dispersão dos dados fornecidos 
+     # para que o usuário indique o período aproximado percebido na amostra
+
+    plt.scatter(valores_x, valores_y, color="blue", marker="o", label="Dados Fornecidos")
+    plt.title("Gráfico para Aproximação do Período")
+    plt.xlabel("Eixo x")
+    plt.ylabel("Eixo y")
+    plt.margins(x=0.1, y=0.1)
+    plt.grid(True)
+    plt.legend()
+    plt.show()
+
+    # Captar o período aproximado e cálculo da frequência aproximada 
+
+    if T_aprox is None:
+        T_aprox = float(input("Digite o Período Aproximado: "))
+    freq_aprox = (2*np.pi) / T_aprox
 
     # Identificar a frequência de menor erro quadrático 
     # dentro de um intervalo próximo à frequência aproximada.
@@ -278,21 +300,21 @@ def ajuste_senoidal(
 
         y_matriz = np.array(valores_y)
 
-        # Construir a matriz de parâmetros iniciais (coeff_iniciais), ou seja: a, b e c
+        # Construir a matriz de parâmetros iniciais (coeff_iniciais), ou seja: a, b e d
 
         try:
             coeff_iniciais, *_ = np.linalg.lstsq(x_matriz, y_matriz, rcond=None)
         except np.linalg.LinAlgError:
             continue  # pula frequências com sistema singular
 
-        a, b, c = coeff_iniciais[0], coeff_iniciais[1], coeff_iniciais[2]
+        a, b, d = coeff_iniciais[0], coeff_iniciais[1], coeff_iniciais[2]
 
         # Calcular o erro para a frequência em questão
 
         erro = np.linalg.norm(
-            y_matriz - (a * matriz_sin + b * matriz_cos + c))**2
+            y_matriz - (a * matriz_sin + b * matriz_cos + d))**2
 
-        erros[freq] = (erro, (a, b, c))
+        erros[freq] = (erro, (a, b, d))
     
     # Obter a frequência de menor erro (freq_final) e seus parâmetros (a, b e c)
 
@@ -301,27 +323,27 @@ def ajuste_senoidal(
 
     a = erros_ordenados[freq_final][1][0]
     b = erros_ordenados[freq_final][1][1]
-    c = erros_ordenados[freq_final][1][2]
+    d = erros_ordenados[freq_final][1][2]
 
     # Gerar array de coeficientes (array_coeficientes)
     # Contém A, B, C, D tal que a função aproximadora é definida como 
-    # y = A * sin(B*x + D) + C.
+    # y = A * sin(B*x + C) + D.
 
     A = float(np.hypot(a, b))
     B = freq_final
-    C = c
-    D = float(np.arctan2(b, a))
+    C = float(np.arctan2(b, a))
+    D = d
 
     array_coeficientes = np.array([A, B, C, D])
 
     # Gerar função senoidal aproximadora simbólica (func_aprox)
 
     x_sym = sp.Symbol("x")
-    func_aprox = A * sp.sin(B * x_sym + D) + C
+    func_aprox = A * sp.sin(B * x_sym + C) + D
 
     if expr:
         print(f"Função Senoidal Aproximadora: "
-              f"y = {A:.4f} * sin({B:.4f}x + {D:.4f}) + {C:.4f}"
+              f"y = {A:.4f} * sin({B:.4f}x + {C:.4f}) + {D:.4f}"
         )
 
     # Plotar o Gráfico
