@@ -487,7 +487,8 @@ def ajuste_logaritmo(valores_x:list, valores_y:list, plt_grafico: bool = True):
 
 def ajuste_multiplo(
         valores_var: list[list[float]], 
-        valores_z: list[float], 
+        valores_z: list[float],
+        incluir_intercepto : bool = True, 
         expr: bool = False
 ) -> np.ndarray:
     """
@@ -495,35 +496,61 @@ def ajuste_multiplo(
 
     A função obtém os coeficientes da função múltipla 
     que mais se aproxima dos dados pelo MMQ. 
-    Opcionalmente, a função também exibe a forma simbólica 
+    Opcionalmente, a função também inclui a busca por um intercepto
+    (termo independente) e exibe a forma simbólica 
     da expressão polinomial resultante (func_aprox).
+
+    Observação: O método pressupõe que as variáveis em 'valores_var'
+    não sejam fortemente relacionadas entre si e que não há
+    colinearidade. Caso contrário, pode haver instabilidade 
+    na regressão e/ou resultados incorretos.
 
     Argumentos:
         valores_var (list): Lista de valores das variáveis independentes.
         valores_z (list): Lista de valores da variável dependente.
+        incluir_intercepto (bool, opcional): Se True (padrão), inclui o termo
+        independente na solução do sistema linear; se False, não inclui.
         expr (bool, opcional): Se True, exibe a função simbólica aproximadora; 
         se False (padrão), não exibe.
 
     Retorna:
-        numpy.ndarray: array_coeficientes, 
-        contendo os coeficientes da função múltipla 
-        na ordem em que as variáveis foram apresentadas em valores_var.
+        numpy.ndarray: array_coeficientes, contendo os coeficientes 
+        da função múltipla.
+            - Se incluir_intercepto = True, retorna o termo
+            independente na primeira posição e os coeficientes
+            relacionados às variáveis na ordem em que foram
+            apresentadas em 'valores_var'.
+            - Se incluir_intercepto = False, retorna apenas os
+            coeficientes relacionados às variáveis na ordem em
+            que foram apresentadas em 'valores_var'.
     """
 
     # Construir a matriz de valores das variáveis (x_matriz)
 
-    xm_temp = np.array(valores_var)
-    x_matriz = np.insert(xm_temp, 0, 1, axis=1)
-    
+    x_matriz = np.array(valores_var, dtype=float).T
+
     # Construir a matriz dos valores de z (z_matriz)
 
-    z_matriz = np.array(valores_z)
+    z_matriz = np.array(valores_z, dtype=float).reshape(-1, 1)
 
-    # Condição de para o bom funcionamento da função
+    # Condição de início
 
-    if x_matriz.shape[0] != len(z_matriz):
+    if x_matriz.shape[0] != z_matriz.shape[0]:
         raise ValueError(
             "Número de linhas de X e número de valores de Z não coincidem."
+        )
+    
+    # Tratar o caso com intercepto
+
+    if incluir_intercepto:
+        x_matriz = np.column_stack([np.ones(len(valores_z)), x_matriz])
+
+    # Verificação de colinearidade
+
+    if np.linalg.matrix_rank(x_matriz) < x_matriz.shape[1]:
+        raise ValueError(
+            "Colinearidade detectada (matriz mal-condicionada). "
+            "Verifique os dados de entrada."
         )
 
     # Construir a matriz de parâmetros (array_coeficientes)
@@ -534,20 +561,47 @@ def ajuste_multiplo(
     # Gerar função aproximadora simbólica para regressão múltipla
 
     if expr:
-        qtd_var = x_matriz.shape[1] - 1
-        ind_fin = qtd_var + 1
+        if incluir_intercepto:
+            qtd_var = x_matriz.shape[1] - 1
+            ind_fin = qtd_var + 1
+        
+            x_sym = sp.symbols(f"x1:{ind_fin}")
+            func_aprox = array_coeficientes[0]
 
-        x_sym = sp.symbols(f"x1:{ind_fin}")
-        func_aprox = array_coeficientes[0]
+            for i in range(qtd_var):
+                func_aprox += array_coeficientes[i + 1] * x_sym[i]
 
-        for i in range(qtd_var):
-            func_aprox += array_coeficientes[i + 1] * x_sym[i]
+        else:
+            qtd_var = x_matriz.shape[1]
+            ind_fin = qtd_var + 1
+        
+            x_sym = sp.symbols(f"x1:{ind_fin}")
+            func_aprox = 0
 
+            for i in range(qtd_var):
+                func_aprox += array_coeficientes[i] * x_sym[i]
+        
         print(f"Função Aproximadora para Regressão Múltipla: {func_aprox}")
 
     # Retornar o array de coeficientes
 
     return array_coeficientes
+
+
+a = np.array([9, -13, 5.5, -213, 44.95])
+b = np.array([15, 33, 94, -0.5, 0.88])
+c = np.array([-24, -24, -24, -24, -24])
+d = np.array([33, -3.22, -178, -26, 500])
+
+z = (
+        3 * a + 
+        4 * b + 
+        5 * c +
+        6 * d
+    )
+
+result = ajuste_multiplo([a, b, c, d], z, incluir_intercepto=False, expr=True)
+
 
 
 # Função de Avaliação do Ajuste

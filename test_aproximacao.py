@@ -121,10 +121,10 @@ def test_werror(expected1):
     assert result == approx(expected1, rel=0.1, abs=1e-4)
 
 ###########
-# Teste - Ajuste Senoidal
+# Testes - Ajuste Senoidal
 ###########
 
-def test_ajuste_senoidal_basico():
+def test_ajuste_senoidal():
 
     # Sem ruído - Frequência Positiva
 
@@ -183,4 +183,59 @@ def test_ajuste_senoidal_basico():
 
     rms3 = np.sqrt(np.mean((y3_fit - y3) ** 2))
     assert rms3 < 1
+
+###########
+# Teste - Ajuste Múltiplo
+###########
+
+@pytest.mark.parametrize(
+    "expected1",
+    [
+        np.array([1, -5, -6, 0]),
+        np.array([1, 3, 4, 7]),
+        np.array([0.45, 2.1, 50, 99]),
+        np.array([-2, -2, -2, -2]),
+        np.array([0, 0, 0, 0]),
+        np.array([2.5, 3.1, 5.7, -2.7]),
+        np.array([7.52, 8, 31.04, 500]),
+    ],
+)
+def teste_ajuste_multiplo(expected1):
+
+    # Teste para colinearidade
+
+    
+
+    # Teste para dados sem ruído e sem intercepto
+
+    a = np.array([9, -13, 5.5, -213, 44.95])
+    b = np.array([15, 33, 94, -0.5, 0.88])
+    c = np.array([-24, -24, -24, -24, -24])
+    d = np.array([33, -3.22, -178, -26, 500])
+
+    z = (
+        expected1[0] * a + 
+        expected1[1] * b + 
+        expected1[2] * c +
+        expected1[3] * d
+    )
+
+    result = ajuste_multiplo([a, b, c, d], z, incluir_intercepto=False)
+    assert result == approx(expected1, rel=1e-4, abs=1e-5)
+
+    # Teste para dados sem ruído e com intercepto
+
+    a = np.array([9, -13, 5.5, -213, 44.95])
+    b = np.array([15, 33, 94, -0.5, 0.88])
+    c = np.array([33, -3.22, -178, -26, 500])
+
+    z = (
+        expected1[0] * a + 
+        expected1[1] * b + 
+        expected1[2] * c + 100
+    )
+
+    result = ajuste_multiplo([a, b, c], z)
+    assert result == approx(
+        [100, expected1[0], expected1[1], expected1[2]], rel=1e-4, abs=1e-5)
 
