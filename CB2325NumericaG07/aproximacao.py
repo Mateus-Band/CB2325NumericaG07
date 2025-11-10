@@ -138,39 +138,53 @@ def ajuste_polinomial(
         valores_y: list[float] | np.ndarray, 
         grau_pol: int, 
         plt_grafico: bool = True, 
-        expr: bool = False
+        expr: bool = False,
+        avaliar: str | None = None
 ) -> np.ndarray:
     """
     Realiza o ajuste polinomial pelo Método dos Mínimos Quadrados (MMQ).
 
-    A função obtém os coeficientes do polinômio de grau especificado pelo usuário 
-    que mais se aproxima dos dados pelo MMQ. 
+    A função obtém os coeficientes do polinômio de grau especificado 
+    pelo usuário que mais se aproxima dos dados pelo MMQ. 
 
-    Opcionalmente, a função também exibe um gráfico de dispersão 
-    dos pontos com o polinômio de ajuste 
-    e a forma simbólica da expressão polinomial resultante (func_aprox).
+    Opcionalmente, a função também exibe:
+        - Um gráfico de dispersão dos pontos com o polinômio de ajuste;
+        - A forma simbólica do polinômio de ajuste (func_aprox);
+        - Os valores de R^2, R^2 ajustado, AIC, AICc e BIC do modelo.
 
     Argumentos:
-        valores_x (list | np.ndarray): Valores da variável independente.
-        valores_y (list | np.ndarray): Valores da variável dependente.
-        grau_pol (int): Grau do polinômio ao qual os dados serão ajustados.
-        plt_grafico (bool, opcional): Se True (padrão), exibe o gráfico de ajuste; 
-        se False, não exibe.
-        expr (bool, opcional): Se True, exibe a função simbólica aproximadora; 
-        se False (padrão), não exibe.
+        valores_x (list | np.ndarray): 
+            Valores da variável independente.
+        valores_y (list | np.ndarray):
+            Valores da variável dependente.
+        grau_pol (int): 
+            Grau do polinômio ao qual os dados serão ajustados.
+        plt_grafico (bool, opcional): 
+            Se True (padrão), exibe o gráfico de ajuste; 
+            se False, não exibe.
+        expr (bool, opcional): 
+            Se True, exibe a função simbólica aproximadora; 
+            se False (padrão), não exibe.
+        avaliar (str | None):   
+            Se 'R2', 'R2A' (R^2 ajustado), 'AIC', 'AICc',
+            'BIC' ou 'all' (todos), exibe os valores do modelo para o(s)
+            criterio(s); Se None (padrão), não exibe.
 
     Retorna:
-        numpy.ndarray: array_coeficientes, 
-        contendo os coeficientes do polinômio em ordem crescente 
-        do grau da variável associada.
+        numpy.ndarray: 
+            array_coeficientes, contendo os coeficientes do polinômio 
+            em ordem crescente do grau da variável associada.
     """
 
-    # Condição de início
+    # Condições de início
 
     if len(valores_x) != len(valores_y):
         raise ValueError(
             "As listas 'valores_x' e 'valores_y' devem ter o mesmo tamanho."
         )
+    
+    if grau_pol < 0:
+        raise ValueError("grau_pol deve ser não negativo.")
 
     # Construir matriz de Vandermonde (x_matriz)
 
@@ -196,6 +210,31 @@ def ajuste_polinomial(
 
     if expr:
         print(f"Função Polinomial Aproximadora: {func_aprox}")
+    
+    # Avaliar o modelo
+
+    if avaliar:
+        if avaliar in ["R2", "AIC", "AICc", "BIC"]:
+            print(f"{avaliar}: {avaliar_ajuste(
+                valores_x, valores_y, avaliar, "polinomial", array_coeficientes
+            )}")
+        elif avaliar == "R2A":
+            print(f"R2 Ajustado: {avaliar_ajuste(
+                valores_x, valores_y, avaliar, "polinomial", array_coeficientes
+            )}")
+        elif avaliar == "all":
+            crit = avaliar_ajuste(
+                valores_x, valores_y, "all", "polinomial", array_coeficientes
+            )
+            print(f"R2: {crit[0]}")
+            print(f"R2 Ajustado: {crit[1]}")
+            print(f"AIC: {crit[2]}")
+            print(f"AICc: {crit[3]}")
+            print(f"BIC: {crit[4]}")
+        else:
+            raise ValueError(
+                "O critério de avaliação deve ser escolhido dentre as opções:"
+                "'R2', 'R2A', 'AIC', 'AICc', 'BIC' e 'all'.")
 
     # Plotar o gráfico
 
@@ -220,7 +259,8 @@ def ajuste_senoidal(
         valores_y: list[float] | np.ndarray, 
         T_aprox: float | None = None,
         plt_grafico: bool = True, 
-        expr: bool = False
+        expr: bool = False,
+        avaliar: str | None = None
 ) -> np.ndarray:
     """
     Realiza o ajuste senoidal pelo Método dos Mínimos Quadrados (MMQ).
@@ -244,23 +284,33 @@ def ajuste_senoidal(
     ela gera a lista de coeficientes A, B, C e D 
     da função senoidal aproximadora.
 
-    Opcionalmente, a função também exibe um gráfico 
-    de dispersão dos pontos com a senóide de ajuste 
-    e a forma simbólica da expressão senoidal resultante (func_aprox).
+    Opcionalmente, a função também exibe:
+        - Um gráfico de dispersão dos pontos com a senóide de ajuste;
+        - A forma simbólica da senóide de ajuste (func_aprox);
+        - Os valores de R^2, R^2 ajustado, AIC, AICc e BIC do modelo.
 
     Argumentos:
-        valores_x (list | np.ndarray): Valores da variável independente.
-        valores_y (list | np.ndarray): Valores da variável dependente.
+        valores_x (list | np.ndarray): 
+            Valores da variável independente.
+        valores_y (list | np.ndarray): 
+            Valores da variável dependente.
         T_aprox (float | None, opcional): Período aproximado da senóide. 
-            - Se for fornecido (float), será usado diretamente.  
-            - Se for None (padrão), o período será solicitado ao usuário via input().
-        plt_grafico (bool, opcional): Se True (padrão), exibe o gráfico de ajuste; 
-        se False, não exibe.
-        expr (bool, opcional): Se True, exibe a função senoidal simbólica aproximadora; 
-        se False (padrão), não exibe.
+            Se for fornecido (float), será usado diretamente.  
+            Se for None (padrão), o período será solicitado ao usuário via input().
+        plt_grafico (bool, opcional): 
+            Se True (padrão), exibe o gráfico de ajuste; 
+            se False, não exibe.
+        expr (bool, opcional): 
+            Se True, exibe a função senoidal simbólica aproximadora; 
+            se False (padrão), não exibe.
+        avaliar (str | None):   
+            Se 'R2', 'R2A' (R^2 ajustado), 'AIC', 'AICc',
+            'BIC' ou 'all' (todos), exibe os valores do modelo para o(s)
+            criterio(s); Se None (padrão), não exibe.
 
     Retorna:
-        numpy.ndarray: array_coeficientes, contendo os coeficientes A, B, C e D.
+        numpy.ndarray: 
+            array_coeficientes, contendo os coeficientes A, B, C e D.
     """
     # Condição de início
 
@@ -353,6 +403,33 @@ def ajuste_senoidal(
         print(f"Função Senoidal Aproximadora: "
               f"y = {A:.4f} * sin({B:.4f}x + {C:.4f}) + {D:.4f}"
         )
+
+    # Avaliar o modelo
+
+        # Avaliar o modelo
+
+    if avaliar:
+        if avaliar in ["R2", "AIC", "AICc", "BIC"]:
+            print(f"{avaliar}: {avaliar_ajuste(
+                valores_x, valores_y, avaliar, "senoidal", array_coeficientes
+            )}")
+        elif avaliar == "R2A":
+            print(f"R2 Ajustado: {avaliar_ajuste(
+                valores_x, valores_y, avaliar, "senoidal", array_coeficientes
+            )}")
+        elif avaliar == "all":
+            crit = avaliar_ajuste(
+                valores_x, valores_y, "all", "senoidal", array_coeficientes
+            )
+            print(f"R2: {crit[0]}")
+            print(f"R2 Ajustado: {crit[1]}")
+            print(f"AIC: {crit[2]}")
+            print(f"AICc: {crit[3]}")
+            print(f"BIC: {crit[4]}")
+        else:
+            raise ValueError(
+                "O critério de avaliação deve ser escolhido dentre as opções:"
+                "'R2', 'R2A', 'AIC', 'AICc', 'BIC' e 'all'.")
 
     # Plotar o Gráfico
 
@@ -542,12 +619,16 @@ def ajuste_multiplo(
     na regressão e/ou resultados incorretos.
 
     Argumentos:
-        valores_var (list | np.ndarray): Valores das variáveis independentes.
-        valores_z (list | np.ndarray): Valores da variável dependente.
-        incluir_intercepto (bool, opcional): Se True (padrão), inclui o termo
-        independente na solução do sistema linear; se False, não inclui.
-        expr (bool, opcional): Se True, exibe a função simbólica aproximadora; 
-        se False (padrão), não exibe.
+        valores_var (list | np.ndarray): 
+            Valores das variáveis independentes.
+        valores_z (list | np.ndarray): 
+            Valores da variável dependente.
+        incluir_intercepto (bool, opcional): 
+            Se True (padrão), inclui o termo independente na 
+            solução do sistema linear; se False, não inclui.
+        expr (bool, opcional): 
+            Se True, exibe a função simbólica aproximadora; 
+            se False (padrão), não exibe.
 
     Retorna:
         numpy.ndarray: array_coeficientes, contendo os coeficientes 
@@ -759,27 +840,35 @@ def melhor_ajuste(
     Já se o critério é AIC, AICc ou BIC, 
     é retornado o ajuste cujo valor para o critério é o menor.
 
-    Opcionalmente, a função também exibe um gráfico de dispersão dos pontos 
-    com o polinômio/reta de ajuste e a 
-    forma simbólica da expressão polinomial resultante (func_aprox). 
-    Além disso, há também a opção de retornar os valores 
-    dos outros critérios para o ajuste sugerido.
+    Opcionalmente, a função também exibe:
+        - Um gráfico de dispersão dos pontos com a função de ajuste;
+        - A forma simbólica da reta/polinômio de ajuste (func_aprox);
+        - Os valores dos outros critérios para o ajuste sugerido.
 
     Argumentos:
-        valores_x (list | np.ndarray): Valores da variável independente.
-        valores_y (list | np.ndarray): Valores da variável dependente.
-        criterio (str): Critério escolhido dentre as opções 
-        "R2", "R2A" (R^2 ajustado), "AIC", "AICc" e "BIC" para sugestão do modelo.
-        exibir_todos (bool, opcional): Se True, exibe os valores dos outros critérios; 
-        se False (padrão), não exibe.
-        plt_grafico (bool, opcional): Se True (padrão), exibe o gráfico de ajuste; 
-        se False, não exibe.
-        expr (bool, opcional): Se True, exibe a função simbólica aproximadora sugerida; 
-        se False (padrão), não exibe.
+        valores_x (list | np.ndarray): 
+            Valores da variável independente.
+        valores_y (list | np.ndarray): 
+            Valores da variável dependente.
+        criterio (str): 
+            Critério escolhido dentre as opções: "R2", "R2A" (R^2 ajustado), 
+            "AIC", "AICc" e "BIC" para sugestão do modelo.
+        exibir_todos (bool, opcional): 
+            Se True, exibe os valores dos outros critérios; 
+            se False (padrão), não exibe.
+        plt_grafico (bool, opcional): 
+            Se True (padrão), exibe o gráfico de ajuste; 
+            se False, não exibe.
+        expr (bool, opcional): 
+            Se True, exibe a função simbólica aproximadora sugerida; 
+            se False (padrão), não exibe.
 
     Retorna:
-        str: aprox_escolhida, representando o nome do modelo escolhido.
-        dict: funcs[aprox_escolhida], contendo as principais informações do modelo sugerido.
+        str: 
+            aprox_escolhida, representando o nome do modelo escolhido.
+        dict: 
+            funcs[aprox_escolhida], contendo as principais informações 
+            do modelo sugerido.
     """
 
     # Condições de Início da Função
