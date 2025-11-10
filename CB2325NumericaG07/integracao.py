@@ -182,7 +182,7 @@ def integral_simpson38(function, a, b, n : int, plotar = False) -> float:
         return integral
     
 
-def integracao_de_montecarlo(func,a:float,b:float, c:int = None,d:int=None,qte = 100,plot = False):
+def integral_de_montecarlo(func,a:float,b:float, c:int = None,d:int=None,qte = 100,plot = False):
     '''
         Parâmetros:
            func : função que será integrada
@@ -239,3 +239,4 @@ def integracao_de_montecarlo(func,a:float,b:float, c:int = None,d:int=None,qte =
 if __name__ == "__main__":
     print(integral_trapezio.__doc__)
     print(integral_simpson38.__doc__)
+    print(integral_de_montecarlo.__doc__)
