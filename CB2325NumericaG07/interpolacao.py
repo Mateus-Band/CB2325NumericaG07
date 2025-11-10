@@ -80,6 +80,51 @@ def duplicate(lista) -> list:
             l.append(i)
         return l
 
+
+def hermite_ddfunc(Point_list:list,derivada,func)-> list:
+    '''
+    Recebe a lista de pontos, uma função que retorna as derivadas em cada ponto, e a função que queremos usar na interpolação,
+    e retorna as f[] necessarias para o calculo da intepolação de hermite em ordem,
+    por exemplo [f[x_0],f[x_0,x_0],f[x_0,x_0,x_1],...] .
+
+    Parâmetros:
+        Point_list (list): lista com os valores dos pontos na coordenada x
+        derivada (função): função que retorna a derivada de cada ponto da Point_list
+        func (função): função que retorna os valores dos pontos na coordenada y para cada ponto da coordenada y, func(x) = y
+
+    Retorna:
+        list: Lista com os valores de cada f[] necessária para calcular o polinomio de hermite na ordem que o f[x] aparece
+
+
+    '''
+    subslist1,subslist2 = Point_list.copy(),Point_list.copy()#sublist1 e sublist2 são listas que usarei para guardar quais valores serão subtraidos nos denomidaores
+    Point_list = [func(p) for p in Point_list] #aplica na lista de pontos a função e retorna cada valor
+    
+    def der(P_list): #funciona com uma redução de lista, seja x_i o elemento da nova lista e x1_i o elemento da lista antiga de posição i, x_i = (x1_(i+1) - x1_i)/(sublist[i]-sublist2[i]), da mesma forma que seria calcular a interpolação por tabela,  
+        '''
+        Reduz uma lista usando o metodo de calcular os valores de f[], pelo método de tabela
+        '''
+
+        new_list = [] #salva nessa lista
+        subslist1.pop(0)
+        subslist2.pop()
+        for i in range(len(P_list)-1):
+            if subslist1[i] == subslist2[i]:
+                new_list.append(derivada(subslist1[i]))
+            else:
+                new_list.append((P_list[i+1] - P_list[i])/(subslist1[i] - subslist2[i]))
+
+        return new_list
+
+    result_list = []
+    while len(Point_list) != 1: #vai reduzindo a lista até sobrar apenas um elemento, e guarda apenas o topo na tabela, no caso o primeiro da lista
+        result_list.append(Point_list[0]) 
+        Point_list = der(Point_list)
+    result_list.append(Point_list[0])
+    return result_list
+
+
+
 def interpolacao_de_hermite(x,y,plot=False, grid=True):
     '''
     Essa função retorna, recebendo uma lista de valores de x e outra lista dos respectivos valores de f(x), uma função que interpola valores conforme f(x)
@@ -94,48 +139,6 @@ def interpolacao_de_hermite(x,y,plot=False, grid=True):
     Retorna:
         Função: Essa nova função recebe valores de x e retorna os valores de f(x) interpolados.
     '''
-
-    def hermite_ddfunc(Point_list:list,derivada,func)-> list:
-        '''
-        Recebe a lista de pontos, uma função que retorna as derivadas em cada ponto, e a função que queremos usar na interpolação,
-        e retorna as f[] necessarias para o calculo da intepolação de hermite em ordem,
-        por exemplo [f[x_0],f[x_0,x_0],f[x_0,x_0,x_1],...] .
-
-        Parâmetros:
-            Point_list (list): lista com os valores dos pontos na coordenada x
-            derivada (função): função que retorna a derivada de cada ponto da Point_list
-            func (função): função que retorna os valores dos pontos na coordenada y para cada ponto da coordenada y, func(x) = y
-
-        Retorna:
-            list: Lista com os valores de cada f[] necessária para calcular o polinomio de hermite na ordem que o f[x] aparece
-
-
-        '''
-        subslist1,subslist2 = Point_list.copy(),Point_list.copy()#sublist1 e sublist2 são listas que usarei para guardar quais valores serão subtraidos nos denomidaores
-        Point_list = [func(p) for p in Point_list] #aplica na lista de pontos a função e retorna cada valor
-        
-        def der(P_list): #funciona com uma redução de lista, seja x_i o elemento da nova lista e x1_i o elemento da lista antiga de posição i, x_i = (x1_(i+1) - x1_i)/(sublist[i]-sublist2[i]), da mesma forma que seria calcular a interpolação por tabela,  
-            '''
-            Reduz uma lista usando o metodo de calcular os valores de f[], pelo método de tabela
-            '''
-
-            new_list = [] #salva nessa lista
-            subslist1.pop(0)
-            subslist2.pop()
-            for i in range(len(P_list)-1):
-                if subslist1[i] == subslist2[i]:
-                    new_list.append(derivada(subslist1[i]))
-                else:
-                    new_list.append((P_list[i+1] - P_list[i])/(subslist1[i] - subslist2[i]))
-
-            return new_list
-
-        result_list = []
-        while len(Point_list) != 1: #vai reduzindo a lista até sobrar apenas um elemento, e guarda apenas o topo na tabela, no caso o primeiro da lista
-            result_list.append(Point_list[0]) 
-            Point_list = der(Point_list)
-        result_list.append(Point_list[0])
-        return result_list
     
     #Cálculo final
 
@@ -215,6 +218,32 @@ def interpolacao_de_hermite(x,y,plot=False, grid=True):
     return interpolation
 
 
+def newton_ddfunc(Point_list:list,func)-> list:
+    '''Recebe a lista de pontos e a função que queremos usar na interpolação,
+    e retorna as f[] necessarias para o calculo da intepolação de newton em ordem,
+    por exemplo [f[x_0],f[x_0,x_1],f[x_0,x_1,x_2],...] .
+    '''
+    subslist1,subslist2 = Point_list.copy(),Point_list.copy()#sublist1 e sublist2 são listas que usarei para guardar quais valores serão subtraidos nos denomidaores
+    Point_list = [func(p) for p in Point_list] #aplica na lista de pontos a função e retorna cada valor
+    
+    def der(P_list): #funciona com uma redução de lista, seja x_i o elemento da nova lista e x1_i o elemento da lista antiga de posição i, x_i = (x1_(i+1) - x1_i)/(sublist[i]-sublist2[i]), da mesma forma que seria calcular a interpolação por tabela,  
+        new_list = [] #salva nessa lista
+        subslist1.pop(0)
+        subslist2.pop()
+        for i in range(len(P_list)-1):
+            new_list.append((P_list[i+1] - P_list[i])/(subslist1[i] - subslist2[i]))
+
+        return new_list
+
+    result_list = []
+    while len(Point_list) != 1: #vai reduzindo a lista até sobrar apenas um elemento, e guarda apenas o topo na tabela, no caso o primeiro da lista
+        result_list.append(Point_list[0]) 
+        Point_list = der(Point_list)
+    result_list.append(Point_list[0])
+    return result_list
+
+
+
 def interpolacao_de_newton(x,y,plot:bool = False,grid:bool = True):
     '''Essa função retorna, recebendo uma lista de valores de x e outra lista dos respectivos valores de f(x), uma função que interpola valores conforme f(x)
     
@@ -228,32 +257,6 @@ def interpolacao_de_newton(x,y,plot:bool = False,grid:bool = True):
     
     
     '''
-
-    def newton_ddfunc(Point_list:list,func)-> list:
-        '''Recebe a lista de pontos e a função que queremos usar na interpolação,
-        e retorna as f[] necessarias para o calculo da intepolação de newton em ordem,
-        por exemplo [f[x_0],f[x_0,x_1],f[x_0,x_1,x_2],...] .
-        '''
-        subslist1,subslist2 = Point_list.copy(),Point_list.copy()#sublist1 e sublist2 são listas que usarei para guardar quais valores serão subtraidos nos denomidaores
-        Point_list = [func(p) for p in Point_list] #aplica na lista de pontos a função e retorna cada valor
-        
-        def der(P_list): #funciona com uma redução de lista, seja x_i o elemento da nova lista e x1_i o elemento da lista antiga de posição i, x_i = (x1_(i+1) - x1_i)/(sublist[i]-sublist2[i]), da mesma forma que seria calcular a interpolação por tabela,  
-            new_list = [] #salva nessa lista
-            subslist1.pop(0)
-            subslist2.pop()
-            for i in range(len(P_list)-1):
-                new_list.append((P_list[i+1] - P_list[i])/(subslist1[i] - subslist2[i]))
-
-            return new_list
-
-        result_list = []
-        while len(Point_list) != 1: #vai reduzindo a lista até sobrar apenas um elemento, e guarda apenas o topo na tabela, no caso o primeiro da lista
-            result_list.append(Point_list[0]) 
-            Point_list = der(Point_list)
-        result_list.append(Point_list[0])
-        return result_list
-
-
 
     f = function_definer(x,y) #define a função que f(x) = y
     coeficientes_newton = newton_ddfunc(x,f)#calcula os resultados dos f[x_0],f[x_0,x_0] ... necessários
