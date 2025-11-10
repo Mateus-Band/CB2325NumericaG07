@@ -361,7 +361,7 @@ if __name__ == "__main__":
     print("=== Documentação dos Métodos ===\n")
     print(integral_trapezio.__doc__)
     print(integral_simpson38.__doc__)
-    print(integracao_de_montecarlo.__doc__)
+    print(integral_de_montecarlo.__doc__)
     print(integral_boole.__doc__)
     print(integral_gauss_legendre.__doc__)
 
@@ -382,7 +382,7 @@ if __name__ == "__main__":
     print(f"Resultado: {area_b:.6f}\n")
 
     print("→ Integração de Monte Carlo:")
-    area_m = integracao_de_montecarlo(f, 0, math.pi, qte=5000, plot=True)
+    area_m = integral_de_montecarlo(f, 0, math.pi, qte=5000, plot=True)
     print(f"Resultado: {area_m:.6f}")
 
     print("→ Quadratura de Gauss–Legendre:")
