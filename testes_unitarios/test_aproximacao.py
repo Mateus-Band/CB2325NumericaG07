@@ -1,9 +1,20 @@
 import matplotlib
 import numpy as np
+
+
+import sys
+import os
+notebook_dir = os.getcwd()
+project_root = os.path.abspath(os.path.join(notebook_dir, '..'))
+if project_root not in sys.path:
+    sys.path.append(project_root)
+
 import pytest
 
 from CB2325NumericaG07.aproximacao import *
 from pytest import approx
+
+
 
 matplotlib.use("Agg")
 
@@ -184,7 +195,6 @@ def test_ajuste_senoidal():
     A1, B1, C1, D1 = 3.5, 0.5, 1.5, 3
     x1 = np.linspace(-15 * np.pi, 15 * np.pi, 200)
     y1 = A1 * np.sin(B1 * x1 + C1) + D1
-
     x1_lista = x1.tolist()
     y1_lista = y1.tolist()
 
