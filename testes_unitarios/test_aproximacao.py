@@ -459,6 +459,124 @@ def teste_ajuste_multiplo(expected1):
     assert rms3 < 1
 
 ###########
+# Testes - Avaliar Ajustes
+###########
+
+# Dados para testes
+
+@pytest.fixture
+def dados():
+    # Dados de y = 2.5x^2 + 0.5x + 1, com um pouco de ruído
+    valores_x = [0, 1, 2, 3, 4]
+    valores_y = [1.1, 2.9, 9.1, 21.1, 39.9]
+
+    modelo = "polinomial"
+    coeficientes = np.array([1.0, 0.5, 2.5])
+    
+
+    return valores_x, valores_y, modelo, coeficientes
+
+# Teste para tamanho de lista inválidos
+
+def test_avaliar_ajuste_invalid_input_lenght():
+    x = [1, 2]
+    y = [1]
+
+    with pytest.raises(ValueError, match="As listas 'valores_x' e 'valores_y' devem ter o mesmo tamanho."):
+        avaliar_ajuste(x, y, "R2", "linear", (1, 1))
+
+# Teste para criterio desconhecido
+
+def test_avaliar_ajuste_criterio_desconhecido():
+    x = [1]
+    y = [1]
+
+    with pytest.raises(ValueError, match="Critério desconhecido."):
+        avaliar_ajuste(x, y, "", "linear", (1, 1))
+
+# Teste para modelo desconhecido
+
+def test_avaliar_ajuste_modelo_desconhecido():
+    x = [1]
+    y = [1]
+
+    with pytest.raises(ValueError, match="Modelo desconhecido."):
+        avaliar_ajuste(x, y, "R2", "", (1, 1))
+
+# Teste para divisão por 0
+
+def test_avaliar_ajuste_divisao_zero():
+    x = [1, 2, 3]
+    y = [2, 4, 6]
+
+    coeficientes = (2, 0)
+    modelo = "linear"
+
+    # n - qtd_coeficientes - 1 = 3 - 2 - 1 = 0. (Falha em R2A, AICc e all)
+    
+    with pytest.raises(ZeroDivisionError, match="Não é possível calcular o critério solicitado."):
+        avaliar_ajuste(x, y, "R2A", modelo, coeficientes)
+        
+    with pytest.raises(ZeroDivisionError, match="Não é possível calcular o critério solicitado."):
+        avaliar_ajuste(x, y, "AICc", modelo, coeficientes)
+        
+    with pytest.raises(ZeroDivisionError, match="Não é possível calcular o critério solicitado."):
+        avaliar_ajuste(x, y, "all", modelo, coeficientes)
+
+# Teste R2
+
+def test_avaliar_ajuste_calculo_r2(dados):
+    x, y, modelo, coeficientes = dados
+    r2 = avaliar_ajuste(x, y, "R2", modelo, coeficientes)
+
+    assert r2 == approx(0.9864, rel=0.01)
+
+# Teste R2A
+
+def test_avaliar_ajuste_calculo_r2a(dados):
+    x, y, modelo, coeficientes = dados
+    r2a = avaliar_ajuste(x, y, "R2A", modelo, coeficientes)
+
+    assert r2a == approx(0.9456, rel=0.01)
+
+# Teste AIC
+
+def test_avaliar_ajuste_calculo_aic(dados):
+    x, y, modelo, coeficientes = dados
+    aic = avaliar_ajuste(x, y, "AIC", modelo, coeficientes)
+
+    assert aic == approx(11.165, rel=0.01)
+
+# Teste AICc
+
+def test_avaliar_ajuste_calculo_aicc(dados):
+    x, y, modelo, coeficientes = dados
+    aicc = avaliar_ajuste(x, y, "AICc", modelo, coeficientes)
+
+    assert aicc == approx(35.165, rel=0.01)
+
+# Teste BIC
+
+def test_avaliar_ajuste_calculo_bic(dados):
+    x, y, modelo, coeficientes = dados
+    bic = avaliar_ajuste(x, y, "BIC", modelo, coeficientes)
+
+    assert bic == approx(9.992, rel=0.01)
+
+# Teste all
+
+def test_avaliar_ajuste_calculo_all(dados):
+    x, y, modelo, coeficientes = dados
+    r2, r2a, aic, aicc, bic = avaliar_ajuste(x, y, "all", modelo, coeficientes)
+
+    assert r2 == approx(0.9864, rel=0.01)
+    assert r2a == approx(0.9456, rel=0.01)
+    assert aic == approx(11.165, rel=0.01)
+    assert aicc == approx(35.165, rel=0.01)
+    assert bic == approx(9.992, rel=0.01)
+
+
+###########
 # Testes - Melhor Ajuste
 ###########
 
