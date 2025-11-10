@@ -138,8 +138,7 @@ def ajuste_polinomial(
         valores_y: list[float] | np.ndarray, 
         grau_pol: int, 
         plt_grafico: bool = True, 
-        expr: bool = False,
-        avaliar: str | None = None
+        expr: bool = False
 ) -> np.ndarray:
     """
     Realiza o ajuste polinomial pelo Método dos Mínimos Quadrados (MMQ).
@@ -149,8 +148,7 @@ def ajuste_polinomial(
 
     Opcionalmente, a função também exibe:
         - Um gráfico de dispersão dos pontos com o polinômio de ajuste;
-        - A forma simbólica do polinômio de ajuste (func_aprox);
-        - Os valores de R^2, R^2 ajustado, AIC, AICc e BIC do modelo.
+        - A forma simbólica do polinômio de ajuste (func_aprox).
 
     Argumentos:
         valores_x (list | np.ndarray): 
@@ -165,10 +163,6 @@ def ajuste_polinomial(
         expr (bool, opcional): 
             Se True, exibe a função simbólica aproximadora; 
             se False (padrão), não exibe.
-        avaliar (str | None):   
-            Se 'R2', 'R2A' (R^2 ajustado), 'AIC', 'AICc',
-            'BIC' ou 'all' (todos), exibe os valores do modelo para o(s)
-            criterio(s); Se None (padrão), não exibe.
 
     Retorna:
         numpy.ndarray: 
@@ -210,31 +204,6 @@ def ajuste_polinomial(
 
     if expr:
         print(f"Função Polinomial Aproximadora: {func_aprox}")
-    
-    # Avaliar o modelo
-
-    if avaliar:
-        if avaliar in ["R2", "AIC", "AICc", "BIC"]:
-            print(f"{avaliar}: {avaliar_ajuste(
-                valores_x, valores_y, avaliar, "polinomial", array_coeficientes
-            )}")
-        elif avaliar == "R2A":
-            print(f"R2 Ajustado: {avaliar_ajuste(
-                valores_x, valores_y, avaliar, "polinomial", array_coeficientes
-            )}")
-        elif avaliar == "all":
-            crit = avaliar_ajuste(
-                valores_x, valores_y, "all", "polinomial", array_coeficientes
-            )
-            print(f"R2: {crit[0]}")
-            print(f"R2 Ajustado: {crit[1]}")
-            print(f"AIC: {crit[2]}")
-            print(f"AICc: {crit[3]}")
-            print(f"BIC: {crit[4]}")
-        else:
-            raise ValueError(
-                "O critério de avaliação deve ser escolhido dentre as opções:"
-                "'R2', 'R2A', 'AIC', 'AICc', 'BIC' e 'all'.")
 
     # Plotar o gráfico
 
@@ -259,8 +228,7 @@ def ajuste_senoidal(
         valores_y: list[float] | np.ndarray, 
         T_aprox: float | None = None,
         plt_grafico: bool = True, 
-        expr: bool = False,
-        avaliar: str | None = None
+        expr: bool = False
 ) -> np.ndarray:
     """
     Realiza o ajuste senoidal pelo Método dos Mínimos Quadrados (MMQ).
@@ -286,8 +254,7 @@ def ajuste_senoidal(
 
     Opcionalmente, a função também exibe:
         - Um gráfico de dispersão dos pontos com a senóide de ajuste;
-        - A forma simbólica da senóide de ajuste (func_aprox);
-        - Os valores de R^2, R^2 ajustado, AIC, AICc e BIC do modelo.
+        - A forma simbólica da senóide de ajuste (func_aprox).
 
     Argumentos:
         valores_x (list | np.ndarray): 
@@ -303,10 +270,6 @@ def ajuste_senoidal(
         expr (bool, opcional): 
             Se True, exibe a função senoidal simbólica aproximadora; 
             se False (padrão), não exibe.
-        avaliar (str | None):   
-            Se 'R2', 'R2A' (R^2 ajustado), 'AIC', 'AICc',
-            'BIC' ou 'all' (todos), exibe os valores do modelo para o(s)
-            criterio(s); Se None (padrão), não exibe.
 
     Retorna:
         numpy.ndarray: 
@@ -403,33 +366,6 @@ def ajuste_senoidal(
         print(f"Função Senoidal Aproximadora: "
               f"y = {A:.4f} * sin({B:.4f}x + {C:.4f}) + {D:.4f}"
         )
-
-    # Avaliar o modelo
-
-        # Avaliar o modelo
-
-    if avaliar:
-        if avaliar in ["R2", "AIC", "AICc", "BIC"]:
-            print(f"{avaliar}: {avaliar_ajuste(
-                valores_x, valores_y, avaliar, "senoidal", array_coeficientes
-            )}")
-        elif avaliar == "R2A":
-            print(f"R2 Ajustado: {avaliar_ajuste(
-                valores_x, valores_y, avaliar, "senoidal", array_coeficientes
-            )}")
-        elif avaliar == "all":
-            crit = avaliar_ajuste(
-                valores_x, valores_y, "all", "senoidal", array_coeficientes
-            )
-            print(f"R2: {crit[0]}")
-            print(f"R2 Ajustado: {crit[1]}")
-            print(f"AIC: {crit[2]}")
-            print(f"AICc: {crit[3]}")
-            print(f"BIC: {crit[4]}")
-        else:
-            raise ValueError(
-                "O critério de avaliação deve ser escolhido dentre as opções:"
-                "'R2', 'R2A', 'AIC', 'AICc', 'BIC' e 'all'.")
 
     # Plotar o Gráfico
 
