@@ -8,6 +8,52 @@ from pytest import approx
 matplotlib.use("Agg")
 
 ###########
+# Testes - Ajuste Linear
+###########
+
+# Teste para tamanho inválido de listas
+
+def test_ajuste_linear_invalid_input_leght():
+    x = [1, 2, 3]
+    y = [1, 2]
+
+    with pytest.raises(
+        ValueError, match="As listas 'valores_x' e 'valores_y' devem ter o mesmo tamanho."
+    ):
+        ajuste_linear(x, y, plt_grafico=False)
+
+# Teste para variância zero
+
+def test_ajuste_linear_zero_variance():
+    x = [2, 2, 2, 2]
+    y = [1, 3, 5, 2]
+
+    with pytest.raises(
+        ValueError, match="A variância de valores_x é zero."
+    ):
+        ajuste_linear(x, y, plt_grafico=False)
+
+# Teste para função ajustada
+
+def test_ajuste_linear_perfeito():
+    x = [1, 2, 3, 4, 5]
+    y = [3, 5, 7, 9, 11] 
+    a, b = ajuste_linear(x, y, plt_grafico=False)
+
+    assert a == approx(2.0)
+    assert b == approx(1.0)
+
+# Teste com ruído
+
+def test_ajuste_linear_ruido():
+    x = [0, 1, 2, 3]
+    y = [1, 2.1, 2.9, 4] 
+    a, b = ajuste_linear(x, y, plt_grafico=False)
+
+    assert a == approx(0.98)
+    assert b == approx(1.03)
+
+###########
 # Testes - Ajuste Polinomial
 ###########
 
@@ -204,6 +250,102 @@ def test_ajuste_senoidal():
 
     rms3 = np.sqrt(np.mean((y3_fit - y3) ** 2))
     assert rms3 < 1
+
+###########
+# Testes - Ajuste Exponencial
+###########
+
+# Teste para tamanho de lista inválidos
+
+def test_ajuste_exponencial_invalid_input_lenght():
+    x = [1, 2, 3]
+    y = [1, 2]
+
+    with pytest.raises(
+        ValueError, match="As listas 'valores_x' e 'valores_y' devem ter o mesmo tamanho."
+    ):
+        ajuste_exponencial(x, y, plt_grafico=False)
+
+# Teste para y não positivo
+
+def test_ajuste_exponencial_y_nao_positivo():
+    x = [1, 2, 3, 4]
+    y = [1, 4, -9, 16]
+
+    with pytest.raises(
+        ValueError, match="A lista de valores de y possui valor\\(es\\) não postivos\\(s\\)."
+    ):
+        ajuste_exponencial(x, y, plt_grafico=False)
+
+# Teste para função ajustada
+
+def test_ajuste_exponencial_perfeito():
+    x = np.array([0, 1, 2, 3, 4])
+    y = 0.5 * np.exp(5 * x)
+    
+    a, b = ajuste_exponencial(x.tolist(), y.tolist(), plt_grafico=False)
+    
+    assert a == approx(5)
+    assert b == approx(0.5)
+
+# Teste para dados com ruído
+
+def test_ajuste_exponencial_ruido():
+    x = [0, 1, 2]
+    y = [3.069674, 3.730489, 4.215573]
+
+    a, b = ajuste_exponencial(x, y, plt_grafico=False)
+    
+    assert a == approx(0.16, rel=0.2)
+    assert b == approx(3.1, rel=0.2)
+
+###########
+# Testes - Ajuste Logaritmo
+###########
+
+# Teste para tamanho de lista inválidos
+
+def test_ajuste_logaritmo_invalid_input_lenght():
+    x = [1, 2, 3]
+    y = [1, 2]
+
+    with pytest.raises(
+        ValueError, match="As listas 'valores_x' e 'valores_y' devem ter o mesmo tamanho."
+    ):
+        ajuste_logaritmo(x, y, plt_grafico=False)
+
+# Teste para x não positivo
+
+def test_ajuste_logaritmo_x_nao_positivo():
+    x = [1, 2, -3, 4]
+    y = [1, 4, 9, 16]
+
+    with pytest.raises(
+        ValueError, match="A lista de valores de x possui valor\\(es\\) não postivos\\(s\\)."
+    ):
+        ajuste_logaritmo(x, y, plt_grafico=False)
+
+# Teste para função ajustada
+
+def test_ajuste_logaritmo_perfeito():
+    x = np.array([1, 2, 3, 4, 5])
+    y = 5 + 2 * np.log(x)
+    
+    a, b = ajuste_logaritmo(x.tolist(), y.tolist(), plt_grafico=False)
+    
+    assert a == approx(5)
+    assert b == approx(2)
+
+# Teste para dados com ruído
+
+def test_ajuste_logaritmo_ruido():
+    x = [1, 2, 3, 4, 5]
+    y = [10.1, 12.0, 13.5, 14.0, 14.9]
+
+    a, b = ajuste_logaritmo(x, y, plt_grafico=False)
+    
+    assert a == approx(10, rel=0.1)
+    assert b == approx(3, rel=0.1)
 
 ###########
 # Testes - Ajuste Múltiplo
