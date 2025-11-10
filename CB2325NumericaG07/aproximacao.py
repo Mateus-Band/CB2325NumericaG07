@@ -126,8 +126,8 @@ def ajuste_linear(valores_x: list, valores_y: list, plt_grafico: bool = True):
 # Função de Ajuste Polinomial
 
 def ajuste_polinomial(
-        valores_x: list[float], 
-        valores_y: list[float], 
+        valores_x: list[float] | np.ndarray, 
+        valores_y: list[float] | np.ndarray, 
         grau_pol: int, 
         plt_grafico: bool = True, 
         expr: bool = False
@@ -143,8 +143,8 @@ def ajuste_polinomial(
     e a forma simbólica da expressão polinomial resultante (func_aprox).
 
     Argumentos:
-        valores_x (list): Lista de valores da variável independente.
-        valores_y (list): Lista de valores da variável dependente.
+        valores_x (list | np.ndarray): Valores da variável independente.
+        valores_y (list | np.ndarray): Valores da variável dependente.
         grau_pol (int): Grau do polinômio ao qual os dados serão ajustados.
         plt_grafico (bool, opcional): Se True (padrão), exibe o gráfico de ajuste; 
         se False, não exibe.
@@ -208,8 +208,8 @@ def ajuste_polinomial(
 # Função de Ajuste Senoidal
 
 def ajuste_senoidal(
-        valores_x: list[float], 
-        valores_y: list[float], 
+        valores_x: list[float] | np.ndarray, 
+        valores_y: list[float] | np.ndarray, 
         T_aprox: float | None = None,
         plt_grafico: bool = True, 
         expr: bool = False
@@ -241,8 +241,8 @@ def ajuste_senoidal(
     e a forma simbólica da expressão senoidal resultante (func_aprox).
 
     Argumentos:
-        valores_x (list): Lista de valores da variável independente.
-        valores_y (list): Lista de valores da variável dependente.
+        valores_x (list | np.ndarray): Valores da variável independente.
+        valores_y (list | np.ndarray): Valores da variável dependente.
         T_aprox (float | None, opcional): Período aproximado da senóide. 
             - Se for fornecido (float), será usado diretamente.  
             - Se for None (padrão), o período será solicitado ao usuário via input().
@@ -486,8 +486,8 @@ def ajuste_logaritmo(valores_x:list, valores_y:list, plt_grafico: bool = True):
 # Função de Ajuste Múltiplo
 
 def ajuste_multiplo(
-        valores_var: list[list[float]], 
-        valores_z: list[float],
+        valores_var: list[list[float]] | np.ndarray, 
+        valores_z: list[float] | np.ndarray,
         incluir_intercepto : bool = True, 
         expr: bool = False
 ) -> np.ndarray:
@@ -506,8 +506,8 @@ def ajuste_multiplo(
     na regressão e/ou resultados incorretos.
 
     Argumentos:
-        valores_var (list): Lista de valores das variáveis independentes.
-        valores_z (list): Lista de valores da variável dependente.
+        valores_var (list | np.ndarray): Valores das variáveis independentes.
+        valores_z (list | np.ndarray): Valores da variável dependente.
         incluir_intercepto (bool, opcional): Se True (padrão), inclui o termo
         independente na solução do sistema linear; se False, não inclui.
         expr (bool, opcional): Se True, exibe a função simbólica aproximadora; 
@@ -549,7 +549,7 @@ def ajuste_multiplo(
 
     if np.linalg.matrix_rank(x_matriz) < x_matriz.shape[1]:
         raise ValueError(
-            "Colinearidade detectada (matriz mal-condicionada). "
+            "Colinearidade detectada por matriz mal-condicionada. "
             "Verifique os dados de entrada."
         )
 
@@ -586,22 +586,6 @@ def ajuste_multiplo(
     # Retornar o array de coeficientes
 
     return array_coeficientes
-
-
-a = np.array([9, -13, 5.5, -213, 44.95])
-b = np.array([15, 33, 94, -0.5, 0.88])
-c = np.array([-24, -24, -24, -24, -24])
-d = np.array([33, -3.22, -178, -26, 500])
-
-z = (
-        3 * a + 
-        4 * b + 
-        5 * c +
-        6 * d
-    )
-
-result = ajuste_multiplo([a, b, c, d], z, incluir_intercepto=False, expr=True)
-
 
 
 # Função de Avaliação do Ajuste
@@ -712,8 +696,8 @@ def avaliar_ajuste(
 # Função de Melhor Ajuste
 
 def melhor_ajuste(
-        valores_x: list[float], 
-        valores_y: list[float], 
+        valores_x: list[float] | np.ndarray, 
+        valores_y: list[float] | np.ndarray, 
         criterio: str, 
         exibir_todos: bool = False, 
         plt_grafico: bool = True, 
@@ -746,8 +730,8 @@ def melhor_ajuste(
     dos outros critérios para o ajuste sugerido.
 
     Argumentos:
-        valores_x (list): Lista de valores da variável independente.
-        valores_y (list): Lista de valores da variável dependente.
+        valores_x (list | np.ndarray): Valores da variável independente.
+        valores_y (list | np.ndarray): Valores da variável dependente.
         criterio (str): Critério escolhido dentre as opções 
         "R2", "R2A" (R^2 ajustado), "AIC", "AICc" e "BIC" para sugestão do modelo.
         exibir_todos (bool, opcional): Se True, exibe os valores dos outros critérios; 
