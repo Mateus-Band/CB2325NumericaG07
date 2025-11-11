@@ -42,9 +42,11 @@ def _plotar_grafico(X, Y,func_sym, titulo, qtd_pontos = 200):
 
 
 def ajuste_linear(X:ArrayLike, Y:ArrayLike, plt_grafico:bool=False, expr:bool=False):
-    # Modelo: y = ax + b
-    # Usa regressão linear simples (polinômio de grau 1) via MMQ.
-
+    """
+    Modelo: y = ax + b
+    Usa regressão linear simples (polinômio de grau 1) via MMQ.
+    """
+    
     if len(X) != len(Y):
         raise ValueError("As listas 'X' e 'Y' devem ter o mesmo tamanho.")
 
