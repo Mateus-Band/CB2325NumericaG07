@@ -45,7 +45,7 @@ def diff_numerica(x,y) -> list:
     return diff_list
 
 
-def function_definer(lista_x,lista_y,exception=None) -> function:
+def function_definer(lista_x,lista_y,exception=None):
     '''
     Essa função recebe duas listas e as vincula, retornando uma função vinculo que ao receber um ponto da lista_x retorna um ponto da lista_x
     '''
