@@ -101,14 +101,14 @@ def test_diff_numerica_invalid_input():
         diff_numerica(x, y)
 
 ###########
-# Testes - Definidor de Função (function_definer)
+# Testes - Definidor de Função (_function_definer)
 ###########
 
 def test_function_definer_basic():
     """Teste básico de mapeamento."""
     lx = [1, 2, 3]
     ly = [10, 20, 30]
-    f = function_definer(lx, ly)
+    f = _function_definer(lx, ly)
 
     assert f(1) == 10
     assert f(2) == 20
@@ -118,7 +118,7 @@ def test_function_definer_error_default():
     """Teste se levanta a exceção padrão para pontos não definidos."""
     lx = [1, 2]
     ly = [10, 20]
-    f = function_definer(lx, ly)
+    f = _function_definer(lx, ly)
 
     with pytest.raises(Exception, match='Esse ponto não foi definido na função'):
         f(3)
@@ -127,7 +127,7 @@ def test_function_definer_custom_exception_return():
     """Teste se retorna o valor de exceção personalizado."""
     lx = [1, 2]
     ly = [10, 20]
-    f = function_definer(lx, ly, exception=np.nan)
+    f = _function_definer(lx, ly, exception=np.nan)
 
     assert np.isnan(f(99))
 
@@ -135,22 +135,22 @@ def test_function_definer_invalid_input_length():
     """Teste de validação de tamanho de entrada."""
     
     with pytest.raises(ValueError, match='As listas x e y devem ter o mesmo tamanho'):
-         function_definer([1, 2, 3], [1, 2])
+         _function_definer([1, 2, 3], [1, 2])
 
 ###########
-# Testes - Funções Auxiliares (duplicate)
+# Testes - Funções Auxiliares (_duplicate)
 ###########
 
 def test_duplicate_basic():
     entrada = [1, 2, 3]
     esperado = [1, 1, 2, 2, 3, 3]
-    assert duplicate(entrada) == esperado
+    assert _duplicate(entrada) == esperado
 
 def test_duplicate_empty():
-    assert duplicate([]) == []
+    assert _duplicate([]) == []
 
 ###########
-# Testes - Diferenças Divididas de Newton (newton_ddfunc)
+# Testes - Diferenças Divididas de Newton (_newton_ddfunc)
 ###########
 
 def test_newton_ddfunc_linear():
@@ -162,9 +162,9 @@ def test_newton_ddfunc_linear():
     """
     x = [1, 2, 3]
     y = [1, 2, 3]
-    f_linear = function_definer(x, y)
+    f_linear = _function_definer(x, y)
     
-    dd = newton_ddfunc(x, f_linear)
+    dd = _newton_ddfunc(x, f_linear)
     assert dd == approx([1, 1, 0])
 
 def test_newton_ddfunc_quadratica():
@@ -176,9 +176,9 @@ def test_newton_ddfunc_quadratica():
     """
     x = [0, 1, 2]
     y = [0, 1, 4]
-    f_quad = function_definer(x, y)
+    f_quad = _function_definer(x, y)
 
-    dd = newton_ddfunc(x, f_quad)
+    dd = _newton_ddfunc(x, f_quad)
     assert dd == approx([0, 1, 1])
 
 ###########
@@ -192,7 +192,7 @@ def test_hermite_ddfunc_cubica():
     Coeficientes esperados (topo da tabela): [1, 3, 4, 1]
     """
     x_orig = [1, 2]
-    x_dup = duplicate(x_orig) # [1, 1, 2, 2]
+    x_dup = _duplicate(x_orig) # [1, 1, 2, 2]
 
     # Funções reais para teste
     func_cubo = lambda x: x**3
