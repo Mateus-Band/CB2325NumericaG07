@@ -97,15 +97,13 @@ def hermite_ddfunc(Point_list:list,derivada,func)-> list:
 
 
     '''
-    subslist1,subslist2 = Point_list.copy(),Point_list.copy()#sublist1 e sublist2 são listas que usarei para guardar quais valores serão subtraidos nos denomidaores
+    subslist1,subslist2 = list(Point_list.copy()),list(Point_list.copy())#sublist1 e sublist2 são listas que usarei para guardar quais valores serão subtraidos nos denomidaores
     Point_list = [func(p) for p in Point_list] #aplica na lista de pontos a função e retorna cada valor
     
     def der(P_list): #funciona com uma redução de lista, seja x_i o elemento da nova lista e x1_i o elemento da lista antiga de posição i, x_i = (x1_(i+1) - x1_i)/(sublist[i]-sublist2[i]), da mesma forma que seria calcular a interpolação por tabela,  
         '''
         Reduz uma lista usando o metodo de calcular os valores de f[], pelo método de tabela
         '''
-        if type(P_list) != list:
-            P_list = list(P_list)
 
 
         new_list = [] #salva nessa lista
@@ -226,10 +224,15 @@ def newton_ddfunc(Point_list:list,func)-> list:
     e retorna as f[] necessarias para o calculo da intepolação de newton em ordem,
     por exemplo [f[x_0],f[x_0,x_1],f[x_0,x_1,x_2],...] .
     '''
-    subslist1,subslist2 = Point_list.copy(),Point_list.copy()#sublist1 e sublist2 são listas que usarei para guardar quais valores serão subtraidos nos denomidaores
+    subslist1,subslist2 = list(Point_list.copy()),list(Point_list.copy())#sublist1 e sublist2 são listas que usarei para guardar quais valores serão subtraidos nos denomidaores
     Point_list = [func(p) for p in Point_list] #aplica na lista de pontos a função e retorna cada valor
     
     def der(P_list): #funciona com uma redução de lista, seja x_i o elemento da nova lista e x1_i o elemento da lista antiga de posição i, x_i = (x1_(i+1) - x1_i)/(sublist[i]-sublist2[i]), da mesma forma que seria calcular a interpolação por tabela,  
+        '''
+        Reduz uma lista usando o metodo de calcular os valores de f[], pelo método de tabela
+        '''
+        
+
         new_list = [] #salva nessa lista
         subslist1.pop(0)
         subslist2.pop()
