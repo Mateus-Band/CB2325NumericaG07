@@ -104,6 +104,9 @@ def hermite_ddfunc(Point_list:list,derivada,func)-> list:
         '''
         Reduz uma lista usando o metodo de calcular os valores de f[], pelo método de tabela
         '''
+        if type(P_list) != list:
+            P_list = list(P_list)
+
 
         new_list = [] #salva nessa lista
         subslist1.pop(0)
@@ -143,7 +146,7 @@ def interpolacao_de_hermite(x,y,plot=False, grid=True):
     #Cálculo final
 
     f = function_definer(x,y) #define a função que f(x) = y
-    d = diff_numerica(zip(x,y)) #gera a lista de derivadas de cada ponto de x
+    d = diff_numerica(x,y) #gera a lista de derivadas de cada ponto de x
     f_linha = function_definer(x,d,exception=0) # define a função 'derivada' f'(x) = y'
     x_duplicated = duplicate(x)#prepara a lista para obter os coeficientes da função
     coeficientes_hermite = hermite_ddfunc(x_duplicated,f_linha,f)#calcula os resultados dos f[x_0],f[x_0,x_0] ... necessários
