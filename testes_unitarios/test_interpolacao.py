@@ -182,7 +182,7 @@ def test_newton_ddfunc_quadratica():
     assert dd == approx([0, 1, 1])
 
 ###########
-# Testes - Diferenças Divididas de Hermite (hermite_ddfunc)
+# Testes - Diferenças Divididas de Hermite (_hermite_ddfunc)
 ###########
 
 def test_hermite_ddfunc_cubica():
@@ -198,7 +198,7 @@ def test_hermite_ddfunc_cubica():
     func_cubo = lambda x: x**3
     deriv_cubo = lambda x: 3 * x**2
     
-    dd_hermite = hermite_ddfunc(x_dup, deriv_cubo, func_cubo)
+    dd_hermite = _hermite_ddfunc(x_dup, deriv_cubo, func_cubo)
     
     assert dd_hermite == approx([1, 3, 4, 1])
 
@@ -211,7 +211,7 @@ def test_hermite_ddfunc_constante():
     func_const = lambda x: 5
     deriv_const = lambda x: 0
 
-    dd_hermite = hermite_ddfunc(x_dup, deriv_const, func_const)
+    dd_hermite = _hermite_ddfunc(x_dup, deriv_const, func_const)
     assert dd_hermite == approx([5, 0, 0, 0])
 
 
