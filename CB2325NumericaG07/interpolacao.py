@@ -45,7 +45,7 @@ def diff_numerica(x,y) -> list:
     return diff_list
 
 
-def function_definer(lista_x,lista_y,exception=None):
+def _function_definer(lista_x,lista_y,exception=None):
     '''
     Essa função recebe duas listas e as vincula, retornando uma função vinculo que ao receber um ponto da lista_x retorna um ponto da lista_x
     '''
@@ -69,7 +69,7 @@ def function_definer(lista_x,lista_y,exception=None):
 
     return func
 
-def duplicate(lista) -> list:
+def _duplicate(lista) -> list:
         '''
         Duplica cada elemento da lista e mantem a ordem, necessaria para o calculo por exemplo da interpolação de hermite,
         recebe: [1,2,3,4] e retorna: [1,1,2,2,3,3,4,4]
@@ -81,7 +81,7 @@ def duplicate(lista) -> list:
         return l
 
 
-def hermite_ddfunc(Point_list:list,derivada,func)-> list:
+def _hermite_ddfunc(Point_list:list,derivada,func)-> list:
     '''
     Recebe a lista de pontos, uma função que retorna as derivadas em cada ponto, e a função que queremos usar na interpolação,
     e retorna as f[] necessarias para o calculo da intepolação de hermite em ordem,
@@ -143,11 +143,11 @@ def interpolacao_de_hermite(x,y,plot=False, grid=True):
     
     #Cálculo final
 
-    f = function_definer(x,y) #define a função que f(x) = y
+    f = _function_definer(x,y) #define a função que f(x) = y
     d = diff_numerica(x,y) #gera a lista de derivadas de cada ponto de x
-    f_linha = function_definer(x,d,exception=0) # define a função 'derivada' f'(x) = y'
-    x_duplicated = duplicate(x)#prepara a lista para obter os coeficientes da função
-    coeficientes_hermite = hermite_ddfunc(x_duplicated,f_linha,f)#calcula os resultados dos f[x_0],f[x_0,x_0] ... necessários
+    f_linha = _function_definer(x,d,exception=0) # define a função 'derivada' f'(x) = y'
+    x_duplicated = _duplicate(x)#prepara a lista para obter os coeficientes da função
+    coeficientes_hermite = _hermite_ddfunc(x_duplicated,f_linha,f)#calcula os resultados dos f[x_0],f[x_0,x_0] ... necessários
     
 
     def interpolation(ponto,plt = plot): #função que será retornada
@@ -212,7 +212,7 @@ def interpolacao_de_hermite(x,y,plot=False, grid=True):
     return interpolation
 
 
-def newton_ddfunc(Point_list:list,func)-> list:
+def _newton_ddfunc(Point_list:list,func)-> list:
     '''Recebe a lista de pontos e a função que queremos usar na interpolação,
     e retorna as f[] necessarias para o calculo da intepolação de newton em ordem,
     por exemplo [f[x_0],f[x_0,x_1],f[x_0,x_1,x_2],...] .
@@ -257,8 +257,8 @@ def interpolacao_de_newton(x,y,plot:bool = False,grid:bool = True):
     
     '''
 
-    f = function_definer(x,y) #define a função que f(x) = y
-    coeficientes_newton = newton_ddfunc(x,f)#calcula os resultados dos f[x_0],f[x_0,x_0] ... necessários
+    f = _function_definer(x,y) #define a função que f(x) = y
+    coeficientes_newton = _newton_ddfunc(x,f)#calcula os resultados dos f[x_0],f[x_0,x_0] ... necessários
 
     
     def interpolation(ponto,plt = plot): #função que será retornada
