@@ -8,6 +8,66 @@ from typing import Sequence, Union
 
 ArrayLike = Union[Sequence[float], np.ndarray]
 
+def ajuste(valores_X: ArrayLike, valores_Y: ArrayLike, tipo:str, **kwargs) -> np.ndarray:
+    """
+    Realiza ajustes de curvas pelo Método dos Mínimos Quadrados (MMQ)
+      para diversos modelos.
+
+    !Funções de ajuste também podem ser chamadas separadamente!
+
+    Parâmetros Principais:
+        X (ArrayLike): Variável independente (ou matriz de variáveis
+          para 'mul').
+        Y (ArrayLike): Variável dependente.
+        tipo (str): Modelo de ajuste:
+            - 'lin': Linear (y = ax + b)
+            - 'pol': Polinomial (requer 'grau_pol')
+            - 'sen': Senoidal (y = A*sin(Bx + C) + D, recomenda-se
+              declarar 'T_aprox', estimativa pode falhar!)
+            - 'exp': Exponencial (y = b*e^(ax), linearizado via ln(y))
+            - 'log': Logarítmico(y = a + b*ln(x), linearizado via ln(x))
+            - 'mul': Regressão Múltipla (usa 'incluir_intercepto')
+        plt_grafico (bool): Se True, exibe o gráfico do ajuste. Padrão: 
+        False.
+        expr (bool): Se True, imprime a expressão matemática encontrada.
+          Padrão: False.
+
+    Parâmetros Específicos:
+        grau_pol (int): Grau do polinômio (usado apenas se tipo='pol').
+        T_aprox (float): Período aproximado inicial para o ajuste
+          senoidal (usado apenas se tipo='sen').
+                         Se não fornecido, tenta estimar grosseiramente
+                           pelos dados.
+        incluir_intercepto (bool): Inclui termo independente na
+          regressão múltipla (usado apenas se tipo='mul').
+
+    Retorna:
+        np.ndarray: Coeficientes do modelo ajustado. A ordem depende do
+          modelo escolhido.
+    """
+
+    funcoes = {
+        'lin': ajuste_linear,
+        'pol': ajuste_polinomial,
+        'sen': ajuste_senoidal,
+        'exp': ajuste_exponencial,
+        'log': ajuste_logaritmo,
+        'mul': ajuste_multiplo,
+    }
+
+    if tipo not in funcoes:
+        raise ValueError(f"Tipo de ajuste desconhecido: {tipo}")
+
+    func = funcoes[tipo]
+    if 'mostrar_parametros' in kwargs and kwargs['mostrar_parametros']:
+        import inspect
+        print(f"Parâmetros disponíveis para '{tipo}':")
+        print(inspect.signature(func))
+        return None
+
+    return func(valores_X, valores_Y, **kwargs)
+
+
 def _plotar_grafico(X, Y,func_sym, titulo, qtd_pontos = 200):
     """
     função auxiliar para plotagem dos ajustes.
@@ -92,8 +152,11 @@ def ajuste_linear(X:ArrayLike, Y:ArrayLike, plt_grafico:bool=False, expr:bool=Fa
     return np.array([a, b])
 
 def ajuste_polinomial(X: ArrayLike, Y: ArrayLike, grau_pol:int, plt_grafico:bool=False, expr:bool=False):
-    # Modelo: y = c0 + c1*x + c2*x^2 + ... + cn*x^n
-    # Requer 'grau_pol'. Usa MMQ para encontrar os coeficientes do polinômio.
+    """
+    Modelo: y = c0 + c1*x + c2*x^2 + ... + cn*x^n
+    Requer 'grau_pol'. Usa MMQ para encontrar os coeficientes do
+      polinômio.
+    """
     
     if grau_pol is None:
         raise ValueError("Para o ajuste polinomial ('pol'), o parâmetro 'grau_pol' deve ser fornecido.")
@@ -145,9 +208,11 @@ def ajuste_polinomial(X: ArrayLike, Y: ArrayLike, grau_pol:int, plt_grafico:bool
     return array_coeficientes
 
 def ajuste_exponencial(X: ArrayLike, Y:ArrayLike, plt_grafico:bool=False, expr:bool=False):
-    # Modelo: y = b * e^(ax)
-    # Linearizado via logaritmo natural em y: ln(y) = ln(b) + ax.
-    # Requer que todos os valores de y sejam positivos.
+    """
+    Modelo: y = b * e^(ax)
+    Linearizado via logaritmo natural em y: ln(y) = ln(b) + ax.
+    Requer que todos os valores de y sejam positivos.
+    """
 
     if len(X) != len(Y):
         raise ValueError("As listas 'X' e 'Y' devem ter o mesmo tamanho.")
@@ -179,10 +244,12 @@ def ajuste_exponencial(X: ArrayLike, Y:ArrayLike, plt_grafico:bool=False, expr:b
     return np.array([a, b])
 
 def ajuste_logaritmo(X: ArrayLike, Y:ArrayLike, plt_grafico:bool=False, expr:bool=False):
-    # Modelo: y = a + b * ln(x)
-    # Linearizado usando ln(x) como nova variável independente.
-    # Requer que todos os valores de x sejam positivos.
-
+    """
+    Modelo: y = a + b * ln(x)
+    Linearizado usando ln(x) como nova variável independente.
+    Requer que todos os valores de x sejam positivos.
+    """
+    
     if len(X) != len(Y):
         raise ValueError("As listas 'X' e 'Y' devem ter o mesmo tamanho.")
 
@@ -212,10 +279,12 @@ def ajuste_logaritmo(X: ArrayLike, Y:ArrayLike, plt_grafico:bool=False, expr:boo
     return np.array([a, b])
 
 def ajuste_senoidal(X: ArrayLike, Y:ArrayLike, T_aprox:float =None, plt_grafico:bool=False, expr:bool=False):
-    # Modelo: y = A * sin(B*x + C) + D
-    # Lineariza fixando frequências (B) ao redor de uma estimativa inicial (T_aprox).
-    # Encontra A, C, D para cada B testado e escolhe o melhor ajuste.
-
+    """
+    Modelo: y = A * sin(B*x + C) + D
+    Lineariza fixando frequências (B) ao redor de uma estimativa inicial (T_aprox).
+    Encontra A, C, D para cada B testado e escolhe o melhor ajuste.
+    """
+    
     if len(X) != len(Y):
         raise ValueError("As listas 'X' e 'Y' devem ter o mesmo tamanho.")
 
@@ -285,11 +354,12 @@ def ajuste_senoidal(X: ArrayLike, Y:ArrayLike, T_aprox:float =None, plt_grafico:
     return array_coeficientes
 
 def ajuste_multiplo(X: ArrayLike, Y:ArrayLike,incluir_intercepto:bool=True, plt_grafico:bool=False, expr:bool=False):
-    # Modelo: y = b0 + b1*x1 + b2*x2 + ... + bn*xn (Regressão Múltipla)
-    # Aplica MMQ diretamente na matriz de variáveis independentes.
+    """
+    Modelo: y = b0 + b1*x1 + b2*x2 + ... + bn*xn (Regressão Múltipla)
+    Aplica MMQ diretamente na matriz de variáveis independentes.
+    """
 
     # Construir a matriz de valores das variáveis (x_matriz)
-
     x_matriz = np.array(X, dtype=float)
 
     z_matriz = np.array(Y, dtype=float).reshape(-1, 1)
@@ -360,58 +430,6 @@ def ajuste_multiplo(X: ArrayLike, Y:ArrayLike,incluir_intercepto:bool=True, plt_
     # Retornar o array de coeficientes
 
     return array_coeficientes
-
-
-def ajuste(valores_X: ArrayLike, valores_Y: ArrayLike, tipo:str, **kwargs) -> np.ndarray:
-    """
-    Realiza ajustes de curvas pelo Método dos Mínimos Quadrados (MMQ) para diversos modelos.
-
-    Parâmetros Principais:
-        X (ArrayLike): Variável independente (ou matriz de variáveis para 'mul').
-        Y (ArrayLike): Variável dependente.
-        tipo (str): Modelo de ajuste:
-            - 'lin': Linear (y = ax + b)
-            - 'pol': Polinomial (requer 'grau_pol')
-            - 'sen': Senoidal (y = A*sin(Bx + C) + D, recomenda-se declarar 'T_aprox', estimativa pode falhar!)
-            - 'exp': Exponencial (y = b*e^(ax), linearizado via ln(y))
-            - 'log': Logarítmico (y = a + b*ln(x), linearizado via ln(x))
-            - 'mul': Regressão Múltipla (usa 'incluir_intercepto')
-        plt_grafico (bool): Se True, exibe o gráfico do ajuste. Padrão: False.
-        expr (bool): Se True, imprime a expressão matemática encontrada. Padrão: False.
-
-    Parâmetros Específicos:
-        grau_pol (int): Grau do polinômio (usado apenas se tipo='pol').
-        T_aprox (float): Período aproximado inicial para o ajuste senoidal (usado apenas se tipo='sen').
-                         Se não fornecido, tenta estimar grosseiramente pelos dados.
-        incluir_intercepto (bool): Inclui termo independente na regressão múltipla (usado apenas se tipo='mul').
-
-    Retorna:
-        np.ndarray: Coeficientes do modelo ajustado. A ordem depende do modelo escolhido.
-    """
-
-    funcoes = {
-        'lin': ajuste_linear,
-        'pol': ajuste_polinomial,
-        'sen': ajuste_senoidal,
-        'exp': ajuste_exponencial,
-        'log': ajuste_logaritmo,
-        'mul': ajuste_multiplo,
-    }
-
-    if tipo not in funcoes:
-        raise ValueError(f"Tipo de ajuste desconhecido: {tipo}")
-
-    func = funcoes[tipo]
-    if 'mostrar_parametros' in kwargs and kwargs['mostrar_parametros']:
-        import inspect
-        print(f"Parâmetros disponíveis para '{tipo}':")
-        print(inspect.signature(func))
-        return None
-
-    return func(valores_X, valores_Y, **kwargs)
-
-
-
 
 
 # Função de Avaliação do Ajuste
@@ -701,4 +719,4 @@ __all__ = ["ajuste", "ajuste_linear", "ajuste_polinomial", "ajuste_exponencial",
 
 
 if __name__ == '__main__':
-    ajuste([0, 1, 2, 3, 4, 5], [1.1, 1.7, 2.9, 5.1, 8.5, 14.2], 'exp', True)
+    ajuste([0, 1, 2, 3, 4, 5], [1.1, 1.7, 2.9, 5.1, 8.5, 14.2], 'exp', plt_grafico=True)
