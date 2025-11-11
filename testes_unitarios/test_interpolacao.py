@@ -3,6 +3,11 @@ import sympy as sp
 import numpy as np
 import sys
 import os
+import matplotlib
+from pytest import approx
+
+
+
 notebook_dir = os.getcwd()
 project_root = os.path.abspath(os.path.join(notebook_dir, '..'))
 if project_root not in sys.path:
@@ -50,3 +55,326 @@ def test_interpolacao_linear_por_partes():
     # Teste 5: fora do intervalo
     _, fora = interpolacao_linear_por_partes(x_vals, y_vals, x_test=10)
     assert isinstance(fora, str) and "Fora do intervalo" in fora
+
+
+
+
+
+matplotlib.use('Agg')
+
+###########
+# Testes - Diferenciação Numérica (diff_numerica)
+###########
+
+def test_diff_numerica_nula():
+    """Teste para função constante (derivada deve ser 0)."""
+    x = [1, 2, 3, 4, 5]
+    y = [2, 2, 2, 2, 2]
+    d = diff_numerica(x, y)
+    assert d == [0, 0, 0, 0, 0]
+
+def test_diff_numerica_linear():
+    """Teste para função linear y = 2x + 5 (derivada deve ser 2)."""
+    x = [0, 1, 2, 3, 4]
+    y = [5, 7, 9, 11, 13]
+    d = diff_numerica(x, y)
+    assert d == approx([2, 2, 2, 2, 2])
+
+def test_diff_numerica_quadratica():
+    """
+    Teste para y = x^2.
+    Esperado: [3,4,6,8,10,11]
+    
+    """
+    x = [1, 2, 3, 4, 5, 6]
+    y = [1, 4, 9, 16, 25, 36]
+    d = diff_numerica(x, y)
+    
+    assert d == approx([3, 4, 6, 8, 10, 11])
+
+def test_diff_numerica_invalid_input():
+    """Teste para verificar erro com listas de tamanhos diferentes."""
+    x = [1, 2, 3, 4]
+    y = [1, 2, 3]
+
+    with pytest.raises(ValueError, match='As listas x e y devem ter o mesmo tamanho'):
+        diff_numerica(x, y)
+
+###########
+# Testes - Definidor de Função (function_definer)
+###########
+
+def test_function_definer_basic():
+    """Teste básico de mapeamento."""
+    lx = [1, 2, 3]
+    ly = [10, 20, 30]
+    f = function_definer(lx, ly)
+
+    assert f(1) == 10
+    assert f(2) == 20
+    assert f(3) == 30
+
+def test_function_definer_error_default():
+    """Teste se levanta a exceção padrão para pontos não definidos."""
+    lx = [1, 2]
+    ly = [10, 20]
+    f = function_definer(lx, ly)
+
+    with pytest.raises(Exception, match='Esse ponto não foi definido na função'):
+        f(3)
+
+def test_function_definer_custom_exception_return():
+    """Teste se retorna o valor de exceção personalizado."""
+    lx = [1, 2]
+    ly = [10, 20]
+    f = function_definer(lx, ly, exception=np.nan)
+
+    assert np.isnan(f(99))
+
+def test_function_definer_invalid_input_length():
+    """Teste de validação de tamanho de entrada."""
+    
+    with pytest.raises(ValueError, match='As listas x e y devem ter o mesmo tamanho'):
+         function_definer([1, 2, 3], [1, 2])
+
+###########
+# Testes - Funções Auxiliares (duplicate)
+###########
+
+def test_duplicate_basic():
+    entrada = [1, 2, 3]
+    esperado = [1, 1, 2, 2, 3, 3]
+    assert duplicate(entrada) == esperado
+
+def test_duplicate_empty():
+    assert duplicate([]) == []
+
+###########
+# Testes - Diferenças Divididas de Newton (newton_ddfunc)
+###########
+
+def test_newton_ddfunc_linear():
+    """
+    Para f(x) = x, os coeficientes de Newton devem ser [x0, 1, 0, 0...]
+    Pontos: (1,1), (2,2), (3,3)
+    
+    Esperado: [0,1,1]
+    """
+    x = [1, 2, 3]
+    y = [1, 2, 3]
+    f_linear = function_definer(x, y)
+    
+    dd = newton_ddfunc(x, f_linear)
+    assert dd == approx([1, 1, 0])
+
+def test_newton_ddfunc_quadratica():
+    """
+    Para f(x) = x^2 em [0, 1, 2]:
+    y = [0, 1, 4]
+   
+    Esperado: [0, 1, 1]
+    """
+    x = [0, 1, 2]
+    y = [0, 1, 4]
+    f_quad = function_definer(x, y)
+
+    dd = newton_ddfunc(x, f_quad)
+    assert dd == approx([0, 1, 1])
+
+###########
+# Testes - Diferenças Divididas de Hermite (hermite_ddfunc)
+###########
+
+def test_hermite_ddfunc_cubica():
+    """
+    Teste usando f(x) = x^3 e f'(x) = 3x^2 
+    
+    Coeficientes esperados (topo da tabela): [1, 3, 4, 1]
+    """
+    x_orig = [1, 2]
+    x_dup = duplicate(x_orig) # [1, 1, 2, 2]
+
+    # Funções reais para teste
+    func_cubo = lambda x: x**3
+    deriv_cubo = lambda x: 3 * x**2
+    
+    dd_hermite = hermite_ddfunc(x_dup, deriv_cubo, func_cubo)
+    
+    assert dd_hermite == approx([1, 3, 4, 1])
+
+def test_hermite_ddfunc_constante():
+    """
+    Para f(x) = 5, f'(x) = 0.
+    Todos os DDs após o primeiro termo devem ser 0.
+    """
+    x_dup = [1, 1, 3, 3]
+    func_const = lambda x: 5
+    deriv_const = lambda x: 0
+
+    dd_hermite = hermite_ddfunc(x_dup, deriv_const, func_const)
+    assert dd_hermite == approx([5, 0, 0, 0])
+
+
+
+###########
+# Testes - Interpolação de Newton
+###########
+
+def test_newton_interpolation_linear():
+    """
+    Teste com função linear f(x) = 2x + 1.
+    Pontos: (0, 1), (2, 5)
+    """
+    x = [0, 2]
+    y = [1, 5]
+    
+    # Cria a função interpoladora
+    P_newton = interpolacao_de_newton(x, y, plot=False)
+    
+    # Verifica nos pontos originais
+    assert P_newton(0) == approx(1)
+    assert P_newton(2) == approx(5)
+    
+    # Verifica em pontos intermediários
+    assert P_newton(1) == approx(3)   # 2(1) + 1 = 3
+    assert P_newton(0.5) == approx(2) # 2(0.5) + 1 = 2
+
+def test_newton_interpolation_quadratic():
+    """
+    Teste com f(x) = x^2.
+    Pontos: (-1, 1), (0, 0), (2, 4)
+    """
+    x = [-1, 0, 2]
+    y = [1, 0, 4]
+    P_newton = interpolacao_de_newton(x, y, plot=False)
+    
+    assert P_newton(1) == approx(1)   # 1^2 = 1
+    assert P_newton(3) == approx(9)   # 3^2 = 9
+    assert P_newton(-2) == approx(4)  # (-2)^2 = 4
+
+def test_newton_interpolation_degree():
+    """
+    Teste para valor fora do intervalo de ponto (extrapolação).
+    f(x) = x^3
+    """
+    x = [-1, 0, 1, 2]
+    y = [-1, 0, 1, 8]
+    P_newton = interpolacao_de_newton(x, y, plot=False)
+    
+    # Testa um ponto fora da amostra
+    assert P_newton(3) == approx(27) # 3^3 = 27
+
+###########
+# Testes - Interpolação de Hermite
+###########
+
+def test_hermite_interpolation_linear():
+    """
+    Teste com função linear f(x) = 2x + 1.
+    Pontos: (0, 1), (2, 5)
+    """
+    x = [0, 2]
+    y = [1, 5]
+    
+    # Cria a função interpoladora
+    P_hermite = interpolacao_de_hermite(x, y, plot=False)
+    
+    # Verifica nos pontos originais
+    assert P_hermite(0) == approx(1)
+    assert P_hermite(2) == approx(5)
+    
+    # Verifica em pontos intermediários
+    assert P_hermite(1) == approx(3)   # 2(1) + 1 = 3
+    assert P_hermite(0.5) == approx(2) # 2(0.5) + 1 = 2
+
+def test_hermite_interpolation_quadratic():
+    """
+    Teste com f(x) = x^2.
+    Pontos: (-1, 1), (0, 0), (2, 4)
+    Polinômio interpolador deve ser exatamente x^2.
+    """
+    x = [-1, 0, 2]
+    y = [1, 0, 4]
+    P_hermite = interpolacao_de_hermite(x, y, plot=False)
+
+    #verificando nos pontos originais
+    assert P_hermite(-1) == approx(1) 
+    assert P_hermite(0) == approx(0) 
+    assert P_hermite(2) == approx(4) 
+ 
+    
+    assert P_hermite(1) == approx(1)   # 1^2 = 1
+    assert P_hermite(3) == approx(9)   # 3^2 = 9
+    assert P_hermite(-2) == approx(4)  # (-2)^2 = 4
+
+def test_hermite_interpolation_degree():
+    """
+    Teste para valor fora do intervalo de ponto (extrapolação).
+    f(x) = x^3
+    """
+    x = [-1, 0, 1, 2]
+    y = [-1, 0, 1, 8]
+    P_hermite = interpolacao_de_hermite(x, y, plot=False)
+    
+    # Testa um ponto fora da amostra
+    assert P_hermite(3) == approx(27) # 3^3 = 27
+
+
+def test_hermite_vs_newton():
+    """
+    Para os mesmos pontos, se a função for um polinômio de grau baixo,
+    Newton e Hermite (mesmo com derivadas aproximadas) devem dar resultados
+    próximos.
+    """
+    x = np.linspace(0, 5, 10)
+    y = np.sin(x)
+    
+    P_newton = interpolacao_de_newton(x, y, plot=False)
+    P_hermite = interpolacao_de_hermite(x, y, plot=False)
+    
+    ponto_teste = 2.5
+    val_newton = P_newton(ponto_teste)
+    val_hermite = P_hermite(ponto_teste)
+    
+   
+    assert val_hermite == approx(val_newton, abs=1e-1)
+
+
+@pytest.mark.parametrize("num, expected",[
+    (7, 5.4), 
+    (3, 8.8), 
+    (1, 1.5), 
+    (7, 9.2), 
+    (1, 2.1), 
+    (7, 3.7), 
+    (2, 4.6), 
+    (6, 7.9), 
+    (4, 0.2), 
+    (2, 6.5), 
+    (3, 1.9), 
+    (7, 4.3), 
+    (6, 8.1), 
+    (7, 2.5), 
+    (0, 9.9), 
+    (3, 7.6), 
+    (4, 3.2), 
+    (7, 5.8), 
+    (8, 0.5), 
+    (2, 8.3)
+])
+def hermite_and_newton_expected_dots(num,expected):
+    #conjunto de pontos
+    x = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18]
+    y = [5.4, 8.8, 1.5, 9.2, 2.1, 3.7, 4.6, 7.9, 0.2, 6.5, 1.9, 4.3, 8.1, 2.5, 9.9, 7.6, 3.2, 5.8, 0.5, 8.3]
+    
+    
+    h =interpolacao_de_hermite(x,y)
+    
+    assert h(num) == expected
+    
+    
+    n = interpolacao_de_newton(x,y)
+
+    assert n(num) == expected
+
+    
