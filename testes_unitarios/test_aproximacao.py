@@ -331,7 +331,7 @@ def test_ajuste_logaritmo_x_nao_positivo():
     y = [1, 4, 9, 16]
 
     with pytest.raises(
-        ValueError, match="A lista de valores de x possui valor\\(es\\) não postivos\\(s\\)."
+        ValueError, match="A lista de valores de x possui valor\\(es\\) não positivos\\(s\\)."
     ):
         ajuste_logaritmo(x, y, plt_grafico=False)
 
@@ -481,7 +481,7 @@ def dados():
     valores_y = [1.1, 2.9, 9.1, 21.1, 39.9]
 
     modelo = "polinomial"
-    coeficientes = np.array([1.0, 0.5, 2.5])
+    coeficientes = ajuste_polinomial(valores_x, valores_y, 2, plt_grafico=False)
     
 
     return valores_x, valores_y, modelo, coeficientes
@@ -539,7 +539,7 @@ def test_avaliar_ajuste_calculo_r2(dados):
     x, y, modelo, coeficientes = dados
     r2 = avaliar_ajuste(x, y, "R2", modelo, coeficientes)
 
-    assert r2 == approx(0.9864, rel=0.01)
+    assert r2 == approx(0.9994, rel=0.01)
 
 # Teste R2A
 
@@ -547,7 +547,7 @@ def test_avaliar_ajuste_calculo_r2a(dados):
     x, y, modelo, coeficientes = dados
     r2a = avaliar_ajuste(x, y, "R2A", modelo, coeficientes)
 
-    assert r2a == approx(0.9456, rel=0.01)
+    assert r2a == approx(0.9978, rel=0.01)
 
 # Teste AIC
 
@@ -555,7 +555,7 @@ def test_avaliar_ajuste_calculo_aic(dados):
     x, y, modelo, coeficientes = dados
     aic = avaliar_ajuste(x, y, "AIC", modelo, coeficientes)
 
-    assert aic == approx(11.165, rel=0.01)
+    assert aic == approx(-4.786, rel=0.01)
 
 # Teste AICc
 
@@ -563,7 +563,7 @@ def test_avaliar_ajuste_calculo_aicc(dados):
     x, y, modelo, coeficientes = dados
     aicc = avaliar_ajuste(x, y, "AICc", modelo, coeficientes)
 
-    assert aicc == approx(35.165, rel=0.01)
+    assert aicc == approx(19.214, rel=0.01)
 
 # Teste BIC
 
@@ -571,7 +571,7 @@ def test_avaliar_ajuste_calculo_bic(dados):
     x, y, modelo, coeficientes = dados
     bic = avaliar_ajuste(x, y, "BIC", modelo, coeficientes)
 
-    assert bic == approx(9.992, rel=0.01)
+    assert bic == approx(-5.957, rel=0.01)
 
 # Teste all
 
@@ -579,11 +579,11 @@ def test_avaliar_ajuste_calculo_all(dados):
     x, y, modelo, coeficientes = dados
     r2, r2a, aic, aicc, bic = avaliar_ajuste(x, y, "all", modelo, coeficientes)
 
-    assert r2 == approx(0.9864, rel=0.01)
-    assert r2a == approx(0.9456, rel=0.01)
-    assert aic == approx(11.165, rel=0.01)
-    assert aicc == approx(35.165, rel=0.01)
-    assert bic == approx(9.992, rel=0.01)
+    assert r2 == approx(0.9994, rel=0.01)
+    assert r2a == approx(0.9978, rel=0.01)
+    assert aic == approx(-4.786, rel=0.01)
+    assert aicc == approx(19.214, rel=0.01)
+    assert bic == approx(-5.957, rel=0.01)
 
 
 ###########
