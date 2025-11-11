@@ -377,4 +377,142 @@ def hermite_and_newton_expected_dots(num,expected):
 
     assert n(num) == expected
 
+
+
+### Testes da Interpolação de Lagrange e Vandermonde ###
+
+# Casos de teste comuns para ambas as funções
+@pytest.mark.parametrize("interp_func", [interpolacao_polinomial, interp_vand])
+class TestInterpolacaoPolinomial:
     
+    def test_interp_linear(self, interp_func):
+        """
+        Teste com uma função linear: f(x) = 2x + 1.
+        Pontos: (0, 1), (2, 5). O polinômio deve ser P(x) = 2x + 1.
+        """
+        pontos = [(0, 1), (2, 5)]
+        
+        # O polinômio esperado é 2*x + 1
+        x = sp.Symbol('x')
+        poli_esperado = 2*x + 1
+        
+        P_x = interp_func(pontos, plotar=False)
+        
+        # O resultado deve ser uma expressão SymPy
+        assert isinstance(P_x, sp.Expr)
+        
+        # O polinômio simplificado deve ser igual ao esperado
+        assert sp.simplify(P_x - poli_esperado) == 0
+        
+        # Teste de avaliação em um ponto (por exemplo, x=1 -> 3)
+        assert P_x.subs(x, 1) == 3
+
+
+    def test_interp_quadratica(self, interp_func):
+        """
+        Teste com uma função quadrática: f(x) = x^2.
+        Pontos: (-1, 1), (0, 0), (2, 4). O polinômio deve ser P(x) = x^2.
+        """
+        pontos = [(-1, 1), (0, 0), (2, 4)]
+        
+        # O polinômio esperado é x**2
+        x = sp.Symbol('x')
+        poli_esperado = x**2
+        
+        P_x = interp_func(pontos, plotar=False)
+        
+        assert sp.simplify(P_x - poli_esperado) == 0
+        
+        # Teste de avaliação em um ponto não amostrado (por exemplo, x=3 -> 9)
+        assert P_x.subs(x, 3) == 9
+        
+        
+    def test_interp_constante(self, interp_func):
+        """
+        Teste com uma função constante: f(x) = 5.
+        Pontos: (1, 5), (5, 5), (10, 5). O polinômio deve ser P(x) = 5.
+        """
+        pontos = [(1, 5), (5, 5), (10, 5)]
+        
+        x = sp.Symbol('x')
+        poli_esperado = sp.Integer(5) 
+        
+        P_x = interp_func(pontos, plotar=False)
+        
+        assert sp.simplify(P_x - poli_esperado) == 0
+        
+        # Teste de avaliação (deve ser 5)
+        assert P_x.subs(x, 99) == 5
+
+    
+    def test_interp_lista_vazia(self, interp_func):
+        """
+        Testa a entrada com lista de pontos vazia.
+        """
+        pontos = []
+        resultado = interp_func(pontos, plotar=False)
+        
+        assert isinstance(resultado, str)
+        assert "Lista de pontos vazia" in resultado
+
+
+    def test_interp_precisao_float(self, interp_func):
+        """
+        Teste com coeficientes flutuantes (seno). Verifica a precisão da interpolação.
+        """
+        pi_val = np.pi
+        pontos = [(0, 0), (pi_val/2, 1), (pi_val, 0)]
+        
+        x = sp.Symbol('x')
+        # Polinômio quadrático exato que passa pelos pontos: P(x) = -(4/pi^2) * x^2 + (4/pi) * x
+        poli_esperado_expr = (-4/pi_val**2) * x**2 + (4/pi_val) * x
+
+        P_x = interp_func(pontos, plotar=False)
+        
+        P_x_numerico = sp.lambdify(x, P_x, 'numpy')
+        
+        x_teste = pi_val / 4
+        valor_interp = P_x_numerico(x_teste)
+        valor_esperado = poli_esperado_expr.subs(x, x_teste).evalf()
+        
+        assert valor_interp == approx(valor_esperado, abs=1e-8)
+
+
+# Teste Específico para Vandermonde (Pontos Duplicados)
+def test_interp_vand_pontos_duplicados():
+    """
+    Teste específico para Vandermonde quando há pontos x duplicados,
+    o que leva a uma matriz singular (det = 0).
+    """
+    pontos = [(1, 2), (1, 5), (3, 4)] # Ponto x=1 duplicado
+    
+    resultado = interp_vand(pontos, plotar=False)
+    
+    assert isinstance(resultado, str)
+    assert "Matriz de Vandermonde é singular" in resultado
+
+
+# Teste de Funcionalidade de Plotagem (garante que o código de plotagem é executado sem erro)
+def test_interpolacao_polinomial_plot():
+    """Testa se a função retorna o polinomio e executa o codigo de plotagem sem erro."""
+    pontos = [(1, 1), (2, 4), (3, 9)]
+    
+    # Chame a função com plotar=True
+    P_x = interpolacao_polinomial(pontos, plotar=True)
+    
+    # O retorno ainda deve ser a expressão simbólica correta (x^2)
+    x = sp.Symbol('x')
+    poli_esperado = x**2 
+    assert sp.simplify(P_x - poli_esperado) == 0
+
+def test_interp_vand_plot():
+    """Testa se a função retorna o polinomio e executa o codigo de plotagem sem erro."""
+    pontos = [(1, 1), (2, 4), (3, 9)]
+    
+    # Chame a função com plotar=True
+    P_x = interp_vand(pontos, plotar=True)
+    
+    # O retorno ainda deve ser a expressão simbólica correta (x^2)
+    x = sp.Symbol('x')
+    poli_esperado = x**2 
+    assert sp.simplify(P_x - poli_esperado) == 0
