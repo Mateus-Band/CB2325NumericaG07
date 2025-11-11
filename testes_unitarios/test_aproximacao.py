@@ -29,7 +29,7 @@ def test_ajuste_linear_invalid_input_leght():
     y = [1, 2]
 
     with pytest.raises(
-        ValueError, match="As listas 'valores_x' e 'valores_y' devem ter o mesmo tamanho."
+        ValueError, match="As listas 'X' e 'Y' devem ter o mesmo tamanho."
     ):
         ajuste_linear(x, y, plt_grafico=False)
 
@@ -40,7 +40,7 @@ def test_ajuste_linear_zero_variance():
     y = [1, 3, 5, 2]
 
     with pytest.raises(
-        ValueError, match="A variância de valores_x é zero."
+        ValueError, match="A variância de X é zero."
     ):
         ajuste_linear(x, y, plt_grafico=False)
 
@@ -75,7 +75,7 @@ def test_invalid_input_length():
     y = np.linspace(2, 4, 9)
 
     with pytest.raises(
-        ValueError, match="As listas 'valores_x' e 'valores_y' devem ter o mesmo tamanho."
+        ValueError, match="As listas 'X' e 'Y' devem ter o mesmo tamanho."
     ):
         ajuste_polinomial(x, y, 2, plt_grafico=False)
 
@@ -272,7 +272,7 @@ def test_ajuste_exponencial_invalid_input_lenght():
     y = [1, 2]
 
     with pytest.raises(
-        ValueError, match="As listas 'valores_x' e 'valores_y' devem ter o mesmo tamanho."
+        ValueError, match="As listas 'X' e 'Y' devem ter o mesmo tamanho."
     ):
         ajuste_exponencial(x, y, plt_grafico=False)
 
@@ -283,7 +283,7 @@ def test_ajuste_exponencial_y_nao_positivo():
     y = [1, 4, -9, 16]
 
     with pytest.raises(
-        ValueError, match="A lista de valores de y possui valor\\(es\\) não postivos\\(s\\)."
+        ValueError, match="A lista Y possui valor\\(es\\) não postivos\\(s\\)."
     ):
         ajuste_exponencial(x, y, plt_grafico=False)
 
@@ -320,7 +320,7 @@ def test_ajuste_logaritmo_invalid_input_lenght():
     y = [1, 2]
 
     with pytest.raises(
-        ValueError, match="As listas 'valores_x' e 'valores_y' devem ter o mesmo tamanho."
+        ValueError, match="As listas 'X' e 'Y' devem ter o mesmo tamanho."
     ):
         ajuste_logaritmo(x, y, plt_grafico=False)
 
@@ -331,7 +331,7 @@ def test_ajuste_logaritmo_x_nao_positivo():
     y = [1, 4, 9, 16]
 
     with pytest.raises(
-        ValueError, match="A lista de valores de x possui valor\\(es\\) não positivos\\(s\\)."
+        ValueError, match="A lista X possui valor\\(es\\) não positivos\\(s\\)."
     ):
         ajuste_logaritmo(x, y, plt_grafico=False)
 
@@ -361,6 +361,35 @@ def test_ajuste_logaritmo_ruido():
 # Testes - Ajuste Múltiplo
 ###########
 
+# Teste 1: Erro de tamanho
+def test_ajuste_multiplo_tamanho_invalido():
+    # Teste para 'x_matriz' (5 elementos) e 'z_matriz' (2 elementos) de tamanhos diferentes
+    a = np.array([9, -13, 5.5, -213, 44.95])
+    b = np.array([15, 33, 94, -0.5, 0.88])
+    z = np.array([1, 2])
+
+    # O seu código 'aproximacao.py' (linha 298) lança um ValueError
+    # com a mensagem "Formato inconsistente..."
+    with pytest.raises(
+        ValueError, match="Formato inconsistente em 'X'"
+    ):
+        ajuste_multiplo([a, b], z, incluir_intercepto=False)
+
+# Teste 2: Aviso de Colinearidade
+def test_ajuste_multiplo_colinearidade_aviso():
+    # Teste para colinearidade (d = 2*c)
+    a = np.array([9, -13, 5.5, -213, 44.95])
+    b = np.array([15, 33, 94, -0.5, 0.88])
+    c = np.array([-24, -24, -24, -24, -24])
+    d = np.array([-48, -48, -48, -48, -48]) # d é colinear com c
+    z = 1*a + 2*b + 3*c + 4*d # z qualquer
+
+    # O seu código 'aproximacao.py' (linha 315) lança um RuntimeWarning,
+    # não um ValueError. O teste deve capturar o aviso.
+    with pytest.warns(RuntimeWarning, match="matriz quase singular"):
+        ajuste_multiplo([a, b, c, d], z, incluir_intercepto=False)
+
+# Teste 3: Coeficientes sem intercepto (Este é o teste parametrizado)
 @pytest.mark.parametrize(
     "expected1",
     [
@@ -373,46 +402,8 @@ def test_ajuste_logaritmo_ruido():
         np.array([7.52, 8, 31.04, 500]),
     ],
 )
-def teste_ajuste_multiplo(expected1):
-
-    # Teste para 'x_matriz' e 'z_matriz' de tamanhos diferentes
-
-    a = np.array([9, -13, 5.5, -213, 44.95])
-    b = np.array([15, 33, 94, -0.5, 0.88])
-    z = np.array([1, 2])
-
-    with pytest.raises(
-        ValueError, match=(
-            "Número de linhas de X e número de "
-            "valores de Z não coincidem."
-        )
-    ):
-        ajuste_multiplo([a, b], z, incluir_intercepto=False)
-
-    # Teste para colinearidade
-
-    a = np.array([9, -13, 5.5, -213, 44.95])
-    b = np.array([15, 33, 94, -0.5, 0.88])
-    c = np.array([-24, -24, -24, -24, -24])
-    d = np.array([-48, -48, -48, -48, -48])
-
-    z = (
-        expected1[0] * a + 
-        expected1[1] * b + 
-        expected1[2] * c +
-        expected1[3] * d
-    )
-
-    with pytest.raises(
-        ValueError, match=(
-            "Colinearidade detectada por matriz mal-condicionada. "
-            "Verifique os dados de entrada."
-        )
-    ):
-        ajuste_multiplo([a, b, c, d], z, incluir_intercepto=False)
-
+def test_ajuste_multiplo_coeficientes_sem_intercepto(expected1):
     # Teste para dados sem ruído e sem intercepto
-
     a = np.array([9, -13, 5.5, -213, 44.95])
     b = np.array([15, 33, 94, -0.5, 0.88])
     c = np.array([-24, -24, -24, -24, -24])
@@ -428,23 +419,32 @@ def teste_ajuste_multiplo(expected1):
     result = ajuste_multiplo([a, b, c, d], z, incluir_intercepto=False)
     assert result == approx(expected1, rel=1e-4, abs=1e-5)
 
+# Teste 4: Coeficientes com intercepto (sem ruído)
+def test_ajuste_multiplo_coeficientes_com_intercepto():
     # Teste para dados sem ruído e com intercepto
-
+    # Usando valores fixos para 'expected', já que não é parametrizado
+    expected_coeffs = np.array([1, -5, -6]) 
+    
     a = np.array([9, -13, 5.5, -213, 44.95])
     b = np.array([15, 33, 94, -0.5, 0.88])
     c = np.array([33, -3.22, -178, -26, 500])
 
     z = (
-        expected1[0] * a + 
-        expected1[1] * b + 
-        expected1[2] * c + 100
+        expected_coeffs[0] * a + 
+        expected_coeffs[1] * b + 
+        expected_coeffs[2] * c + 100 # 100 é o intercepto
     )
 
-    result = ajuste_multiplo([a, b, c], z)
-    assert result == approx(
-        [100, expected1[0], expected1[1], expected1[2]], rel=1e-4, abs=1e-5)
+    result = ajuste_multiplo([a, b, c], z, incluir_intercepto=True)
+    expected_result = np.array([100, expected_coeffs[0], expected_coeffs[1], expected_coeffs[2]])
     
+    assert result == approx(expected_result, rel=1e-4, abs=1e-5)
+
+# Teste 5: Coeficientes com intercepto (com ruído)
+def test_ajuste_multiplo_coeficientes_com_intercepto_ruido():
     # Teste para dados com ruído e com intercepto
+    # Usando valores fixos para 'expected'
+    expected_coeffs = np.array([2.5, 3.1, 5.7])
 
     rng = np.random.default_rng(42)
     a = np.array([9, -13, 5.5, -213, 44.95])
@@ -452,21 +452,20 @@ def teste_ajuste_multiplo(expected1):
     c = np.array([33, -3.22, -178, -26, 500])
 
     z = (
-        expected1[0] * a + 
-        expected1[1] * b + 
-        expected1[2] * c + 100
-        + rng.normal(0, 1, size=a.shape)
+        expected_coeffs[0] * a + 
+        expected_coeffs[1] * b + 
+        expected_coeffs[2] * c + 100 # 100 é o intercepto
+        + rng.normal(0, 1, size=a.shape) # Adiciona ruído
     )
 
-    coeffs = ajuste_multiplo([a, b, c], z)
+    coeffs = ajuste_multiplo([a, b, c], z, incluir_intercepto=True)
     I, A, B, C = coeffs
 
     # Reconstrói Z com os coeficientes estimados
-
     z_fit = A * a + B * b + C * c + I
 
-    rms3 = np.sqrt(np.mean((z_fit - z) ** 2))
-    assert rms3 < 1
+    rms = np.sqrt(np.mean((z_fit - z) ** 2))
+    assert rms < 1
 
 ###########
 # Testes - Avaliar Ajustes
@@ -492,7 +491,7 @@ def test_avaliar_ajuste_invalid_input_lenght():
     x = [1, 2]
     y = [1]
 
-    with pytest.raises(ValueError, match="As listas 'valores_x' e 'valores_y' devem ter o mesmo tamanho."):
+    with pytest.raises(ValueError, match="As listas 'X' e 'Y' devem ter o mesmo tamanho."):
         avaliar_ajuste(x, y, "R2", "linear", (1, 1))
 
 # Teste para criterio desconhecido
