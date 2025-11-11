@@ -149,7 +149,6 @@ def interpolacao_de_hermite(x,y,plot=False, grid=True):
     x_duplicated = duplicate(x)#prepara a lista para obter os coeficientes da função
     coeficientes_hermite = hermite_ddfunc(x_duplicated,f_linha,f)#calcula os resultados dos f[x_0],f[x_0,x_0] ... necessários
     
-    individual_color = 'red'
 
     def interpolation(ponto,plt = plot): #função que será retornada
         '''
@@ -176,20 +175,15 @@ def interpolacao_de_hermite(x,y,plot=False, grid=True):
             hermite += mult*i # + f[x_0,...,x_i]*(x-x_0)^2 * ... (x - x_i)
             soma += 1
         
-        if plt: # se for pra plotar plota o ponto
-             ax.scatter([ponto],[hermite],color = individual_color,zorder = 2)
-
-
-
-
-
         return hermite
 
     if plot: #plotagem
             fig = plt.figure()
             ax = fig.add_subplot()
-            ax.scatter(x,y,color = 'Black',label = 'Pontos Originais',zorder = 3) #plota os pontos originais
+            ax.scatter(x,y,color = 'red',label = 'Pontos Originais',zorder = 3) #plota os pontos originais
             
+            ax.set_title('Interpolação de Newton')
+
             inicio = min(x)
             fim = max(x)
             arranjo = 1
@@ -206,13 +200,12 @@ def interpolacao_de_hermite(x,y,plot=False, grid=True):
             cred =lambda x: x/arranjo #serve apenas para consertar o intervalo
             xval = np.linspace(int(inicio*arranjo),int(fim*arranjo),int((interval)*arranjo)*pontos_unidades) #gera uma sequencia de x pontos entre a e b
             xval = np.array(list(map(cred,xval))) # calcula os valores de x para plotar
+
             yval = np.array(list(map(lambda x: interpolation(x,plt=False),xval))) #calcula os valores de y para plotar
             ax.plot(xval,yval,label = 'Curva de Interpolação') #plota a curva
             
             #configuações da plotagem
-            ax.set_aspect('equal')
             ax.grid(grid)
-            ax.plot([],[],'o', color = individual_color,label = 'Pontos Calculados')
             ax.legend()
 
 
@@ -267,7 +260,6 @@ def interpolacao_de_newton(x,y,plot:bool = False,grid:bool = True):
     f = function_definer(x,y) #define a função que f(x) = y
     coeficientes_newton = newton_ddfunc(x,f)#calcula os resultados dos f[x_0],f[x_0,x_0] ... necessários
 
-    individual_color = 'red'
     
     def interpolation(ponto,plt = plot): #função que será retornada
         '''
@@ -290,10 +282,6 @@ def interpolacao_de_newton(x,y,plot:bool = False,grid:bool = True):
             newton += mult*i # + f[x_0,...,x_i]*(x-x_0)^2 * ... (x - x_i)
             soma += 1
         
-        if plt: # se for pra plotar plota o ponto
-            global individual_color_bool
-            individual_color_bool = True
-            ax.scatter([ponto],[newton],color = individual_color,zorder = 2)
 
         return newton
 
@@ -301,8 +289,10 @@ def interpolacao_de_newton(x,y,plot:bool = False,grid:bool = True):
     if plot: #plotagem
             fig = plt.figure()
             ax = fig.add_subplot()
-            ax.scatter(x,y,color = 'Black',label = 'Pontos Originais',zorder = 3) #plota os pontos originais
+            ax.scatter(x,y,color = 'red',label = 'Pontos Originais',zorder = 3) #plota os pontos originais
             
+            fig.set_title('Interpolação de Newton')
+
             inicio = min(x)
             fim = max(x)
             arranjo = 1
@@ -323,9 +313,7 @@ def interpolacao_de_newton(x,y,plot:bool = False,grid:bool = True):
             ax.plot(xval,yval,label = 'Curva de Interpolação') #plota a curva
             
             #configuações da plotagem
-            ax.set_aspect('equal')
             ax.grid(grid)
-            ax.plot([],[],'o', color = individual_color,label = 'Pontos Calculados')
             ax.legend()
 
 
