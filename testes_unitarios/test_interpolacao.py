@@ -494,7 +494,7 @@ def test_interp_vand_pontos_duplicados():
 
 # Teste de Funcionalidade de Plotagem (garante que o código de plotagem é executado sem erro)
 def test_interpolacao_polinomial_plot():
-    """Testa se a função retorna o polinomio e executa o codigo de plotagem sem erro."""
+    """Testa se a função retorna o polinômio e executa o codigo de plotagem sem erro."""
     pontos = [(1, 1), (2, 4), (3, 9)]
     
     # Chame a função com plotar=True
@@ -506,7 +506,7 @@ def test_interpolacao_polinomial_plot():
     assert sp.simplify(P_x - poli_esperado) == 0
 
 def test_interp_vand_plot():
-    """Testa se a função retorna o polinomio e executa o codigo de plotagem sem erro."""
+    """Testa se a função retorna o polinomio e executa o código de plotagem sem erro."""
     pontos = [(1, 1), (2, 4), (3, 9)]
     
     # Chame a função com plotar=True
