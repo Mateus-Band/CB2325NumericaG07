@@ -27,7 +27,7 @@ def test_ajuste_linear_invalid_input_leght():
     y = [1, 2]
 
     with pytest.raises(
-        ValueError, match="As listas 'X' e 'Y' devem ter o mesmo tamanho."
+        ValueError, match="As listas 'valores_x' e 'valores_y' devem ter o mesmo tamanho."
     ):
         ajuste_linear(x, y, plt_grafico=False)
 
@@ -38,7 +38,7 @@ def test_ajuste_linear_zero_variance():
     y = [1, 3, 5, 2]
 
     with pytest.raises(
-        ValueError, match="A variância de X é zero."
+        ValueError, match="A variância de valores_x é zero."
     ):
         ajuste_linear(x, y, plt_grafico=False)
 
@@ -73,9 +73,9 @@ def test_invalid_input_length():
     y = np.linspace(2, 4, 9)
 
     with pytest.raises(
-        ValueError, match="As listas 'X' e 'Y' devem ter o mesmo tamanho."
+        ValueError, match="As listas 'valores_x' e 'valores_y' devem ter o mesmo tamanho."
     ):
-        ajuste_polinomial(x, y, 2, plt_grafico=False)
+        ajuste_polinomial(x, y, 2, plt_grafico=True)
 
 # Teste para plot do gráfico
 
@@ -93,7 +93,7 @@ def test_invalid_input_length():
 def test_plot_withouerror(expected1):
     x = np.linspace(-10, 10, 200)
     y = expected1[2] * x ** 2 + expected1[1] * x + expected1[0]
-    modelo = ajuste_polinomial(x, y, 2)
+    modelo = ajuste_polinomial(x, y, 2, plt_grafico=True)
 
 # Teste para verificar se os coeficientes gerados correspondem ao grau
 
@@ -270,7 +270,7 @@ def test_ajuste_exponencial_invalid_input_lenght():
     y = [1, 2]
 
     with pytest.raises(
-        ValueError, match="As listas 'X' e 'Y' devem ter o mesmo tamanho."
+        ValueError, match="As listas 'valores_x' e 'valores_y' devem ter o mesmo tamanho."
     ):
         ajuste_exponencial(x, y, plt_grafico=False)
 
@@ -281,7 +281,7 @@ def test_ajuste_exponencial_y_nao_positivo():
     y = [1, 4, -9, 16]
 
     with pytest.raises(
-        ValueError, match="A lista Y possui valor\\(es\\) não postivos\\(s\\)."
+        ValueError, match="A lista de valores de y possui valores não postivos."
     ):
         ajuste_exponencial(x, y, plt_grafico=False)
 
@@ -318,7 +318,7 @@ def test_ajuste_logaritmo_invalid_input_lenght():
     y = [1, 2]
 
     with pytest.raises(
-        ValueError, match="As listas 'X' e 'Y' devem ter o mesmo tamanho."
+        ValueError, match="As listas 'valores_x' e 'valores_y' devem ter o mesmo tamanho."
     ):
         ajuste_logaritmo(x, y, plt_grafico=False)
 
@@ -329,7 +329,7 @@ def test_ajuste_logaritmo_x_nao_positivo():
     y = [1, 4, 9, 16]
 
     with pytest.raises(
-        ValueError, match="A lista X possui valor\\(es\\) não positivos\\(s\\)."
+        ValueError, match="A lista de valores de x possui valores não positivos."
     ):
         ajuste_logaritmo(x, y, plt_grafico=False)
 
@@ -361,28 +361,28 @@ def test_ajuste_logaritmo_ruido():
 
 # Teste 1: Erro de tamanho
 def test_ajuste_multiplo_tamanho_invalido():
-    # Teste para 'x_matriz' (5 elementos) e 'z_matriz' (2 elementos) de tamanhos diferentes
+    # Teste para 'x_matriz' e 'z_matriz' de tamanhos diferentes
     a = np.array([9, -13, 5.5, -213, 44.95])
     b = np.array([15, 33, 94, -0.5, 0.88])
     z = np.array([1, 2])
 
-    # O seu código 'aproximacao.py' (linha 298) lança um ValueError
+    # O código 'aproximacao.py' (linha 430) lança um ValueError
     # com a mensagem "Formato inconsistente..."
     with pytest.raises(
-        ValueError, match="Formato inconsistente em 'X'"
+        ValueError, match="Formato inconsistente em 'valores_x'"
     ):
         ajuste_multiplo([a, b], z, incluir_intercepto=False)
 
 # Teste 2: Aviso de Colinearidade
 def test_ajuste_multiplo_colinearidade_aviso():
-    # Teste para colinearidade (d = 2*c)
+    # Teste para colinearidade (d = 2 * c)
     a = np.array([9, -13, 5.5, -213, 44.95])
     b = np.array([15, 33, 94, -0.5, 0.88])
     c = np.array([-24, -24, -24, -24, -24])
     d = np.array([-48, -48, -48, -48, -48]) # d é colinear com c
     z = 1*a + 2*b + 3*c + 4*d # z qualquer
 
-    # O seu código 'aproximacao.py' (linha 315) lança um RuntimeWarning,
+    # O código 'aproximacao.py' lança um RuntimeWarning,
     # não um ValueError. O teste deve capturar o aviso.
     with pytest.warns(RuntimeWarning, match="matriz quase singular"):
         ajuste_multiplo([a, b, c, d], z, incluir_intercepto=False)
@@ -434,7 +434,8 @@ def test_ajuste_multiplo_coeficientes_com_intercepto():
     )
 
     result = ajuste_multiplo([a, b, c], z, incluir_intercepto=True)
-    expected_result = np.array([100, expected_coeffs[0], expected_coeffs[1], expected_coeffs[2]])
+    expected_result = np.array([100, expected_coeffs[0], 
+                    expected_coeffs[1], expected_coeffs[2]])
     
     assert result == approx(expected_result, rel=1e-4, abs=1e-5)
 
@@ -479,7 +480,6 @@ def dados():
 
     modelo = "polinomial"
     coeficientes = ajuste_polinomial(valores_x, valores_y, 2, plt_grafico=False)
-    
 
     return valores_x, valores_y, modelo, coeficientes
 
@@ -489,7 +489,7 @@ def test_avaliar_ajuste_invalid_input_lenght():
     x = [1, 2]
     y = [1]
 
-    with pytest.raises(ValueError, match="As listas 'X' e 'Y' devem ter o mesmo tamanho."):
+    with pytest.raises(ValueError, match="As listas 'valores_x' e 'valores_y' devem ter o mesmo tamanho."):
         avaliar_ajuste(x, y, "R2", "linear", (1, 1))
 
 # Teste para criterio desconhecido
@@ -582,7 +582,6 @@ def test_avaliar_ajuste_calculo_all(dados):
     assert aicc == approx(19.214, rel=0.01)
     assert bic == approx(-5.957, rel=0.01)
 
-
 ###########
 # Testes - Melhor Ajuste
 ###########
@@ -593,8 +592,6 @@ def test_avaliar_ajuste_calculo_all(dados):
 
 def test_melhor_ajuste_linear(criterio):
 
-    # Dados gerados a partir de um modelo linear
-
     rng = np.random.default_rng(42)
     x = np.linspace(-10, 8, 30)
     y = 5 * x + 8 + rng.normal(0, 0.5, size=x.shape)
@@ -602,7 +599,7 @@ def test_melhor_ajuste_linear(criterio):
     mod, info = melhor_ajuste(x, y, criterio)
 
     if criterio == "R2":
-        pytest.skip("R2 tende a favorecer modelos mais complexos, " \
+        pytest.skip("R2 tende a favorecer modelos mais complexos, "
         "gerando overfitting")
 
     assert "linear" in mod
@@ -615,8 +612,6 @@ def test_melhor_ajuste_linear(criterio):
     ["R2", "R2A", "AIC", "AICc", "BIC"])
 
 def test_melhor_ajuste_polinomial(criterio):
-
-    # Dados gerados a partir de um modelo linear
 
     rng = np.random.default_rng(42)
     x = np.linspace(-20, 34, 60)

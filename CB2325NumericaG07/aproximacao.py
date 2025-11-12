@@ -111,30 +111,35 @@ def _plotar_grafico(
     plt.show()
 
 
-def ajuste_linear(X:ArrayLike, Y:ArrayLike, plt_grafico:bool=False, expr:bool=False):
+def ajuste_linear(
+        valores_x: ArrayLike, 
+        valores_y: ArrayLike, 
+        plt_grafico: bool = False, 
+        expr: bool = False
+):
     """
     Modelo: y = ax + b
     Usa regressão linear simples (polinômio de grau 1) via MMQ.
     """
     
-    if len(X) != len(Y):
-        raise ValueError("As listas 'X' e 'Y' devem ter o mesmo tamanho.")
+    if len(valores_x) != len(valores_y):
+        raise ValueError("As listas 'valores_x' e 'valores_y' devem ter o mesmo tamanho.")
 
-    x_medio = reduce(lambda x, y: x + y, X) / len(X)
-    y_medio = reduce(lambda x, y: x + y, Y) / len(Y)
+    x_medio = reduce(lambda x, y: x + y, valores_x) / len(valores_x)
+    y_medio = reduce(lambda x, y: x + y, valores_y) / len(valores_y)
 
     # Cálculo da covariância de x e y e da variância
 
     cov_xy = 0
     var_x = 0
 
-    for i in range(len(X)):
-        cov_xy += (X[i] - x_medio) * (Y[i] - y_medio)
-        var_x += (X[i] - x_medio) ** 2
+    for i in range(len(valores_x)):
+        cov_xy += (valores_x[i] - x_medio) * (valores_y[i] - y_medio)
+        var_x += (valores_x[i] - x_medio) ** 2
 
     if var_x == 0:
         raise ValueError(
-            f"A variância de X é zero (var={np.var(X):.3e}). "
+            f"A variância de valores_x é zero. "
             "Não é possível calcular o ajuste."
             )
 
@@ -154,7 +159,9 @@ def ajuste_linear(X:ArrayLike, Y:ArrayLike, plt_grafico:bool=False, expr:bool=Fa
         x_sym = sp.Symbol("x")
         y_func = a * x_sym + b
 
-        _plotar_grafico(X, Y,
+        _plotar_grafico(
+            valores_x, 
+            valores_y,
             y_func,
             "Gráfico do Ajuste Linear"
         )
@@ -232,22 +239,27 @@ def ajuste_polinomial(
     return array_coeficientes
 
 
-def ajuste_exponencial(X: ArrayLike, Y:ArrayLike, plt_grafico:bool=False, expr:bool=False):
+def ajuste_exponencial(
+        valores_x: ArrayLike, 
+        valores_y: ArrayLike, 
+        plt_grafico: bool = False, 
+        expr: bool = False
+):
     """
     Modelo: y = b * e^(ax)
     Linearizado via logaritmo natural em y: ln(y) = ln(b) + ax.
     Requer que todos os valores de y sejam positivos.
     """
 
-    if len(X) != len(Y):
-        raise ValueError("As listas 'X' e 'Y' devem ter o mesmo tamanho.")
+    if len(valores_x) != len(valores_y):
+        raise ValueError("As listas 'valores_x' e 'valores_y' devem ter o mesmo tamanho.")
 
-    for y in Y:
+    for y in valores_y:
         if y <= 0:
-            raise ValueError("A lista de valores de y possui valor(es) não postivo(s).")
+            raise ValueError("A lista de valores de y possui valores não postivos.")
 
-    ln_Y = [math.log(y) for y in Y]
-    a, b_aux = ajuste_linear(X, ln_Y)
+    ln_Y = [math.log(y) for y in valores_y]
+    a, b_aux = ajuste_linear(valores_x, ln_Y)
     b = math.exp(b_aux)
 
     # Print da expressão
@@ -261,7 +273,9 @@ def ajuste_exponencial(X: ArrayLike, Y:ArrayLike, plt_grafico:bool=False, expr:b
         x_sym = sp.Symbol("x")
         y_func = b * sp.exp(a * x_sym)
 
-        _plotar_grafico(X, Y,
+        _plotar_grafico(
+            valores_x, 
+            valores_y,
             y_func,
             "Gráfico do Ajuste Exponencial"
         )
@@ -269,21 +283,26 @@ def ajuste_exponencial(X: ArrayLike, Y:ArrayLike, plt_grafico:bool=False, expr:b
     return np.array([a, b])
 
 
-def ajuste_logaritmo(X: ArrayLike, Y:ArrayLike, plt_grafico:bool=False, expr:bool=False):
+def ajuste_logaritmo(
+        valores_x: ArrayLike, 
+        valores_y: ArrayLike, 
+        plt_grafico: bool = False, 
+        expr: bool = False
+):
     """
     Modelo: y = a + b * ln(x)
     Linearizado usando ln(x) como nova variável independente.
     Requer que todos os valores de x sejam positivos.
     """
     
-    if len(X) != len(Y):
-        raise ValueError("As listas 'X' e 'Y' devem ter o mesmo tamanho.")
+    if len(valores_x) != len(valores_y):
+        raise ValueError("As listas 'valores_x' e 'valores_y' devem ter o mesmo tamanho.")
 
-    if any(x <= 0 for x in X):
-        raise ValueError("A lista de valores de x possui valor(es) não positivos(s).")
+    if any(x <= 0 for x in valores_x):
+        raise ValueError("A lista de valores de x possui valores não positivos.")
 
-    ln_X = [math.log(x) for x in X]
-    b, a = ajuste_linear(ln_X, Y)
+    ln_X = [math.log(x) for x in valores_x]
+    b, a = ajuste_linear(ln_X, valores_y)
 
 
     # Print da expressão
@@ -297,7 +316,9 @@ def ajuste_logaritmo(X: ArrayLike, Y:ArrayLike, plt_grafico:bool=False, expr:boo
         x_sym = sp.Symbol("x")
         y_func = a + b * sp.ln(x_sym)
 
-        _plotar_grafico(X, Y,
+        _plotar_grafico(
+            valores_x, 
+            valores_y,
             y_func,
             "Gráfico do Ajuste Logaritmo"
         )
@@ -321,7 +342,7 @@ def ajuste_senoidal(
     
     if len(valores_x) != len(valores_y):
         raise ValueError(
-            "As listas 'X' e 'Y' devem ter o mesmo tamanho."
+            "As listas 'valores_x' e 'valores_y' devem ter o mesmo tamanho."
         )
 
     # Captar o período aproximado e calcular a frequência aproximada 
@@ -378,10 +399,21 @@ def ajuste_senoidal(
     x_sym = sp.Symbol("x")
     func_aprox = A * sp.sin(B * x_sym + C) + D
 
+    def clean_zero(x, tol=1e-12):
+        return 0.0 if abs(x) < tol else x
+
+    C_vis = clean_zero(C)
+    D_vis = clean_zero(D)
+
+    sign1 = "+" if C >= 0 else "-"
+    sign2 = "+" if D >= 0 else "-"
+
+    C_vis = abs(C_vis)
+    D_vis = abs(D_vis)
+
     if expr:
         print(f"Função Senoidal Aproximadora: "
-            f"y = {A:.4f} * sin({B:.4f}x + ({C:.4f})) + ({D:.4f})"
-        )
+              f"{A:.4f} * sin({B:.4f}x {sign1} {C_vis:.4f}) {sign2} {D_vis:.4f}")
 
     # Plotar o Gráfico
 
@@ -408,6 +440,9 @@ def ajuste_multiplo(
     """
     Modelo: y = b0 + b1*x1 + b2*x2 + ... + bn*xn (Regressão Múltipla)
 
+    Cada linha de 'valores_x' representa uma variável independente.
+    Cada coluna (ou índice dentro de cada vetor) representa uma amostra.
+
     Aplica MMQ diretamente na matriz de variáveis independentes.
     """
 
@@ -417,17 +452,16 @@ def ajuste_multiplo(
 
     z_matriz = np.array(valores_y, dtype=float).reshape(-1, 1)
 
-    if x_matriz.ndim == 1:
-        x_matriz = x_matriz.reshape(-1, 1)
+    # Transpor para o formato exigido pelo MMQ: (n_amostras, n_variáveis)
+
+    x_matriz = x_matriz.T
+
+    # Validar dimensões
 
     if x_matriz.shape[0] != z_matriz.shape[0]:
-        if x_matriz.shape[1] == z_matriz.shape[0]:
-            x_matriz = x_matriz.T
-        else:
-            raise ValueError(
-                "Formato inconsistente em 'X'. " \
-                "Forneça uma matriz (n_amostras, n_variaveis) "
-                "ou uma lista de vetores cada um de comprimento n_amostras."
+        raise ValueError(
+                "Formato inconsistente em 'valores_x'. "
+                "Forneça uma matriz (n_variaveis, n_amostras)."
             )
 
     # Tratar o caso com intercepto
@@ -483,8 +517,8 @@ def ajuste_multiplo(
 
 
 def avaliar_ajuste(
-        X: ArrayLike, 
-        Y: ArrayLike, 
+        valores_x: ArrayLike, 
+        valores_y: ArrayLike, 
         criterio: str, 
         modelo: str, 
         coeficientes: tuple | np.ndarray
@@ -493,8 +527,8 @@ def avaliar_ajuste(
     Avalie um modelo de ajuste por meio de um ou mais critérios
 
     Argumentos:
-        X (list): Lista de valores da variável independente.
-        Y (list): Lista de valores da variável dependente.
+        valores_x (list): Lista de valores da variável independente.
+        valores_y (list): Lista de valores da variável dependente.
         criterio (str): Critério de avaliação ("R2", "R2A", "AIC", 
             "AICc", "BIC", "all").
         modelo (str): Modelo utilizado ("linear", "polinomial", 
@@ -512,8 +546,8 @@ def avaliar_ajuste(
     """
 
 
-    if len(X) != len(Y):
-        raise ValueError("As listas 'X' e 'Y' devem ter o mesmo tamanho.")
+    if len(valores_x) != len(valores_y):
+        raise ValueError("As listas 'valores_x' e 'valores_y' devem ter o mesmo tamanho.")
 
     if criterio not in ("R2", "R2A", "AIC", "AICc", "BIC", "all"):
         raise ValueError("Critério desconhecido. Use R2, R2A , AIC, AICc, BIC, all")
@@ -521,37 +555,37 @@ def avaliar_ajuste(
     if modelo not in ("linear", "polinomial", "exponencial", "logaritmo", "senoidal"):
         raise ValueError("Modelo desconhecido. Use linear, polinomial, exponencial, logaritmo, senoidal")
 
-    X = np.array(X)
-    Y = np.array(Y)
-    n = len(X)
+    valores_x = np.array(valores_x)
+    valores_y = np.array(valores_y)
+    n = len(valores_x)
 
     # Adquire os valores de y que a aproximação forneceu
 
     if modelo == "linear":
         qtd_coeficientes = 2
-        y_modelo = coeficientes[0] * X + coeficientes[1]
+        y_modelo = coeficientes[0] * valores_x + coeficientes[1]
 
     elif modelo == "polinomial":
         qtd_coeficientes = len(coeficientes)
-        y_modelo = np.polynomial.polynomial.polyval(X, coeficientes)
+        y_modelo = np.polynomial.polynomial.polyval(valores_x, coeficientes)
 
     elif modelo == "exponencial":
         qtd_coeficientes = 2
-        y_modelo = coeficientes[1] * np.exp(coeficientes[0] * X)
+        y_modelo = coeficientes[1] * np.exp(coeficientes[0] * valores_x)
 
     elif modelo == "logaritmo":
         qtd_coeficientes = 2
-        y_modelo = coeficientes[0] + coeficientes[1] * np.log(X)
+        y_modelo = coeficientes[0] + coeficientes[1] * np.log(valores_x)
 
     elif modelo == "senoidal":
         qtd_coeficientes = 4
-        y_modelo = coeficientes[0] * np.sin(coeficientes[1] * X + coeficientes[3]) + coeficientes[2]
+        y_modelo = coeficientes[0] * np.sin(coeficientes[1] * valores_x + coeficientes[3]) + coeficientes[2]
 
     # Calcula o resíduo quadrático e o resíduo total (tratando o caso igual a 0)
 
-    media_y = np.mean(Y)
-    RST = 1e-12 if np.sum((Y - media_y) ** 2) == 0 else np.sum((Y - media_y) ** 2)
-    RSS = max(np.sum((Y - y_modelo) ** 2), 1e-12) # Evita problemas no log
+    media_y = np.mean(valores_y)
+    RST = 1e-12 if np.sum((valores_y - media_y) ** 2) == 0 else np.sum((valores_y - media_y) ** 2)
+    RSS = max(np.sum((valores_y - y_modelo) ** 2), 1e-12) # Evita problemas no log
 
     R2 = 1 - (RSS / RST)
 
