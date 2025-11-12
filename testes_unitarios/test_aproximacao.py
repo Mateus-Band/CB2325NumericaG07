@@ -1,20 +1,18 @@
+import os
+import sys
+
 import matplotlib
 import numpy as np
+import pytest
+from pytest import approx
 
-
-import sys
-import os
+# Adiciona o diretório raiz do projeto ao sys.path para permitir importações locais
 notebook_dir = os.getcwd()
 project_root = os.path.abspath(os.path.join(notebook_dir, '..'))
 if project_root not in sys.path:
     sys.path.append(project_root)
 
-import pytest
-
 from CB2325NumericaG07.aproximacao import *
-from pytest import approx
-
-
 
 matplotlib.use("Agg")
 

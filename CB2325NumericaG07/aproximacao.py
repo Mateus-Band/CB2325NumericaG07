@@ -1,49 +1,54 @@
 import math
 from functools import reduce
-import numpy as np
-import sympy as sp
-import matplotlib.pyplot as plt
 import warnings
 from typing import Sequence, Union
 
+import numpy as np
+import sympy as sp
+import matplotlib.pyplot as plt
+
 ArrayLike = Union[Sequence[float], np.ndarray]
 
-def ajuste(valores_X: ArrayLike, valores_Y: ArrayLike, tipo:str, **kwargs) -> np.ndarray:
+def ajuste(
+        valores_x: ArrayLike, 
+        valores_y: ArrayLike, 
+        tipo: str, 
+        **kwargs
+) -> np.ndarray:
     """
     Realiza ajustes de curvas pelo Método dos Mínimos Quadrados (MMQ)
-      para diversos modelos.
+    para diversos modelos.
 
-    !Funções de ajuste também podem ser chamadas separadamente!
+    As funções de ajuste também podem ser chamadas separadamente.
 
-    Parâmetros Principais:
-        X (ArrayLike): Variável independente (ou matriz de variáveis
-          para 'mul').
-        Y (ArrayLike): Variável dependente.
-        tipo (str): Modelo de ajuste:
-            - 'lin': Linear (y = ax + b)
-            - 'pol': Polinomial (requer 'grau_pol')
-            - 'sen': Senoidal (y = A*sin(Bx + C) + D, recomenda-se
-              declarar 'T_aprox', estimativa pode falhar!)
-            - 'exp': Exponencial (y = b*e^(ax), linearizado via ln(y))
-            - 'log': Logarítmico(y = a + b*ln(x), linearizado via ln(x))
-            - 'mul': Regressão Múltipla (usa 'incluir_intercepto')
-        plt_grafico (bool): Se True, exibe o gráfico do ajuste. Padrão: 
-        False.
-        expr (bool): Se True, imprime a expressão matemática encontrada.
-          Padrão: False.
-
-    Parâmetros Específicos:
-        grau_pol (int): Grau do polinômio (usado apenas se tipo='pol').
-        T_aprox (float): Período aproximado inicial para o ajuste
-          senoidal (usado apenas se tipo='sen').
-                         Se não fornecido, tenta estimar grosseiramente
-                           pelos dados.
-        incluir_intercepto (bool): Inclui termo independente na
-          regressão múltipla (usado apenas se tipo='mul').
-
-    Retorna:
-        np.ndarray: Coeficientes do modelo ajustado. A ordem depende do
-          modelo escolhido.
+    Parâmetros
+    ----------
+    valores_x : ArrayLike
+        Variável independente (ou matriz de variáveis para 'mul').
+    valores_y : ArrayLike
+        Variável dependente.
+    tipo : str 
+        Modelo de ajuste:
+        - 'lin': Linear (y = ax + b)
+        - 'pol': Polinomial (requer 'grau_pol')
+        - 'sen': Senoidal (y = A*sin(Bx + C) + D, recomenda-se
+            declarar 'T_aprox', já que estimativa pode falhar)
+        - 'exp': Exponencial (y = b*e^(ax), linearizado via ln(y))
+        - 'log': Logarítmico(y = a + b*ln(x), linearizado via ln(x))
+        - 'mul': Regressão Múltipla (usa 'incluir_intercepto')
+    **kwargs :
+        Parâmetros opcionais e específicos do modelo, como:
+        - grau_pol (int): Grau do polinômio (tipo='pol').
+        - T_aprox (float): Período aproximado inicial (tipo='sen').
+        - incluir_intercepto (bool): Inclui termo independente (tipo='mul').
+        - plt_grafico (bool): Se True, exibe o gráfico do ajuste (opcional). 
+            Padrão: False.
+        - expr (bool): Se True, imprime a expressão matemática encontrada (opcional).
+            Padrão: False.
+    Retorna
+    -------
+    np.ndarray
+        Coeficientes do modelo ajustado. A ordem depende do modelo escolhido.
     """
 
     funcoes = {
@@ -65,28 +70,33 @@ def ajuste(valores_X: ArrayLike, valores_Y: ArrayLike, tipo:str, **kwargs) -> np
         print(inspect.signature(func))
         return None
 
-    return func(valores_X, valores_Y, **kwargs)
+    return func(valores_x, valores_y, **kwargs)
 
 
-def _plotar_grafico(X, Y,func_sym, titulo, qtd_pontos = 200):
+def _plotar_grafico(
+        valores_x, 
+        valores_y, 
+        func_sym, 
+        titulo, 
+        qtd_pontos=200
+):
     """
-    função auxiliar para plotagem dos ajustes.
+    Função auxiliar para plotagem dos ajustes.
     """
-        # Tratar a função simbólica
+    # Tratar a função simbólica
 
     x_sym = sp.Symbol("x")
     f = sp.lambdify(x_sym, func_sym, "numpy")
 
     # Gerar os pontos
 
-    x_func = np.linspace(min(X), max(X), qtd_pontos)
+    x_func = np.linspace(min(valores_x), max(valores_x), qtd_pontos)
     y_func = np.array(f(x_func))    
     y_func = np.broadcast_to(y_func, x_func.shape)
 
-
     # Plotar os gráficos
 
-    plt.scatter(X, Y, color="blue", marker="o", 
+    plt.scatter(valores_x, valores_y, color="blue", marker="o", 
         label="Dados Fornecidos")
 
     plt.plot(x_func, y_func, color="black", linewidth=2, 
@@ -151,19 +161,31 @@ def ajuste_linear(X:ArrayLike, Y:ArrayLike, plt_grafico:bool=False, expr:bool=Fa
 
     return np.array([a, b])
 
-def ajuste_polinomial(X: ArrayLike, Y: ArrayLike, grau_pol:int, plt_grafico:bool=False, expr:bool=False):
+
+def ajuste_polinomial(
+        valores_x: ArrayLike, 
+        valores_y: ArrayLike, 
+        grau_pol:int, 
+        plt_grafico: bool = False, 
+        expr: bool = False
+):
     """
     Modelo: y = c0 + c1*x + c2*x^2 + ... + cn*x^n
+
     Requer 'grau_pol'. Usa MMQ para encontrar os coeficientes do
-      polinômio.
+    polinômio.
+
+    Retorna os coeficientes em ordem crescente do grau da variável associada.
     """
     
     if grau_pol is None:
-        raise ValueError("Para o ajuste polinomial ('pol'), o parâmetro 'grau_pol' deve ser fornecido.")
-
-    if len(X) != len(Y):
         raise ValueError(
-            "As listas 'X' e 'Y' devem ter o mesmo tamanho."
+            "Para o ajuste polinomial ('pol'), o parâmetro 'grau_pol' deve ser fornecido."
+        )
+
+    if len(valores_x) != len(valores_y):
+        raise ValueError(
+            "As listas 'valores_x' e 'valores_y' devem ter o mesmo tamanho."
         )
     
     if grau_pol < 0:
@@ -207,6 +229,7 @@ def ajuste_polinomial(X: ArrayLike, Y: ArrayLike, grau_pol:int, plt_grafico:bool
 
     return array_coeficientes
 
+
 def ajuste_exponencial(X: ArrayLike, Y:ArrayLike, plt_grafico:bool=False, expr:bool=False):
     """
     Modelo: y = b * e^(ax)
@@ -243,6 +266,7 @@ def ajuste_exponencial(X: ArrayLike, Y:ArrayLike, plt_grafico:bool=False, expr:b
     
     return np.array([a, b])
 
+
 def ajuste_logaritmo(X: ArrayLike, Y:ArrayLike, plt_grafico:bool=False, expr:bool=False):
     """
     Modelo: y = a + b * ln(x)
@@ -278,40 +302,57 @@ def ajuste_logaritmo(X: ArrayLike, Y:ArrayLike, plt_grafico:bool=False, expr:boo
 
     return np.array([a, b])
 
-def ajuste_senoidal(X: ArrayLike, Y:ArrayLike, T_aprox:float =None, plt_grafico:bool=False, expr:bool=False):
+
+def ajuste_senoidal(
+        valores_x: ArrayLike, 
+        valores_y: ArrayLike, 
+        T_aprox: float = None, 
+        plt_grafico: bool = False, 
+        expr: bool = False
+):
     """
     Modelo: y = A * sin(B*x + C) + D
+
     Lineariza fixando frequências (B) ao redor de uma estimativa inicial (T_aprox).
     Encontra A, C, D para cada B testado e escolhe o melhor ajuste.
     """
     
-    if len(X) != len(Y):
-        raise ValueError("As listas 'X' e 'Y' devem ter o mesmo tamanho.")
+    if len(valores_x) != len(valores_y):
+        raise ValueError(
+            "As listas 'X' e 'Y' devem ter o mesmo tamanho."
+        )
 
-    # Captar o período aproximado e cálculo da frequência aproximada 
+    # Captar o período aproximado e calcular a frequência aproximada 
 
     if T_aprox is None:
-        T_aprox = (np.max(vx) - np.min(vx))/2
+        T_aprox = (np.max(valores_x) - np.min(valores_x)) / 2
         warnings.warn(f"T_aprox não fornecido. Usando estimativa: {T_aprox:.2f}")
-    freq_aprox = (2*np.pi) / T_aprox
 
-    X = np.array(X)
+    freq_aprox = (2 * np.pi) / T_aprox
+
+    valores_x = np.array(valores_x)
 
     freq_list = np.linspace(freq_aprox * 0.5, freq_aprox * 1.5, 400)
+    y_matriz = np.array(valores_y)
     erros_vals = []
     parametros = []
 
     for freq in freq_list:
-        x_matriz = np.array([[np.sin(freq * v), np.cos(freq * v), 1] for v in X])
-        y_matriz = np.array(Y)
+        x_matriz = np.array([
+            [np.sin(freq * v), np.cos(freq * v), 1] for v in valores_x
+        ])
+
         try:
             coeff, *_ = np.linalg.lstsq(x_matriz, y_matriz, rcond=None)
         except np.linalg.LinAlgError:
             erros_vals.append(np.inf)
             parametros.append((0, 0, 0))
             continue
+
         a, b, d = coeff
-        erro = np.linalg.norm(y_matriz - (a*np.sin(freq*X) + b*np.cos(freq*X) + d))**2
+        erro = np.linalg.norm(
+            y_matriz - (a * np.sin(freq * valores_x) 
+                        + b*np.cos(freq * valores_x) + d)) ** 2
         erros_vals.append(erro)
         parametros.append((a, b, d))
 
@@ -321,7 +362,7 @@ def ajuste_senoidal(X: ArrayLike, Y:ArrayLike, T_aprox:float =None, plt_grafico:
 
     # Gerar array de coeficientes (array_coeficientes)
     # Contém A, B, C, D tal que a função aproximadora é definida como 
-    # y = A * sin(B*x + C) + D.
+    # y = A * sin( B* x + C) + D.
 
     A = float(np.hypot(a, b))
     B = freq_final
@@ -337,13 +378,15 @@ def ajuste_senoidal(X: ArrayLike, Y:ArrayLike, T_aprox:float =None, plt_grafico:
 
     if expr:
         print(f"Função Senoidal Aproximadora: "
-            f"y = {A:.4f} * sin({B:.4f}x + {C:.4f}) + {D:.4f}"
+            f"y = {A:.4f} * sin({B:.4f}x + ({C:.4f})) + ({D:.4f})"
         )
 
     # Plotar o Gráfico
 
     if plt_grafico:
-        _plotar_grafico(X, Y,
+        _plotar_grafico(
+            valores_x, 
+            valores_y,
             func_aprox, 
             "Gráfico dos Dados Fornecidos e da Função Senoidal Aproximadora",
             qtd_pontos=600
@@ -353,16 +396,24 @@ def ajuste_senoidal(X: ArrayLike, Y:ArrayLike, T_aprox:float =None, plt_grafico:
 
     return array_coeficientes
 
-def ajuste_multiplo(X: ArrayLike, Y:ArrayLike,incluir_intercepto:bool=True, plt_grafico:bool=False, expr:bool=False):
+
+def ajuste_multiplo(
+        valores_x: ArrayLike, 
+        valores_y: ArrayLike, 
+        incluir_intercepto: bool = True, 
+        plt_grafico: bool = False, 
+        expr: bool = False):
     """
     Modelo: y = b0 + b1*x1 + b2*x2 + ... + bn*xn (Regressão Múltipla)
+
     Aplica MMQ diretamente na matriz de variáveis independentes.
     """
 
     # Construir a matriz de valores das variáveis (x_matriz)
-    x_matriz = np.array(X, dtype=float)
 
-    z_matriz = np.array(Y, dtype=float).reshape(-1, 1)
+    x_matriz = np.array(valores_x, dtype=float)
+
+    z_matriz = np.array(valores_y, dtype=float).reshape(-1, 1)
 
     if x_matriz.ndim == 1:
         x_matriz = x_matriz.reshape(-1, 1)
@@ -372,17 +423,17 @@ def ajuste_multiplo(X: ArrayLike, Y:ArrayLike,incluir_intercepto:bool=True, plt_
             x_matriz = x_matriz.T
         else:
             raise ValueError(
-                "Formato inconsistente em 'X'. Forneça uma matriz (n_amostras, n_variaveis) "
+                "Formato inconsistente em 'X'. " \
+                "Forneça uma matriz (n_amostras, n_variaveis) "
                 "ou uma lista de vetores cada um de comprimento n_amostras."
             )
 
     # Tratar o caso com intercepto
 
     if incluir_intercepto:
-        x_matriz = np.column_stack([np.ones(len(Y)), x_matriz])
+        x_matriz = np.column_stack([np.ones(len(valores_y)), x_matriz])
 
-    # Verificação de colinearidade
-
+    # Verificar colinearidade
 
     tol = 1e-10
     rank = np.linalg.matrix_rank(x_matriz, tol=tol)
@@ -394,8 +445,6 @@ def ajuste_multiplo(X: ArrayLike, Y:ArrayLike,incluir_intercepto:bool=True, plt_
             "Os resultados podem ser instáveis devido à colinearidade.",
             RuntimeWarning
         )
-
-
 
     # Construir a matriz de parâmetros (array_coeficientes)
 
@@ -414,7 +463,6 @@ def ajuste_multiplo(X: ArrayLike, Y:ArrayLike,incluir_intercepto:bool=True, plt_
 
             for i in range(qtd_var):
                 func_aprox += array_coeficientes[i + 1] * x_sym[i]
-
         else:
             qtd_var = x_matriz.shape[1]
             ind_fin = qtd_var + 1
@@ -432,7 +480,6 @@ def ajuste_multiplo(X: ArrayLike, Y:ArrayLike,incluir_intercepto:bool=True, plt_
     return array_coeficientes
 
 
-# Função de Avaliação do Ajuste
 def avaliar_ajuste(
         X: ArrayLike, 
         Y: ArrayLike, 
@@ -534,16 +581,14 @@ def avaliar_ajuste(
         AICc = AIC + (2 * qtd_coeficientes * (qtd_coeficientes + 1)) / (n - qtd_coeficientes - 1)
 
         return (R2, R2A, AIC, AICc, BIC)
-    
 
 
-# Função de Melhor Ajuste
 def melhor_ajuste(
-        X: ArrayLike, 
-        Y: ArrayLike, 
+        valores_x: ArrayLike, 
+        valores_y: ArrayLike, 
         criterio: str, 
         exibir_todos: bool = False, 
-        plt_grafico: bool = True, 
+        plt_grafico: bool = False, 
         expr: bool = False
 ):
     """
@@ -571,25 +616,27 @@ def melhor_ajuste(
         - A forma simbólica da reta/polinômio de ajuste (func_aprox);
         - Os valores dos outros critérios para o ajuste sugerido.
 
-    Argumentos:
-        X (list | np.ndarray): 
-            Valores da variável independente.
-        Y (list | np.ndarray): 
-            Valores da variável dependente.
-        criterio (str): 
-            Critério escolhido dentre as opções: "R2", "R2A" (R^2 ajustado), 
-            "AIC", "AICc" e "BIC" para sugestão do modelo.
-        exibir_todos (bool, opcional): 
-            Se True, exibe os valores dos outros critérios; 
-            se False (padrão), não exibe.
-        plt_grafico (bool, opcional): 
-            Se True (padrão), exibe o gráfico de ajuste; 
-            se False, não exibe.
-        expr (bool, opcional): 
-            Se True, exibe a função simbólica aproximadora sugerida; 
-            se False (padrão), não exibe.
+    Parâmetros
+    ----------
+    valores_x : list | np.ndarray
+        Valores da variável independente.
+    valores_y : list | np.ndarray
+        Valores da variável dependente.
+    criterio : str
+        Critério escolhido dentre as opções: "R2", "R2A" (R^2 ajustado), 
+        "AIC", "AICc" e "BIC" para sugestão do modelo.
+    exibir_todos : bool, opcional 
+        Se True, exibe os valores dos outros critérios; 
+        Padrão: False.
+    plt_grafico : bool, opcional
+        Se True, exibe o gráfico de ajuste; 
+        Padrão: False.
+    expr : bool, opcional
+        Se True, exibe a função simbólica aproximadora sugerida; 
+        sPadrão: False.
 
     Retorna:
+    -------
         str: 
             aprox_escolhida, representando o nome do modelo escolhido.
         dict: 
@@ -597,11 +644,12 @@ def melhor_ajuste(
             do modelo sugerido.
     """
 
-
     # Condições de Início da Função
 
-    if len(X) != len(Y):
-        raise ValueError("As listas 'X' e 'Y' devem ter o mesmo tamanho.")
+    if len(valores_x) != len(valores_y):
+        raise ValueError(
+            "As listas 'valores_x' e 'valores_y' devem ter o mesmo tamanho."
+        )
     
     if criterio not in ("R2", "R2A", "AIC", "AICc", "BIC"):
         raise ValueError(
@@ -611,30 +659,32 @@ def melhor_ajuste(
 
     # Obter os parâmetros dos ajustes linear e polinomial (grau 2 a 10)
 
-    funcs = dict()
+    funcs = {}
 
     funcs["linear"] = {"params": np.array(
-        [par for par in ajuste(X, Y, tipo='lin', plt_grafico=False)]
+        [par for par in ajuste(valores_x, valores_y, 
+        tipo='lin', plt_grafico=False)]
     )}
 
     for grau in range(2, 11):
         funcs[f"polinomial grau {grau}"] = {"params": ajuste(
-            X, Y, tipo='pol', grau_pol=grau, plt_grafico=False, expr=False
+            valores_x, valores_y, tipo='pol', grau_pol=grau, 
+            plt_grafico=False, expr=False
         )}
-
 
     # Encontrar os valores dos critérios
 
-    Y = np.array(Y)
-    X = np.array(X)
+    valores_x = np.array(valores_x)
+    valores_y = np.array(valores_y)
 
     # Ajuste Linear
 
     # Ajuste Linear - Calcular SSE
 
-    y_lin = np.array(funcs["linear"]["params"][0] * X + funcs["linear"]["params"][1])
+    y_lin = np.array(funcs["linear"]["params"][0] * valores_x 
+                     + funcs["linear"]["params"][1])
 
-    SSE_lin = np.sum((Y - y_lin)**2)
+    SSE_lin = np.sum((valores_y - y_lin)**2)
     SSE_lin = max(SSE_lin, 1e-12) # Evita problemas no cálculo do log(SSE_lin / n).
 
     funcs["linear"]["SSE"] = SSE_lin
@@ -645,9 +695,10 @@ def melhor_ajuste(
 
         # Ajustes Polinomiais - Calcular SSE
 
-        y_pol = np.polynomial.polynomial.polyval(X, funcs[f"polinomial grau {i}"]["params"])
+        y_pol = np.polynomial.polynomial.polyval(
+            valores_x, funcs[f"polinomial grau {i}"]["params"])
 
-        SSE_pol = np.sum((Y - y_pol) ** 2)
+        SSE_pol = np.sum((valores_y - y_pol) ** 2)
         SSE_pol = max(SSE_pol, 1e-12) # Evita problemas no cálculo do log(SSE_pol / n).
 
         funcs[f"polinomial grau {i}"]["SSE"] = SSE_pol
@@ -657,34 +708,35 @@ def melhor_ajuste(
     lista_ajustes = ["linear"] + [f"polinomial grau {i}" for i in range(2, 11)]
 
     for nome_ajuste in lista_ajustes:
-            mod = "linear" if nome_ajuste == "linear" else "polinomial"
-            
-            try:
-                # Tenta calcular todas as métricas
-                R2, R2A, AIC, AICc, BIC = avaliar_ajuste(
-                    X, Y, "all", mod, funcs[nome_ajuste]["params"]
-                )
-                funcs[nome_ajuste]["R2"] = R2
-                funcs[nome_ajuste]["R2A"] = R2A
-                funcs[nome_ajuste]["AIC"] = AIC
-                funcs[nome_ajuste]["AICc"] = AICc
-                funcs[nome_ajuste]["BIC"] = BIC
-                
-            except ZeroDivisionError:
-                # Se não há pontos suficientes para as métricas ajustadas, 
-                # penalizamos o modelo para que ele não seja escolhido.
-                funcs[nome_ajuste]["R2"] = -np.inf   # Valor muito ruim
-                funcs[nome_ajuste]["R2A"] = -np.inf  # Valor muito ruim
-                funcs[nome_ajuste]["AIC"] = np.inf   # Valor muito ruim (queremos o menor)
-                funcs[nome_ajuste]["AICc"] = np.inf  # Valor muito ruim
-                funcs[nome_ajuste]["BIC"] = np.inf   # Valor muito ruim
+        mod = "linear" if nome_ajuste == "linear" else "polinomial"
+        
+        try:
+            # Tenta calcular todas as métricas
+            R2, R2A, AIC, AICc, BIC = avaliar_ajuste(
+                valores_x, valores_y, "all", mod, funcs[nome_ajuste]["params"]
+            )
+            funcs[nome_ajuste]["R2"] = R2
+            funcs[nome_ajuste]["R2A"] = R2A
+            funcs[nome_ajuste]["AIC"] = AIC
+            funcs[nome_ajuste]["AICc"] = AICc
+            funcs[nome_ajuste]["BIC"] = BIC
+        except ZeroDivisionError:
+            # Se não há pontos suficientes para as métricas ajustadas, 
+            # penalizamos o modelo para que ele não seja escolhido.
+            funcs[nome_ajuste]["R2"] = -np.inf   # Valor muito ruim
+            funcs[nome_ajuste]["R2A"] = -np.inf  # Valor muito ruim
+            funcs[nome_ajuste]["AIC"] = np.inf   # Valor muito ruim (queremos o menor)
+            funcs[nome_ajuste]["AICc"] = np.inf  # Valor muito ruim
+            funcs[nome_ajuste]["BIC"] = np.inf   # Valor muito ruim
     
     # Encontrar a aproximação mais adequada com base no critério escolhido
     
     if criterio == "R2" or criterio == "R2A":
-        funcs_ordenadas = dict(sorted(funcs.items(), key=lambda item: item[1][criterio], reverse=True))
+        funcs_ordenadas = dict(sorted(funcs.items(), 
+                    key=lambda item: item[1][criterio], reverse=True))
     elif criterio == "AIC" or criterio == "AICc" or criterio == "BIC":
-        funcs_ordenadas = dict(sorted(funcs.items(), key=lambda item: item[1][criterio]))
+        funcs_ordenadas = dict(sorted(funcs.items(), 
+                    key=lambda item: item[1][criterio]))
     
     aprox_escolhida = next(iter(funcs_ordenadas))
     
@@ -707,16 +759,15 @@ def melhor_ajuste(
     ff = True if expr else False
 
     if aprox_escolhida == "linear":
-        ajuste(X, Y, tipo='lin', plt_grafico=graf, expr=ff)
+        ajuste(valores_x, valores_y, tipo='lin', plt_grafico=graf, expr=ff)
     else:
         grau = int(aprox_escolhida.split()[-1])
-        ajuste(X, Y, tipo='pol', grau_pol=grau, plt_grafico=graf, expr=ff)
+        ajuste(valores_x, valores_y, tipo='pol', grau_pol=grau, plt_grafico=graf, expr=ff)
 
     return aprox_escolhida, funcs[aprox_escolhida]
 
 
 __all__ = ["ajuste", "ajuste_linear", "ajuste_polinomial", "ajuste_exponencial", "ajuste_logaritmo", "ajuste_senoidal", "ajuste_multiplo", "avaliar_ajuste", "melhor_ajuste"]
-
 
 if __name__ == '__main__':
     ajuste([0, 1, 2, 3, 4, 5], [1.1, 1.7, 2.9, 5.1, 8.5, 14.2], 'exp', plt_grafico=True)
