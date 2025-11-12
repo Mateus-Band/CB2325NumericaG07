@@ -96,3 +96,81 @@ print(f"Resultado da integral (n=20): {resultado_plot}")
 ```
 
 __Outras funções abaixo:__
+
+
+### `integral_de_montecarlo`
+
+Calcula a integral definida de uma função usando o método de monte carlo.
+
+#### Parâmetros
+
+* **`function`** (callable): Função que será integrada.
+* **`a`** (float): O limite inferior da integração.
+* **`b`** (float): O limite superior da integração.
+* **`c`** (float): Limite superior em y da integral.
+* **`d`** (float): Limite inferior em y da integral.
+* **`qte`** (int): Quantidade de pontos que serão gerados para calcular a integral.
+* **`plot`** (bool, opcional): Se `True`, exibe um gráfico usando `matplotlib` que visualiza os pontos usados e a função integrada. O padrão é `False`.
+
+#### Retorna
+
+* **`float`**: O valor aproximado da integral definida.
+
+#### Fórmula Matemática
+
+A integral de montecarlo consiste em gerar pontos aleatoriamente em um quadrado, e calcular a proporção entre os valores que estão 'dentro' da área calculada pela integral. 
+
+
+---
+
+## Exemplos de Uso
+
+Abaixo estão exemplos de como usar a função `integral_de_montecarlo`.
+
+```python
+import math
+import sympy as sp
+from integracao import integral_trapezio # Supondo que o arquivo se chame integracao.py
+
+# Simplificações do SymPy
+pi, sin, cos = sp.pi, sp.sin, sp.cos
+```
+
+### Exemplo 1: Função Python Padrão (lambda)
+
+Integrando $f(x) = x^2$ de 0 a 1, que analiticamente é $1/3$.
+
+```python
+
+f_lambda = lambda x: x**2
+
+resultado = integral_de_montecarlo(f_lambda, a=0, b=1,qte=100)
+print(f"Integral de x^2 de 0 a 1 (qte=100): {resultado}")
+# Saída esperada: ~0.33335
+```
+
+### Exemplo 2: Expressão SymPy
+
+Integrando $f(x) = \sin(x)$ de 0 a $\pi$, que analiticamente é 2.
+
+```python
+f_lamda = lambda x : sin(x)
+resultado = integral_de_montecarlo(f_lamda, a=0, b=pi, qte=50)
+print(f"Integral de sin(x) de 0 a pi (qte=50): {resultado}")
+# Saída esperada: ~1.9993
+```
+
+### Exemplo 3: Usando a Visualização Gráfica
+
+Calculando a integral de uma função mais complexa e ativando o parâmetro `plotar`.
+
+```python
+f_complexa = lambda x: (x**2) * math.sin(x)
+
+print("Calculando e plotando a integral de x^2 * sin(x)...")
+
+# A chamada da função irá exibir um gráfico
+resultado_plot = integral_de_montecarlo(f_complexa, a=0, b=10, qte=20, plot=True)
+
+print(f"Resultado da integral (qte=20): {resultado_plot}")
+```

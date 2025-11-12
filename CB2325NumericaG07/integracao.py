@@ -338,9 +338,12 @@ def integral_de_montecarlo(func,a:float,b:float, c:int = None,d:int=None,qte = 1
 
     I = 0
     for x,y in dots:
-        if func(x) > y:
-            I += 1
-
+        if func(x) > 0 :
+            if func(x) > y:
+                I += 1
+        else:
+            if func(x) < y < 0:
+                I += 1
 
     if plot:
         fig = plt.figure()
