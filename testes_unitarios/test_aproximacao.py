@@ -27,7 +27,7 @@ def test_ajuste_linear_invalid_input_leght():
     y = [1, 2]
 
     with pytest.raises(
-        ValueError, match="As listas 'X' e 'Y' devem ter o mesmo tamanho."
+        ValueError, match="As listas 'valores_x' e 'valores_y' devem ter o mesmo tamanho."
     ):
         ajuste_linear(x, y, plt_grafico=False)
 
@@ -38,7 +38,7 @@ def test_ajuste_linear_zero_variance():
     y = [1, 3, 5, 2]
 
     with pytest.raises(
-        ValueError, match="A variância de X é zero."
+        ValueError, match="A variância de valores_x é zero."
     ):
         ajuste_linear(x, y, plt_grafico=False)
 
@@ -270,7 +270,7 @@ def test_ajuste_exponencial_invalid_input_lenght():
     y = [1, 2]
 
     with pytest.raises(
-        ValueError, match="As listas 'X' e 'Y' devem ter o mesmo tamanho."
+        ValueError, match="As listas 'valores_x' e 'valores_y' devem ter o mesmo tamanho."
     ):
         ajuste_exponencial(x, y, plt_grafico=False)
 
@@ -281,7 +281,7 @@ def test_ajuste_exponencial_y_nao_positivo():
     y = [1, 4, -9, 16]
 
     with pytest.raises(
-        ValueError, match="A lista Y possui valor\\(es\\) não postivos\\(s\\)."
+        ValueError, match="A lista de valores de y possui valores não postivos."
     ):
         ajuste_exponencial(x, y, plt_grafico=False)
 
@@ -318,7 +318,7 @@ def test_ajuste_logaritmo_invalid_input_lenght():
     y = [1, 2]
 
     with pytest.raises(
-        ValueError, match="As listas 'X' e 'Y' devem ter o mesmo tamanho."
+        ValueError, match="As listas 'valores_x' e 'valores_y' devem ter o mesmo tamanho."
     ):
         ajuste_logaritmo(x, y, plt_grafico=False)
 
@@ -329,7 +329,7 @@ def test_ajuste_logaritmo_x_nao_positivo():
     y = [1, 4, 9, 16]
 
     with pytest.raises(
-        ValueError, match="A lista X possui valor\\(es\\) não positivos\\(s\\)."
+        ValueError, match="A lista de valores de x possui valores não positivos."
     ):
         ajuste_logaritmo(x, y, plt_grafico=False)
 
@@ -489,7 +489,7 @@ def test_avaliar_ajuste_invalid_input_lenght():
     x = [1, 2]
     y = [1]
 
-    with pytest.raises(ValueError, match="As listas 'X' e 'Y' devem ter o mesmo tamanho."):
+    with pytest.raises(ValueError, match="As listas 'valores_x' e 'valores_y' devem ter o mesmo tamanho."):
         avaliar_ajuste(x, y, "R2", "linear", (1, 1))
 
 # Teste para criterio desconhecido
