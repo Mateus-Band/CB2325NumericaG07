@@ -1,10 +1,38 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-def metodo_newton_raphson(função, tol, plotar = False):
+def metodo_newton_raphson(função, tol=1e-6, max_iter=100, plotar = False, estimativa_inicial=None):
     '''
-    Rhuan adicionar docstring com explicação.
+    Encontra a raíz de uma função pelo método Newton-Raphson.
+    O método localiza uma raiz da função usando a reta tangente
+    à função numa estimativa f(x). Tal estimativa pode ser um argumento
+    ou o padrão, que é uma função que faz uma estimativa inicial grosseira.
+    A busca é interrompida quando a largura do intervalo é menor que 'tol' ou
+    'max_inter' é atingido.
+
+    Args:
+        f (callable): A função para a qual a raiz está sendo procurada
+            (deve receber um float e retornar um float).
+        a (float): O início do intervalo.
+        b (float): O fim do intervalo.
+        tol (float): A tolerância (critério de parada). O loop para
+            quando abs(a - b) < tol. Default é 1e-6.
+            Além disso, tol é usado para calcular a derivada numérica.
+        plotar (bool, optional): Se True, exibe um gráfico das
+            iterações ao final. Default é False.
+
+    Returns:
+        float: A aproximação da raiz da função.
+        None: Se o método atingir 'max_inter' antes de convergir.
+
+    Raises:
+        ValueError: Se 'função' não for callable ou se max_iter/tol tiverem
+            valores inválidos.
+
     '''
+
+    #Estimativa inicial grosseira. 
+    #Pode ser substituída por uma manual para aumentar a precisão.
 
     def estimar_raiz(função):
         estimativa0 = 1
@@ -15,9 +43,9 @@ def metodo_newton_raphson(função, tol, plotar = False):
             estimativa0 *= 2
             iterações += 1
             if iterações >= max_iterações:
-                estimativa0 = 1
+                estimativa0 = -1
                 while abs(função(estimativa0)) > 1000:
-                    estimativa0 *= -2
+                    estimativa0 *= 2
                     iterações2 += 1
                     if iterações2 >= max_iterações:
                         estimativa0 = 1
@@ -26,6 +54,8 @@ def metodo_newton_raphson(função, tol, plotar = False):
         estimativa_raiz = estimativa0
 
         return estimativa_raiz
+    
+    #Por tol ser muito baixo, podemos usá-lo para fazer a derivada numérica
 
     def derivar(função, tol):
         return lambda x: (função(x + tol) - função(x)) / (tol)
@@ -39,11 +69,12 @@ def metodo_newton_raphson(função, tol, plotar = False):
             print(f"Derivada nula em x = {estimativa}")
             return estimativa  
     
-    
-    estimativa = estimar_raiz(função)
+    if estimativa_inicial is not None:
+        estimativa = float(estimativa_inicial)
+    else:
+        estimativa = estimar_raiz(função)
     erros = [tol+1]
     estimativas_tentadas = [estimativa]
-    max_iter = 100
     iterações = 0
     while erros.pop() > tol and iterações < max_iter:
         nova_estimativa = metodo_nr(função, estimativa, tol)
@@ -55,6 +86,7 @@ def metodo_newton_raphson(função, tol, plotar = False):
     if iterações == max_iter:
         print("O método não convergiu")
 
+    #Plotagem
 
     x0 = estimativas_tentadas[0]
     xf = estimativas_tentadas[-1]
@@ -84,7 +116,6 @@ def metodo_newton_raphson(função, tol, plotar = False):
         x_tf = np.linspace(xf - 2, xf + 2, 20)
         y_tf = mf * (x - xf) + yf
 
-        # --- Plotagem ---
         plt.plot(x, y, label='f(x)')
         plt.plot(x, y_t0, '--', color='orange', label='Tangente inicial')
         plt.plot(x, y_tf, '--', color='green', label='Tangente final')
@@ -135,9 +166,13 @@ def metodo_bissecao(f, a, b, tol=1e-6, max_inter = 100, plotar = False):
     inter = 0
     if f(a) * f(b) >= 0:
         raise ValueError("f(a) e f(b) devem ter sinais opostos.")
+    pontos_c = []
+    pontos_f = []
     while abs(a-b)>tol and inter<max_inter:
         c = (a + b)/2
         inter += 1
+        pontos_c.append(c)
+        pontos_f.append(f(c))
         if inter == max_inter:
             print('Não foram encontradas raizes')
             return None
@@ -146,13 +181,28 @@ def metodo_bissecao(f, a, b, tol=1e-6, max_inter = 100, plotar = False):
         elif f(c)*f(b)<0:
             a = c
         else:
-            return c
+            break
+    
+    c_final = (a+b)/2
         
     if plotar:
-        #adicionar código de plotagem
-        pass
-    
-    return ((a+b)/2)
+        x = np.linspace(a, b, 400)
+        y = [f(xi) for xi in x]
+
+        plt.figure(figsize=(8, 5))
+        plt.axhline(0, color='black', linewidth=1)
+        plt.plot(x, y, label='f(x)', color='blue')
+        plt.scatter(pontos_c, pontos_f, color='red', s=40, label='Iterações')
+        plt.scatter(c_final, f(c_final), color='green', s=80, label=f'Raiz ≈ {c_final:.6f}')
+        plt.title('Método da Bisseção')
+        plt.xlabel('x')
+        plt.ylabel('f(x)')
+        plt.legend()
+        plt.grid(True)
+        plt.show()
+
+    return c_final
+
 
 
 def metodo_secante(f, x0, x1, tol = 1e-6, max_inter = 100, plotar= False):
@@ -222,7 +272,7 @@ def metodo_secante(f, x0, x1, tol = 1e-6, max_inter = 100, plotar= False):
 
 
 
-if __name__ == '__main__':
-    print(metodo_newton_raphson.__doc__)
-    print(metodo_bissecao.__doc__)
-    print(metodo_secante.__doc__)
+if _name_ == '_main_':
+    print(metodo_newton_raphson._doc_)
+    print(metodo_bissecao._doc_)
+    print(metodo_secante._doc_)
