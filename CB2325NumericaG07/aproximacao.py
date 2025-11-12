@@ -194,12 +194,12 @@ def ajuste_polinomial(
     # Construir matriz de Vandermonde (x_matriz)
 
     x_matriz = np.array(
-        [[valor ** i for i in range(grau_pol + 1)] for valor in X]
+        [[valor ** i for i in range(grau_pol + 1)] for valor in valores_x]
     )
     
     # Construir a matriz dos valores de y (y_matriz)
 
-    y_matriz = np.array(Y)
+    y_matriz = np.array(valores_y)
 
     # Obter os coeficientes (array_coeficientes)
 
@@ -219,7 +219,9 @@ def ajuste_polinomial(
     # Plotar o gráfico
 
     if plt_grafico:
-        _plotar_grafico(X, Y,
+        _plotar_grafico(
+            valores_x, 
+            valores_y,
             func_aprox, 
             f"Gráfico dos Dados Fornecidos e da Função "
             f"Polinomial Aproximadora de Grau {grau_pol}"
