@@ -408,6 +408,9 @@ def ajuste_multiplo(
     """
     Modelo: y = b0 + b1*x1 + b2*x2 + ... + bn*xn (Regressão Múltipla)
 
+    Cada linha de 'valores_x' representa uma variável independente.
+    Cada coluna (ou índice dentro de cada vetor) representa uma amostra.
+
     Aplica MMQ diretamente na matriz de variáveis independentes.
     """
 
@@ -417,17 +420,16 @@ def ajuste_multiplo(
 
     z_matriz = np.array(valores_y, dtype=float).reshape(-1, 1)
 
-    if x_matriz.ndim == 1:
-        x_matriz = x_matriz.reshape(-1, 1)
+    # Transpor para o formato exigido pelo MMQ: (n_amostras, n_variáveis)
+
+    x_matriz = x_matriz.T
+
+    # Validar dimensões
 
     if x_matriz.shape[0] != z_matriz.shape[0]:
-        if x_matriz.shape[1] == z_matriz.shape[0]:
-            x_matriz = x_matriz.T
-        else:
-            raise ValueError(
-                "Formato inconsistente em 'X'. " \
-                "Forneça uma matriz (n_amostras, n_variaveis) "
-                "ou uma lista de vetores cada um de comprimento n_amostras."
+        raise ValueError(
+                "Formato inconsistente em 'valores_x'. "
+                "Forneça uma matriz (n_variaveis, n_amostras)."
             )
 
     # Tratar o caso com intercepto
