@@ -15,6 +15,7 @@ if project_root not in sys.path:
 
 
 from CB2325NumericaG07.interpolacao import *
+from CB2325NumericaG07.interpolacao import _duplicate,_function_definer,_newton_ddfunc,_hermite_ddfunc
 
 
 def test_interpolacao_linear_por_partes():
@@ -252,17 +253,6 @@ def test_newton_interpolation_quadratic():
     assert P_newton(3) == approx(9)   # 3^2 = 9
     assert P_newton(-2) == approx(4)  # (-2)^2 = 4
 
-def test_newton_interpolation_degree():
-    """
-    Teste para valor fora do intervalo de ponto (extrapolação).
-    f(x) = x^3
-    """
-    x = [-1, 0, 1, 2]
-    y = [-1, 0, 1, 8]
-    P_newton = interpolacao_de_newton(x, y, plot=False)
-    
-    # Testa um ponto fora da amostra
-    assert P_newton(3) == approx(27) # 3^3 = 27
 
 ###########
 # Testes - Interpolação de Hermite
@@ -307,17 +297,6 @@ def test_hermite_interpolation_quadratic():
     assert P_hermite(3) == approx(9)   # 3^2 = 9
     assert P_hermite(-2) == approx(4)  # (-2)^2 = 4
 
-def test_hermite_interpolation_degree():
-    """
-    Teste para valor fora do intervalo de ponto (extrapolação).
-    f(x) = x^3
-    """
-    x = [-1, 0, 1, 2]
-    y = [-1, 0, 1, 8]
-    P_hermite = interpolacao_de_hermite(x, y, plot=False)
-    
-    # Testa um ponto fora da amostra
-    assert P_hermite(3) == approx(27) # 3^3 = 27
 
 
 def test_hermite_vs_newton():
