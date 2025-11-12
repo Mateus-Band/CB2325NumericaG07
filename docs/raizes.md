@@ -79,13 +79,13 @@ metodo_secante(f, x0, x1, tol=1e-6, max_inter=100, plotar=False)
 
 **Levanta Erros (Raises):**
 
-  * `ValueError`: Se ocorrer divisão por zero ($f(x_1) = f(x_0)$) durante o cálculo.
+  * `ValueError`: Se ocorrer divisão por zero (`f(x1) == f(x0)`) durante o cálculo.
 
 -----
 
 ## Exemplos Práticos
 
-### Exemplo 1: Bisseção com Gráfico (Exemplo do PDF)
+### Exemplo 1: Bisseção com Gráfico
 
 ```python
 import matplotlib.pyplot as plt
@@ -101,7 +101,7 @@ print(f"Raiz encontrada: {raiz:.6f}")
 # Saída esperada: aprox. 0.576888
 ```
 
-### Exemplo 2: Secante (Convergência Rápida)
+### Exemplo 2: Secante
 
 ```python
 import math
