@@ -321,7 +321,7 @@ def ajuste_senoidal(
     
     if len(valores_x) != len(valores_y):
         raise ValueError(
-            "As listas 'X' e 'Y' devem ter o mesmo tamanho."
+            "As listas 'valores_x' e 'valores_y' devem ter o mesmo tamanho."
         )
 
     # Captar o período aproximado e calcular a frequência aproximada 
@@ -379,9 +379,7 @@ def ajuste_senoidal(
     func_aprox = A * sp.sin(B * x_sym + C) + D
 
     if expr:
-        print(f"Função Senoidal Aproximadora: "
-            f"y = {A:.4f} * sin({B:.4f}x + ({C:.4f})) + ({D:.4f})"
-        )
+        print(f"Função Senoidal Aproximadora: {func_aprox.evalf(n=4)}")
 
     # Plotar o Gráfico
 
