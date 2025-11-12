@@ -36,9 +36,9 @@ def test_bissecao_erro_sinais_iguais(func_quadratica):
         metodo_bissecao(func_quadratica, 3, 5, tol=1e-6)
     assert "sinais opostos" in str(erro.value)
 
-def test_bissecao_nao_convergencia(func_pdf):
+def test_bissecao_nao_convergencia(func_cubica):
     """Testa se retorna None quando atinge max_inter."""
-    resultado = metodo_bissecao(func_pdf, 0, 2, tol=1e-6, max_inter=1)
+    resultado = metodo_bissecao(func_cubica, 0, 2, tol=1e-6, max_inter=1)
     assert resultado is None
 
 # Testes para o Método da Secante
@@ -60,9 +60,9 @@ def test_secante_divisao_zero():
         metodo_secante(f, -1, 1, tol=1e-6)
     assert "divisão por zero" in str(erro.value)
 
-def test_secante_nao_convergencia(func_pdf):
+def test_secante_nao_convergencia(func_cubica):
     """Testa se retorna None quando atinge max_inter."""
-    resultado = metodo_secante(func_pdf, 0, 2, tol=1e-6, max_inter=1)
+    resultado = metodo_secante(func_cubica, 0, 2, tol=1e-6, max_inter=1)
     assert resultado is None
 
 def test_secante_raiz_exata():

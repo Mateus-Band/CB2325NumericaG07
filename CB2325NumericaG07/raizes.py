@@ -239,7 +239,7 @@ def metodo_secante(f, x0, x1, tol = 1e-6, max_inter = 100, plotar= False):
             if f(x1) == 0:
                 return x1
             else:
-                raise ValueError('f(x1) e f(x0) não podem ser iguais')  
+                raise ValueError('f(x1) e f(x0) não podem ser iguais (divisão por zero)') 
         else:
             x2 = x1 - (f(x1)*(x1-x0))/(f(x1)-f(x0))
             historico.append(x2)
@@ -269,7 +269,6 @@ def metodo_secante(f, x0, x1, tol = 1e-6, max_inter = 100, plotar= False):
         plt.grid(True)
         plt.show()
     return x1
-
 
 
 if __name__ == '__main__':
