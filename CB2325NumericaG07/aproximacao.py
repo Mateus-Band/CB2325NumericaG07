@@ -378,8 +378,21 @@ def ajuste_senoidal(
     x_sym = sp.Symbol("x")
     func_aprox = A * sp.sin(B * x_sym + C) + D
 
+    def clean_zero(x, tol=1e-12):
+        return 0.0 if abs(x) < tol else x
+
+    C_vis = clean_zero(C)
+    D_vis = clean_zero(D)
+
+    sign1 = "+" if C >= 0 else "-"
+    sign2 = "+" if D >= 0 else "-"
+
+    C_vis = abs(C_vis)
+    D_vis = abs(D_vis)
+
     if expr:
-        print(f"Função Senoidal Aproximadora: {func_aprox.evalf(n=4)}")
+        print(f"Função Senoidal Aproximadora: "
+              f"{A:.4f} * sin({B:.4f}x {sign1} {C_vis:.4f}) {sign2} {D_vis:.4f}")
 
     # Plotar o Gráfico
 
