@@ -7,7 +7,7 @@ def metodo_newton_raphson(função, tol=1e-6, max_iter=100, plotar = False, esti
     O método localiza uma raiz da função usando a reta tangente
     à função numa estimativa f(x). Tal estimativa pode ser um argumento
     ou o padrão, que é uma função que faz uma estimativa inicial grosseira.
-    A busca é interrompida quando a largura do intervalo é menor que 'tol' ou
+    A busca é interrompida quando o erro, f(x) - 0, é menor que 'tol' ou
     'max_inter' é atingido.
 
     Args:
