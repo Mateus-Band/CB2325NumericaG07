@@ -336,14 +336,12 @@ def integral_de_montecarlo(func,a:float,b:float, c:int = None,d:int=None,qte = 1
 
     dots = zip(x_list,y_list)
 
+
     I = 0
     for x,y in dots:
-        if func(x) > 0 :
-            if func(x) > y:
-                I += 1
-        else:
-            if func(x) < y < 0:
-                I += 1
+        if func(x) > y:
+            I += 1
+    
 
     if plot:
         fig = plt.figure()
@@ -354,7 +352,7 @@ def integral_de_montecarlo(func,a:float,b:float, c:int = None,d:int=None,qte = 1
 
         ax.text(-0.2,d-k*0.3,f'Pontos a baixo da função:{I} , Pontos totais : {qte}')
 
-    return (c-d)*(b-a)*(I/qte)
+    return (c-d)*(b-a)*(I/qte) + d*(b-a)
 
 
 
