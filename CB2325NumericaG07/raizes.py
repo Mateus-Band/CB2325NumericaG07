@@ -272,7 +272,7 @@ def metodo_secante(f, x0, x1, tol = 1e-6, max_inter = 100, plotar= False):
 
 
 
-if _name_ == '_main_':
+if __name__ == '_main_':
     print(metodo_newton_raphson._doc_)
     print(metodo_bissecao._doc_)
     print(metodo_secante._doc_)

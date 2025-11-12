@@ -347,9 +347,8 @@ def integral_de_montecarlo(func,a:float,b:float, c:int = None,d:int=None,qte = 1
         fig = plt.figure()
         ax = fig.add_subplot()
         ax.scatter(x_list,y_list,alpha = 0.25,color = 'yellow')
-        ax.set_aspect('equal')
         ax.plot(test,nums)
-
+        
         ax.text(-0.2,d-k*0.3,f'Pontos a baixo da função:{I} , Pontos totais : {qte}')
 
     return (c-d)*(b-a)*(I/qte) + d*(b-a)
