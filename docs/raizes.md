@@ -146,7 +146,7 @@ def grid_search(func,a,b,n= 1000):
     intervals = []
     vals = np.linspace(a,b,n)
     for idx in range(1,len(vals)):
-        if func(vals[idx-1])*func(vals[idx]) < 0:
+        if func(vals[idx-1])*func(vals[idx]) <= 0:
             intervals.append((vals[idx-1],vals[idx]))
 
     return intervals

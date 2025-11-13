@@ -128,6 +128,23 @@ def test_nr_plotagem_executa_sem_erro(mock_show):
     assert raiz == pytest.approx(1.0)
 
 
+def test_sem_raizes():
+    '''
+    Teste se a função não tiver raizes
+    '''
+
+    f = lambda x: x**2 +1
+    assert grid_search(f,0,10) == []
+
+def test_raiz_na_borda():
+    '''
+    Teste se as raizes estiveram no limite
+    '''
+
+    f = lambda x: 4 - x**2
+    a,b = grid_search(f,-2,2)[0] 
+
+    assert a == pytest.approx(-2) 
 
 
 
