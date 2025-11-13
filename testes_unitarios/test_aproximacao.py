@@ -369,7 +369,7 @@ def test_ajuste_multiplo_tamanho_invalido():
     # O código 'aproximacao.py' (linha 430) lança um ValueError
     # com a mensagem "Formato inconsistente..."
     with pytest.raises(
-        ValueError, match="Formato inconsistente em 'valores_x'"
+        ValueError, match="Formato inconsistente em 'valores_var'"
     ):
         ajuste_multiplo([a, b], z, incluir_intercepto=False)
 
