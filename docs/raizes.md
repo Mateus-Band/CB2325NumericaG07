@@ -7,6 +7,7 @@ Este módulo implementa métodos numéricos fundamentais para a determinação d
 * **Método da Bisseção**: Método intervalar que garante a convergência (desde que o intervalo inicial contenha uma raiz).
 * **Método da Secante**: Método iterativo rápido que utiliza a inclinação da reta secante para aproximar a raiz.
 * **Visualização Gráfica**: Plotagem automática da função e dos pontos de iteração utilizando `matplotlib`.
+* **grid_search** :  Função que retorna intervalos menores para procura as raizes.
 
 ---
 
@@ -81,6 +82,23 @@ metodo_secante(f, x0, x1, tol=1e-6, max_inter=100, plotar=False)
 
   * `ValueError`: Se ocorrer divisão por zero (`f(x1) == f(x0)`) durante o cálculo.
 
+------
+
+### 3\. `grid_search`
+
+Encontra os intervalos para calcular as raizes de uma função em um intervalo grande.
+
+**Parâmetros:**
+
+  * `func` (*callable*) : A função que queremos achar as raizes.
+  * `a` (*float*) : Inicio do intervalo.
+  * `b` (*float*) : Fim do intervalo.
+  * `n` (*int*, opicional) : Quantidade de subdivisões para a procura dos intervalos 
+
+**Retorno**
+
+  * `list` : Lista com os sub-intervalos que contem as raizes. 
+
 -----
 
 ## Exemplos Práticos
@@ -117,4 +135,27 @@ if raiz_sec:
     print(f"Raiz encontrada via Secante: {raiz_sec:.6f}")
 else:
     print("O método não convergiu.")
+```
+
+### Exemplo 3: grid search
+```python
+from CB2325NumericaG07.raizes import grid_search
+
+
+def grid_search(func,a,b,n= 1000):
+    intervals = []
+    vals = np.linspace(a,b,n)
+    for idx in range(1,len(vals)):
+        if func(vals[idx-1])*func(vals[idx]) < 0:
+            intervals.append((vals[idx-1],vals[idx]))
+
+    return intervals
+
+
+import numpy as np
+f = lambda x : np.sin(x)
+
+print(f'Os intervalos encontrados para calcular as raizes são : {grid_search(f,0,10)}')
+
+
 ```

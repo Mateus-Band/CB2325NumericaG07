@@ -319,7 +319,11 @@ def integral_de_montecarlo(func,a:float,b:float, c:int = None,d:int=None,qte = 1
             Float: retorna o valor calculado da integral.
             
     '''
-    
+
+    if qte == 0:
+        raise RuntimeWarning('qte não pode ser igual a 0') 
+
+
     x_list =np.random.uniform(a,b,qte)
 
     #calculando o intervalo em y
@@ -346,7 +350,7 @@ def integral_de_montecarlo(func,a:float,b:float, c:int = None,d:int=None,qte = 1
     if plot:
         fig = plt.figure()
         ax = fig.add_subplot()
-        ax.scatter(x_list,y_list,alpha = 0.25,color = 'yellow')
+        ax.scatter(x_list,y_list,alpha = 0.5,color = 'yellow')
         ax.plot(test,nums)
         
         ax.text(-0.2,d-k*0.3,f'Pontos a baixo da função:{I} , Pontos totais : {qte}')
