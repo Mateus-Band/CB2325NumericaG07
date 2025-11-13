@@ -1,3 +1,4 @@
+from unittest.mock import patch
 import sys
 import os
 import pytest
@@ -70,3 +71,63 @@ def test_secante_raiz_exata():
     f = lambda x: x**2 - 1
     raiz = metodo_secante(f, 0.5, 1.0, tol=1e-6)
     assert raiz == 1.0
+
+#Testes método newton_raphson
+
+def test_nr_raiz_simples_polinomio():
+    '''Testa para um polinomio simples de segundo grau'''
+    funcao = lambda x: x**2 - 4
+    raiz = metodo_newton_raphson(funcao, estimativa_inicial=3.0)
+    assert raiz == pytest.approx(2.0)
+
+def test_nr_raiz_simples_polinomio_negativa():
+    '''Testa a raíz negativa de um polinomio simples de segundo grau'''
+    funcao = lambda x: x**2 - 4
+    raiz = metodo_newton_raphson(funcao, estimativa_inicial=-1.0)
+    assert raiz == pytest.approx(-2.0)
+
+def test_nr_raiz_transcendental():
+    '''Testa para uma função transcendental'''
+    funcao = lambda x: math.cos(x) - x
+    raiz_conhecida = 0.739085133
+    raiz = metodo_newton_raphson(funcao, estimativa_inicial=1.0)
+    assert raiz == pytest.approx(raiz_conhecida, abs=1e-6)
+
+def test_nr_estimador_interno_automatico():
+    '''Testa se a estimativa inicial automatica está funcionando'''
+    funcao = lambda x: (x - 5)**3
+    raiz = metodo_newton_raphson(funcao, estimativa_inicial=None)
+    assert raiz == pytest.approx(5.0, abs=1e-5)
+
+def test_nr_nao_convergencia_max_iter(capsys):
+    '''Testa o método nr para quando o limite de iterações é atingido'''
+    funcao = lambda x: x**3 - 2*x + 2
+    raiz = metodo_newton_raphson(funcao, estimativa_inicial=0.0, max_iter=10)
+    out, err = capsys.readouterr()
+    assert "O método não convergiu" in out
+
+def test_nr_derivada_nula(capsys):
+    """
+    Testa Newton-Raphson: derivada nula com uma função constante f(x) = 5.
+    """
+    funcao = lambda x: 5
+    estimativa = 3.0  
+    raiz = metodo_newton_raphson(funcao, estimativa_inicial=estimativa, tol=1e-8)
+    
+    out, err = capsys.readouterr()
+    assert "Derivada nula" in out
+    
+    assert raiz == estimativa
+
+@patch('matplotlib.pyplot.show')
+def test_nr_plotagem_executa_sem_erro(mock_show):
+    '''Testa se o gráfico é executado sem erro'''
+    funcao = lambda x: x - 1
+    raiz = metodo_newton_raphson(funcao, estimativa_inicial=5.0, plotar=True)
+    assert mock_show.called
+    assert raiz == pytest.approx(1.0)
+
+
+
+
+
