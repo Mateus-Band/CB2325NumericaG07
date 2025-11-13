@@ -45,6 +45,30 @@ Onde:
 
 ---
 
+### `ajuste_polinomial`
+
+Calcula os coeficientes de um ajuste polinomial (modelo $y = c_{0} + c_{1}x + ... + c_{n}x^{n}$) para um conjunto de dados (valores_x, valores_y) usando o Método dos Mínimos Quadrados (MMQ).
+
+#### Parâmetros
+
+* **`valores_x`** (ArrayLike): A variável independente (lista ou array NumPy de valores).
+* **`valores_y`** (ArrayLike): A variável dependente (lista ou array NumPy de valores).
+* **`grau_pol`** (int): Grau do polinômio ao qual os dados serão ajustados.
+* **`plt_grafico`** (bool, opcional): Se `True`, exibe um gráfico do ajuste usando `matplotlib`. O padrão é `False`.
+* **`expr`** (bool, opcional): Se `True`, imprime a expressão matemática encontrada. O padrão é `False`.
+
+#### Retorna
+
+* **`np.ndarray`**: Um array NumPy contendo os coeficientes do modelo em ordem crescente referente ao grau da variável a que estão associados, ou seja: `[c0, c1, ..., cn]`.
+
+#### Método Utilizado
+
+O ajuste polinomial $y = c_{0} + c_{1}x + ... + c_{n}x^{n}$ é encontrado a partir de uma decomposição SVD, a qual é implementada pelo **`numpy.linalg.lstsq`**. 
+
+Esse método promove maior estabilidade quanto a erros numéricos e ao mal condicionamento de matrizes, especialmente em comparação com a fórmula dos mínimos quadrados normais.
+
+---
+
 ### `ajuste_exponencial`
 
 Calcula os coeficientes de um ajuste exponencial (modelo $y = b \cdot e^{ax}$) para um conjunto de dados (valores_x, valores_y). O método lineariza o modelo aplicando o logaritmo natural.
@@ -107,6 +131,68 @@ Onde:
 
 ---
 
+### `ajuste_senoidal`
+
+Calcula os coeficientes de um ajuste senoidal (modelo $y = A \cdot \sin(Bx + C) + D$) para um conjunto de dados (valores_x, valores_y). O método lineariza o modelo a partir da estimativa inicial do período fornecida pelo usuário.
+
+#### Parâmetros
+
+* **`valores_x`** (ArrayLike): A variável independente.
+* **`valores_y`** (ArrayLike): A variável dependente.
+* **`T_aprox`** (float): O período aproximado.
+* **`plt_grafico`** (bool, opcional): Se `True`, exibe um gráfico do ajuste. O padrão é `False`.
+* **`expr`** (bool, opcional): Se `True`, imprime a expressão matemática encontrada. O padrão é `False`.
+
+#### Retorna
+
+* **`np.ndarray`**: Um array NumPy contendo os coeficientes `[A, B, C, D]` do modelo.
+
+#### Método Utilizado
+
+O modelo $y = A \cdot \sin(Bx + C) + D$ é linearizado tal que $y = a \cdot \sin(Bx) + b \cdot \cos(Bx) + d$.
+
+Onde:
+* $a = A \cdot \cos(C)$
+* $b = A \cdot \sin(C)$
+* $d = D$
+
+O problema é reduzido, então, à obtenção dos coeficientes $a$, $b$ e $d$.
+
+Para isso, inicialmente encontra-se uma frequência $B$ adequada. Isso é feito ao avaliar os erros quadráticos obtidos para valores de frequência em torno da frequência inicial (esta é captada pela aproximação do período inserida pelo usuário como parâmetro da função).
+
+Após isso, $a$, $b$ e $d$ são estimados pelo Método dos Mínimos Quadrados, o qual é abordado a partir de uma decomposição SVD implementada pelo **`numpy.linalg.lstsq`**. 
+
+O programa, então, calcula:
+* $A = \sqrt{a^2 + b^2}$
+* $C = \operatorname{arctan2}(b,a)$
+
+---
+
+### `ajuste_multiplo`
+
+Calcula os coeficientes de um ajuste múltiplo (modelo $y = c_{0} + c_{1}x_{1} + ... + c_{n}x_{n}$) para um conjunto de dados (valores_var, valores_y). O método lineariza o modelo usando o Método dos Mínimos Quadrados (MMQ).
+
+#### Parâmetros
+
+* **`valores_var`** (ArrayLike): As variáveis independentes (sendo cada linha referente às amostras ed cada variável).
+* **`valores_y`** (ArrayLike): A variável dependente.
+* **`incluir_intercepto`** (bool, opcional): Se `True`, busca também um intercepto $c_{0}$ noas cálculos. O padrão é `False`.
+* **`expr`** (bool, opcional): Se `True`, imprime a expressão matemática encontrada. O padrão é `False`.
+
+#### Retorna
+
+* **`np.ndarray`**: Um array NumPy contendo os coeficientes do modelo. 
+
+    Caso **`incluir_intercepto`**, o termo $c_{0}$ ocupa a primeira posição no array, seguido dos outros coeficientes atrelados às variáveis na ordem em que estas foram inseridas em **`valores_var`**. Do contrário, apenas os coeficientes atrelados às variáveis são incluídos.
+
+#### Método Utilizado
+
+O ajuste múltiplo $y = c_{0} + c_{1}x_{1} + ... + c_{n}x_{n}$ é encontrado a partir de uma decomposição SVD, a qual é implementada pelo **`numpy.linalg.lstsq`**.
+
+O modelo adotado também busca tratar os casos de mal condicionamento dos dados inseridos, uma vez que pode ser impactado por casos de colinearidade.
+
+---
+
 ### `avaliar_ajuste`
 
 Avalia a qualidade de um modelo de ajuste (previamente calculado) usando um ou mais critérios estatísticos.
@@ -147,3 +233,25 @@ Onde:
 * $y_i$ = valor observado; $\hat{y}_i$ = valor previsto pelo modelo; $\bar{y}$ = média dos valores observados.
 
 ---
+
+### `melhor_ajuste`
+
+Sugere qual modelo de ajuste (linear ou polinomial de grau 2 a 10) pode ser o mais adequado a partir de um critério estatístico selecionado pelo usuário (a saber, $R^2$, $R^2$ ajustado, $AIC$, $AICc$ ou $BIC$).
+
+#### Parâmetros
+
+* **`valores_x`** (ArrayLike): Lista de valores da variável independente usados no ajuste.
+* **`valores_y`** (ArrayLike): Lista de valores da variável dependente usados no ajuste.
+* **`criterio`** (str): O critério de avaliação desejado para a sugestão. Opções: `"R2"`, `"R2A"` ($R^2$ ajustado), `"AIC"`, `"AICc"` ou `"BIC"`.
+* **`exibir_todos`** (bool, opcional): Se `True`, imprime os valores dos outros critérios do modelo sugerido. O padrão é `False`.
+* **`plt_grafico`** (bool, opcional): Se `True`, exibe o gráfico do ajuste sugerido. O padrão é `False`.
+* **`expr`** (bool, opcional): Se `True`, imprime a expressão matemática do ajuste sugerido. O padrão é `False`.
+
+
+#### Retorna
+
+* **`str`**: O nome do modelo sugerido (`linear` ou `"polinomial grau i"`).
+* **`dict`**: Dicionário com as principais informações do modelo sugerido (`params` (parâmetros), `SSE` (Soma dos Quadrados dos Erros), `R2`, `R2A`, `AIC`, `AICc`, `BIC`)
+
+#### Método Utilizado
+

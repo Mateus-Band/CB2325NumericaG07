@@ -329,7 +329,7 @@ def ajuste_logaritmo(
 def ajuste_senoidal(
         valores_x: ArrayLike, 
         valores_y: ArrayLike, 
-        T_aprox: float = None, 
+        T_aprox: float, 
         plt_grafico: bool = False, 
         expr: bool = False
 ):
@@ -345,11 +345,7 @@ def ajuste_senoidal(
             "As listas 'valores_x' e 'valores_y' devem ter o mesmo tamanho."
         )
 
-    # Captar o período aproximado e calcular a frequência aproximada 
-
-    if T_aprox is None:
-        T_aprox = (np.max(valores_x) - np.min(valores_x)) / 2
-        warnings.warn(f"T_aprox não fornecido. Usando estimativa: {T_aprox:.2f}")
+    # Calcular a frequência aproximada 
 
     freq_aprox = (2 * np.pi) / T_aprox
 
@@ -432,25 +428,26 @@ def ajuste_senoidal(
 
 
 def ajuste_multiplo(
-        valores_x: ArrayLike, 
+        valores_var: ArrayLike, 
         valores_y: ArrayLike, 
-        incluir_intercepto: bool = True, 
-        plt_grafico: bool = False, 
+        incluir_intercepto: bool = False, 
         expr: bool = False):
     """
-    Modelo: y = b0 + b1*x1 + b2*x2 + ... + bn*xn (Regressão Múltipla)
+    Modelo: y = c0 + c1*x1 + c2*x2 + ... + cn*xn (Regressão Múltipla)
 
-    Cada linha de 'valores_x' representa uma variável independente.
+    Cada linha de 'valores_var' representa uma variável independente.
     Cada coluna (ou índice dentro de cada vetor) representa uma amostra.
 
     Aplica MMQ diretamente na matriz de variáveis independentes.
     """
 
-    # Construir a matriz de valores das variáveis (x_matriz)
+    # Construir a matriz de valores das variáveis ind. (x_matriz)
 
-    x_matriz = np.array(valores_x, dtype=float)
+    x_matriz = np.array(valores_var, dtype=float)
 
-    z_matriz = np.array(valores_y, dtype=float).reshape(-1, 1)
+     # Construir a matriz de valores da variável dependente (y_matriz)
+
+    y_matriz = np.array(valores_y, dtype=float).reshape(-1, 1)
 
     # Transpor para o formato exigido pelo MMQ: (n_amostras, n_variáveis)
 
@@ -458,9 +455,9 @@ def ajuste_multiplo(
 
     # Validar dimensões
 
-    if x_matriz.shape[0] != z_matriz.shape[0]:
+    if x_matriz.shape[0] != y_matriz.shape[0]:
         raise ValueError(
-                "Formato inconsistente em 'valores_x'. "
+                "Formato inconsistente em 'valores_var'. "
                 "Forneça uma matriz (n_variaveis, n_amostras)."
             )
 
@@ -484,7 +481,7 @@ def ajuste_multiplo(
 
     # Construir a matriz de parâmetros (array_coeficientes)
 
-    array_coeficientes, *_ = np.linalg.lstsq(x_matriz, z_matriz, rcond=None)
+    array_coeficientes, *_ = np.linalg.lstsq(x_matriz, y_matriz, rcond=None)
     array_coeficientes = array_coeficientes.ravel()
 
     # Gerar função aproximadora simbólica para regressão múltipla
@@ -669,7 +666,7 @@ def melhor_ajuste(
         Padrão: False.
     expr : bool, opcional
         Se True, exibe a função simbólica aproximadora sugerida; 
-        sPadrão: False.
+        Padrão: False.
 
     Retorna:
     -------
