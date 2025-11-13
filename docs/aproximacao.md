@@ -12,6 +12,22 @@ Este módulo requer as seguintes bibliotecas Python para sua funcionalidade comp
 
 ## Funções
 
+### `_plotar_grafico`
+
+Plota o gráfico com os dados fornecidos pelo usuário e a função aproximadora encontrada.
+
+É chamada internamente por outras funções de `aproximacao.py`. 
+
+#### Parâmetros
+
+* **`valores_x`** (ArrayLike): A variável independente (lista ou array NumPy de valores).
+* **`valores_y`** (ArrayLike): A variável dependente (lista ou array NumPy de valores).
+* **`func_sym`** (sp.Expr): Função simbólica da aproximação que se busca visualizar.
+* **`titulo`** (str): Título do gráfico.
+* **`qtd_pontos`** (int, opcional): Define a quantidade de pontos exibidos no gráfico da função de ajuste. O padrão é 200.
+
+---
+
 ### `ajuste_linear`
 
 Calcula os coeficientes de um ajuste linear (modelo $y = ax + b$) para um conjunto de dados (valores_x, valores_y) usando o Método dos Mínimos Quadrados (MMQ).
@@ -158,7 +174,7 @@ Onde:
 
 O problema é reduzido, então, à obtenção dos coeficientes $a$, $b$ e $d$.
 
-Para isso, inicialmente encontra-se uma frequência $B$ adequada. Isso é feito ao avaliar os erros quadráticos obtidos para valores de frequência em torno da frequência inicial (esta é captada pela aproximação do período inserida pelo usuário como parâmetro da função).
+Para isso, inicialmente encontra-se uma frequência $B$ adequada. Isso é feito ao avaliar os erros quadráticos obtidos para valores de frequência em torno da frequência inicial $B_{0}$ (esta é captada pela aproximação do período inserida pelo usuário como parâmetro da função, de modo que $B_{0} = \frac{2\pi}{T_{aprox}}$).
 
 Após isso, $a$, $b$ e $d$ são estimados pelo Método dos Mínimos Quadrados, o qual é abordado a partir de uma decomposição SVD implementada pelo **`numpy.linalg.lstsq`**. 
 
@@ -174,9 +190,9 @@ Calcula os coeficientes de um ajuste múltiplo (modelo $y = c_{0} + c_{1}x_{1} +
 
 #### Parâmetros
 
-* **`valores_var`** (ArrayLike): As variáveis independentes (sendo cada linha referente às amostras ed cada variável).
+* **`valores_var`** (ArrayLike): As variáveis independentes (sendo cada linha referente às amostras de cada variável).
 * **`valores_y`** (ArrayLike): A variável dependente.
-* **`incluir_intercepto`** (bool, opcional): Se `True`, busca também um intercepto $c_{0}$ noas cálculos. O padrão é `False`.
+* **`incluir_intercepto`** (bool, opcional): Se `True`, busca também um intercepto $c_{0}$ nos cálculos. O padrão é `False`.
 * **`expr`** (bool, opcional): Se `True`, imprime a expressão matemática encontrada. O padrão é `False`.
 
 #### Retorna
@@ -255,3 +271,18 @@ Sugere qual modelo de ajuste (linear ou polinomial de grau 2 a 10) pode ser o ma
 
 #### Método Utilizado
 
+O programa obtém os coeficientes de regressão de cada modelo de ajuste (ajuste linear e polinomial de grau 2 a 10) através da função `ajuste` aplicada aos dados.
+
+Além disso, o programa calcula a Soma dos Quadrados dos Erros (SSE) de cada modelo por meio da seguinte fórmula:
+
+$$
+SSE = \sum_{i = 1}^{n} (y_{i} - f(x_{i}))^2
+$$
+
+, em que $y_{i}$ é o i-ésimo valor da variável dependente inserida pelo usuário e $f(x_{i})$ corresponde ao valor da função de aproximação para o i-ésimo valor da variável independente.
+
+Em seguida, ele obtém os valores dos critérios R2, R2A, AIC, AICc e BIC para cada modelo de ajuste a partir da função `avaliar_ajuste`. 
+
+Por fim, ele seleciona o modelo que obteve o melhor valor para o critério escolhido pelo usuário. Mais especificamente, no caso do R2 e do R2A, busca-se o maior, e no caso do AIC, AICc e BIC, busca-se o menor.
+
+---

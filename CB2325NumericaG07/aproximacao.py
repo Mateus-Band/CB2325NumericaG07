@@ -74,15 +74,16 @@ def ajuste(
 
 
 def _plotar_grafico(
-        valores_x, 
-        valores_y, 
-        func_sym, 
-        titulo, 
-        qtd_pontos=200
+        valores_x: ArrayLike, 
+        valores_y: ArrayLike, 
+        func_sym: sp.Expr, 
+        titulo: str, 
+        qtd_pontos: int = 200
 ):
     """
     Função auxiliar para plotagem dos ajustes.
     """
+
     # Tratar a função simbólica
 
     x_sym = sp.Symbol("x")
@@ -96,11 +97,17 @@ def _plotar_grafico(
 
     # Plotar os gráficos
 
-    plt.scatter(valores_x, valores_y, color="blue", marker="o", 
-        label="Dados Fornecidos")
+    plt.scatter(
+        valores_x, valores_y, 
+        color="blue", marker="o", 
+        label="Dados Fornecidos"
+    )
 
-    plt.plot(x_func, y_func, color="black", linewidth=2, 
-        label="Função Aproximadora")
+    plt.plot(
+        x_func, y_func, 
+        color="black", linewidth=2, 
+        label="Função Aproximadora"
+    )
 
     plt.title(titulo)
     plt.xlabel("Eixo x")
@@ -172,7 +179,7 @@ def ajuste_linear(
 def ajuste_polinomial(
         valores_x: ArrayLike, 
         valores_y: ArrayLike, 
-        grau_pol:int, 
+        grau_pol: int, 
         plt_grafico: bool = False, 
         expr: bool = False
 ):
@@ -182,12 +189,18 @@ def ajuste_polinomial(
     Requer 'grau_pol'. Usa MMQ para encontrar os coeficientes do
     polinômio.
 
-    Retorna os coeficientes em ordem crescente do grau da variável associada.
+    Retorna
+    -------
+    np.ndarray
+        Array contendo os coeficientes em ordem crescente do grau da variável associada.
     """
+
+    # Condições de início
     
     if grau_pol is None:
         raise ValueError(
-            "Para o ajuste polinomial ('pol'), o parâmetro 'grau_pol' deve ser fornecido."
+            "Para o ajuste polinomial ('pol'), o parâmetro " \
+            "'grau_pol' deve ser fornecido."
         )
 
     if len(valores_x) != len(valores_y):
@@ -334,9 +347,10 @@ def ajuste_senoidal(
         expr: bool = False
 ):
     """
-    Modelo: y = A * sin(B*x + C) + D
+    Modelo: y = A * sin(B * x + C) + D
 
-    Lineariza fixando frequências (B) ao redor de uma estimativa inicial (T_aprox).
+    Lineariza o modelo para diferentes frequências B em torno da
+    frequência inicial B_0 = 2pi/(T_aprox).
     Encontra A, C, D para cada B testado e escolhe o melhor ajuste.
     """
     
@@ -395,11 +409,11 @@ def ajuste_senoidal(
     x_sym = sp.Symbol("x")
     func_aprox = A * sp.sin(B * x_sym + C) + D
 
-    def clean_zero(x, tol=1e-12):
+    def _clean_zero(x, tol=1e-12):
         return 0.0 if abs(x) < tol else x
 
-    C_vis = clean_zero(C)
-    D_vis = clean_zero(D)
+    C_vis = _clean_zero(C)
+    D_vis = _clean_zero(D)
 
     sign1 = "+" if C >= 0 else "-"
     sign2 = "+" if D >= 0 else "-"
@@ -445,7 +459,7 @@ def ajuste_multiplo(
 
     x_matriz = np.array(valores_var, dtype=float)
 
-     # Construir a matriz de valores da variável dependente (y_matriz)
+    # Construir a matriz de valores da variável dependente (y_matriz)
 
     y_matriz = np.array(valores_y, dtype=float).reshape(-1, 1)
 
@@ -458,7 +472,8 @@ def ajuste_multiplo(
     if x_matriz.shape[0] != y_matriz.shape[0]:
         raise ValueError(
                 "Formato inconsistente em 'valores_var'. "
-                "Forneça uma matriz (n_variaveis, n_amostras)."
+                "Forneça uma matriz "
+                "(n_variaveis, n_amostras)."
             )
 
     # Tratar o caso com intercepto
@@ -630,7 +645,7 @@ def melhor_ajuste(
     A função encontra os ajustes linear e polinomial (grau 2 a 10) 
     a partir das funções ajuste_linear e ajuste_polinomial. 
     Além disso, calcula seus respectivos valores 
-    de Soma dos Quadrados dos Resíduos (SSE).
+    de Soma dos Quadrados dos Erros (SSE).
 
     Após esses processos, a função calcula o R^2, R^2 ajustado, 
     AIC, AICc e BIC através da função avaliar_ajuste,
@@ -694,10 +709,9 @@ def melhor_ajuste(
 
     funcs = {}
 
-    funcs["linear"] = {"params": np.array(
-        [par for par in ajuste(valores_x, valores_y, 
-        tipo='lin', plt_grafico=False)]
-    )}
+    funcs["linear"] = {"params": ajuste(valores_x, valores_y, 
+        tipo='lin', plt_grafico=False)
+    }
 
     for grau in range(2, 11):
         funcs[f"polinomial grau {grau}"] = {"params": ajuste(
@@ -774,7 +788,9 @@ def melhor_ajuste(
     aprox_escolhida = next(iter(funcs_ordenadas))
     
     print(f"Modelo sugerido: Aproximação {aprox_escolhida}")
-    print(f"{criterio}: {funcs[aprox_escolhida][criterio]:.6f}\n")
+    print(
+        f"{criterio}: {funcs[aprox_escolhida][criterio]:.6f}\n"
+    )
 
     # Exibir todos o valores de todos os critérios da aproximação escolhida
 
