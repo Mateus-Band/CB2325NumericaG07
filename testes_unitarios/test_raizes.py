@@ -142,9 +142,11 @@ def test_raiz_na_borda():
     '''
 
     f = lambda x: 4 - x**2
-    a,b = grid_search(f,-2,2)[0] 
+    a,b = grid_search(f,-2,2)[0]
+    c,d = grid_search(f,-2,2)[1] 
 
-    assert a == pytest.approx(-2) 
+    assert a == pytest.approx(-2)
+    assert d == pytest.approx(2) 
 
 
 
