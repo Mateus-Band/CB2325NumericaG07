@@ -1,5 +1,5 @@
 Adicionar documentação
-# `intepolacao.py` - Módulo de Integração Numérica
+# `intepolacao.py` - Módulo de Interpolação 
 
 Esse modulo fornece ferramentas para a interpolação de pontos.
 
@@ -137,4 +137,96 @@ $$
 H(x) = f[x_0] + f[x_0,x_1](x - x_0) + f[x_0,x_1,x_2](x - x_0)(x - x_1) + ...
 $$
 
+
+
+
+Este módulo fornece ferramentas para calcular o **polinômio interpolador** para um conjunto de pontos, utilizando os métodos de **Lagrange** e da **Matriz de Vandermonde**.
+
+## Dependências
+
+Este módulo requer as seguintes bibliotecas Python para sua funcionalidade completa:
+
+* **NumPy (`np`)**: Para operações numéricas eficientes e manipulação de arrays (e.g., construção da Matriz de Vandermonde e preparação de dados para plotagem).
+* **SymPy (`sp`)**: Para manipulação de **expressões simbólicas** e simplificação dos polinômios.
+* **Matplotlib (`plt`)**: Para a visualização gráfica do polinômio e dos pontos originais (opcional, requer `plotar=True`).
+
+
+## Funções
+
+### `interpolacao_polinomial` (Método de Lagrange)
+
+Calcula o Polinômio Interpolador de **Lagrange** para um conjunto de pontos $\left(x_i, f(x_i)\right)$ dados, construindo-o pela soma dos Polinômios Construtores $L_k(x)$.
+
+#### Parâmetros
+
+* **`tupla_de_pontos`** (`list of tuple`): Lista contendo os pontos de interpolação na forma `[(x0, f(x0)), (x1, f(x1)), ...]`. Os valores de $x$ devem ser distintos.
+* **`plotar`** (`bool`, *opcional*): Se `True`, gera e exibe um gráfico do polinômio interpolador e dos pontos originais usando **Matplotlib**. Padrão é `False`.
+
+#### Retorna
+
+* **`sympy.Expr`** (se bem-sucedido): A expressão simbólica do polinômio de Lagrange simplificado, na forma padrão (e.g., $a_n x^n + \dots + a_0$).
+* **`str`** (se erro): Uma mensagem de erro se a lista de pontos estiver vazia.
+
+#### Matemática
+
+O Polinômio Interpolador de Lagrange, $P(x)$, é dado por:
+
+$$
+P(x) = \sum_{k=0}^{n-1} f(x_k) \cdot L_k(x)
+$$
+
+Onde $L_k(x)$ são os **Polinômios Construtores de Lagrange**:
+
+$$
+L_k(x) = \prod_{\substack{i=0 \\ i \neq k}}^{n-1} \frac{x - x_i}{x_k - x_i}
+$$
+
+
+
+### `interp_vand` (Método da Matriz de Vandermonde)
+
+Calcula o Polinômio Interpolador através da solução do **Sistema Linear** $V \cdot \mathbf{a} = \mathbf{Y}$, onde $V$ é a **Matriz de Vandermonde**, $\mathbf{a}$ são os coeficientes do polinômio e $\mathbf{Y}$ são os valores de $f(x_i)$.
+
+#### Parâmetros
+
+* **`tupla_de_pontos`** (`list of tuple`): Lista contendo os pontos de interpolação na forma `[(x0, f(x0)), (x1, f(x1)), ...]`. Os valores de $x$ devem ser distintos.
+* **`plotar`** (`bool`, *opcional*): Se `True`, gera e exibe um gráfico do polinômio interpolador e dos pontos originais usando **Matplotlib**. Padrão é `False`.
+
+#### Retorna
+
+* **`sympy.Expr`** (se bem-sucedido): A expressão simbólica do polinômio na forma padrão $P(x) = a_0 + a_1 x + \dots + a_{n-1} x^{n-1}$.
+* **`str`** (se erro): Uma mensagem de erro se a lista de pontos estiver vazia ou se a matriz de Vandermonde for singular (e.g., devido a pontos $x$ duplicados).
+
+#### Matemática
+
+O polinômio é buscado na forma:
+$$
+P(x) = a_0 + a_1 x + a_2 x^2 + \dots + a_{n-1} x^{n-1}
+$$
+
+A condição $P(x_i) = f(x_i)$ para todos os $n$ pontos leva ao sistema linear:
+
+$$
+\begin{pmatrix}
+1 & x_0 & x_0^2 & \dots & x_0^{n-1} \\
+1 & x_1 & x_1^2 & \dots & x_1^{n-1} \\
+\vdots & \vdots & \vdots & \ddots & \vdots \\
+1 & x_{n-1} & x_{n-1}^2 & \dots & x_{n-1}^{n-1}
+\end{pmatrix}
+\begin{pmatrix}
+a_0 \\
+a_1 \\
+\vdots \\
+a_{n-1}
+\end{pmatrix}
+=
+\begin{pmatrix}
+f(x_0) \\
+f(x_1) \\
+\vdots \\
+f(x_{n-1})
+\end{pmatrix}
+$$
+
+A primeira matriz é a **Matriz de Vandermonde** ($V$). A solução deste sistema, o vetor $\mathbf{a} = \left(a_0, a_1, \dots, a_{n-1}\right)^T$, fornece os coeficientes do polinômio.
 
