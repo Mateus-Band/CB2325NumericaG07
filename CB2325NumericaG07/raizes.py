@@ -213,7 +213,7 @@ def metodo_bissecao(f, a, b, tol=1e-6, max_inter = 100, plotar = False):
         plt.axvline(a, color='gray', linestyle=':', linewidth=0.8, label='a final')
         plt.axvline(b, color='gray', linestyle='-.', linewidth=0.8, label='b final')
 
-        plt.title('Método da Bisseção — iterações')
+        plt.title('Método da Bisseção')
         plt.xlabel('x')
         plt.ylabel('f(x)')
         plt.legend()
