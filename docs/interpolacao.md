@@ -230,3 +230,59 @@ $$
 
 A primeira matriz é a **Matriz de Vandermonde** ($V$). A solução deste sistema, o vetor $\mathbf{a} = \left(a_0, a_1, \dots, a_{n-1}\right)^T$, fornece os coeficientes do polinômio.
 
+
+### `interpolacao_linear_por_partes`
+
+Constrói a **interpolação linear por partes** a partir de pontos dados, produzindo um polinômio linear em cada intervalo $[x_i, x_{i+1}]$.
+
+#### Parâmetros
+
+* **`x_vals`** (`list`): Lista contendo os valores de \(x\) dos pontos.
+* **`y_vals`** (`list`): Lista contendo os valores de \(y\) correspondentes.
+  Ambas as listas devem ter o mesmo comprimento.
+
+* **`plotar`** (`bool`, opcional):  
+  Se `True`, plota os pontos originais e os segmentos lineares.  
+  Padrão é `False`.
+
+* **`x_test`** (`float` | `int` | `None`, opcional):  
+  Valor onde se deseja avaliar a interpolação.  
+  Se fornecido, a função retorna também o valor interpolado.
+
+#### Retorna
+
+* **`list[sympy.Expr]`**: Lista contendo os polinômios lineares $P_i(x)$ de cada intervalo.
+* **`tuple`** (se `x_test` for fornecido): `(lista_de_polinomios, valor_interpolado)`.
+* **`str`**: Mensagem de erro caso `x_test` esteja fora do domínio.
+
+#### Matemática
+
+A interpolação linear por partes toma pontos:
+
+$$
+(x_0, y_0), (x_1, y_1), \dots, (x_{n-1}, y_{n-1})
+$$
+
+e constrói um polinômio linear em cada subintervalo.
+
+O polinômio no intervalo $\[x_i, x_{i+1}]\$ é:
+
+$$
+P_i(x) = y_i + \frac{y_{i+1} - y_i}{x_{i+1} - x_i}(x - x_i)
+$$
+
+A função completa é dada por:
+
+$$
+P(x) =
+\begin{cases}
+P_0(x), & x_0 \le x \le x_1 \\
+P_1(x), & x_1 \le x \le x_2 \\
+\vdots \\
+P_{n-2}(x), & x_{n-2} \le x \le x_{n-1}
+\end{cases}
+$$
+
+Onde cada $P_i(x)$ é um polinômio de grau $1$. A função é contínua mas não necessariamente diferenciável nos pontos $x_i$.
+
+
