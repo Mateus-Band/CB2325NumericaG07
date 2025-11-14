@@ -95,8 +95,6 @@ resultado_plot = integral_trapezio(f_complexa, a=0, b=10, n=20, plotar=True)
 print(f"Resultado da integral (n=20): {resultado_plot}")
 ```
 
-__Outras funções abaixo:__
-
 
 ### `integral_de_montecarlo`
 

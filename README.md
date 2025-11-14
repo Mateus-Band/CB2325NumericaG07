@@ -1,89 +1,133 @@
+
 # CB2325NumericaG07
-__Trabalho AV2 de Programação 2. Grupo 07__
 
-## Instruções para os alunos (Tutorial git):
-Git é um sistema de controle de versão que ajuda a rastrear mudanças no seu código e a colaborar com outras pessoas.
+[](https://www.google.com/search?q=https://pypi.org/project/CB2325NumericaG07/)
+[](https://opensource.org/licenses/MIT)
 
-### 1. Configuração Inicial (Para o primeiro uso)
+Uma biblioteca de Cálculo Numérico desenvolvida em Python, com recursos gráficos integrados.
 
-* Configure seu nome e email (usados para identificar seus commits):
-    ```bash
-    git config --global user.name "Seu nome"
-    git config --global user.email "al.nome.sobrenome@impatech.edu.br"
-    ```
+-----
 
-### 2. Clonando o Repositório
+> **Contexto Acadêmico:**
+>
+> Este projeto foi desenvolvido pelo **Grupo 07** como trabalho final para a disciplina **CB23 - Prog 02 (2025)**, ministrada pelo Prof. Emilio Brazil.
+>
+> O objetivo principal é implementar os métodos numéricos centrais estudados em classe, encapsulando-os em uma biblioteca Python reutilizável, documentada e distribuída no PyPI.
 
-* **Para o projeto existente (remoto):** Clone o repositório da web:
-    ```bash
-    git clone https://github.com/Mateus-Band/CB2325NumericaG07.git
-    ```
+## Instalação
 
-### 3. O Fluxo Básico: Modificar -> Preparar -> Salvar
+Você pode instalar a biblioteca diretamente do PyPI usando `pip`:
 
-* **Modifique** seus arquivos normalmente.
-* **Prepare (Stage):** Escolha quais mudanças você quer salvar no repositório online.
-    * Para preparar um arquivo específico:
-        ```bash
-        git add <nome_do_arquivo_modificado>
-        ```
-    * Para preparar todos os arquivos modificados/novos:
-        ```bash
-        git add .
-        ```
-* **Salve (Commit):** Crie uma versão permanente das mudanças preparadas, com uma mensagem bem descritiva.
-    ```bash
-    git commit -m "Sua mensagem clara sobre o que mudou (MUITO IMPORTANTE!)"
-    ```
-    *PARTE MAIS IMPORTANTE, SUA NOTA ESTÁ EM BOA PARTE AQUI!*
+```bash
+pip install CB2325NumericaG07
+```
 
-### 4. Verificando o Status
+## Funcionalidades Principais
 
-* Para ver quais arquivos foram modificados, quais estão preparados (processo de commit) e quais não estão sendo rastreados:
-    ```bash
-    git status
-    ```
+Esta biblioteca cumpre todos os requisitos do projeto, implementando módulos para:
 
-### 5. Enviando para o repositórios online (GitHub)
+* **Raízes de Funções**
 
-* **Enviar seus commits:** Mande os commits locais para o repositório remoto (ex: GitHub). Geralmente, para a branch `main` ou `master`:
-    ```bash
-    git push origin main
-    ```
-* **Receber atualizações:** Baixe as últimas mudanças do repositório remoto e comece seu trabalho local:
-    ```bash
-    git pull origin main
-    ```
+* **Interpolação**
 
-### 6. Vendo o Histórico
+* **Aproximação de Funções**
 
-* Para ver a lista de commits feitos:
-    ```bash
-    git log
-    ```
-* Para uma versão mais resumida:
-    ```bash
-    git log --oneline
-    ```
+* **Integração Numérica**
 
-### 7. Desfazendo Coisas (Avançado)
+* **Erros Numéricos**
 
-* **Descartar mudanças *não preparadas* em um arquivo:**
-    ```bash
-    git checkout -- <nome_do_arquivo>
-    ```
-* **Tirar um arquivo da área de *stage* (mas manter as mudanças):**
-    ```bash
-    git reset HEAD <nome_do_arquivo>
-    ```
+Todos os módulos que produzem saídas visuais (ex: `Interpolação` ou `Aproximação`) possuem parâmetros para gerar gráficos usando `matplotlib`.
 
-### 8. Ajuda!
+## Exemplo Rápido (Tutorial Rápido)
 
-* Para obter ajuda sobre qualquer comando:
-    ```bash
-    git help <nome_do_comando>
-    # Ex: git help commit
-    ```
-    *Ou pergunte aos outros :-)*
+Veja como é simples encontrar raízes de funções ou interpolar uma nuvem de pontos.
 
----
+### Exemplo 1: Encontrando uma Raiz (Newton-Raphson)
+
+```python
+# Importando o módulo de raízes
+from CB2325NumericaG07.raizes import newton_raphson
+
+# Definindo a função f(x) = x² - 9x + 5
+função = lambda x: x**2 - 9*x + 5
+
+tol = 1/100 # Definindo tolerância
+
+resultado = metodo_newton_raphson(função, tol)
+
+print(f'Valor calculado foi {resultado}')
+# Saída esperada: Valor calculado foi 0.5948752170638366
+```
+
+### Exemplo 2: Interpolação de Pontos (Hermite)
+
+```python
+from CB2325NumericaG07.interpolacao import interpolacao_de_hermite 
+
+x_hermite = [0, 1, 4, 6, 8]
+y_hermite = [0, 1, 2, 4, 2]
+
+print('Hermite')
+funcao_interpolada_h = interpolacao_de_hermite(x_hermite, y_hermite, plot=True)
+
+ponto_teste_h = 0.5
+valor_interpolado_h = funcao_interpolada_h(ponto_teste_h)
+
+print(f"Pontos x: {x_hermite}")
+print(f"Pontos y: {y_hermite}")
+print(f"f(x) interpolado em x={ponto_teste_h}: {valor_interpolado_h}")
+
+#Saida esperada: 
+#Hermite
+#Pontos x: [0, 1, 4, 6, 8]
+#Pontos y: [0, 1, 2, 4, 2]
+#f(x) interpolado em x=0.5: 0.6149757407960439
+```
+![alt text](docs/images/image.png)
+
+
+## Estrutura do Projeto
+
+O repositório está organizado conforme os requisitos do trabalho:
+
+```txt
+CB2325NumericaG07/
+├── CB2325NumericaG07/      # O pacote python (código fonte)
+│   ├── __init__.py
+│   ├── raizes.py
+│   ├── interpolacao.py
+│   ├── aproximacao.py
+│   └── integracao.py
+|   └── erros.py
+├── docs/                 # Documentação em Markdown
+│   └── aproximacao.md
+|   └── ...
+├── tests/                # Testes unitários (unittest)
+│   └── test_raizes.py
+│   └── ...
+├── notebooks_demos/      # Notebooks Jupyter com exemplos de uso
+|   └── integracao_demo.ipynb
+|   └── ...
+├── testes_unitarios/     # Arquivos .py para test com pytest
+|   └── test_interpolacao.py
+├── README.md             # Este arquivo
+├── pyprojec.toml              # Configuração do pacote
+└── .gitignore
+```
+
+## Autores (Grupo 07)
+
+  * Gabriel Da Silva Rodrigues
+  * Josiete Morais Santos Silva
+  * José Armando Silva Duarte
+  * Kayky Lopes Teixeira Martins
+  * Lucas Mourão Cerqueira E Silva
+  * Lucca Moulin Cruz
+  * Marcella Decembrino De Souza
+  * Maria Izabelle Sousa Da Silva
+  * **Mateus Bandeira De Mello Torres**
+  * Rhuan Soler De Almeida
+
+## Licença
+
+Este projeto é licenciado sob a Licença MIT. Veja o arquivo `pyproject.toml` para mais detalhes.
