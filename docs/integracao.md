@@ -11,7 +11,7 @@ Este módulo requer as seguintes bibliotecas Python para sua funcionalidade comp
 * **Matplotlib**: Para a visualização gráfica (opcional).
 
 ## Funções
-
+----------------------------------------------------------------------------------
 ### `integral_trapezio`
 
 Calcula a integral definida de uma função usando o método do trapézio (regra trapezoidal composta).
@@ -94,7 +94,7 @@ resultado_plot = integral_trapezio(f_complexa, a=0, b=10, n=20, plotar=True)
 
 print(f"Resultado da integral (n=20): {resultado_plot}")
 ```
-
+----------------------------------------------------------------------------------
 
 ### `integral_de_montecarlo`
 
@@ -172,3 +172,54 @@ resultado_plot = integral_de_montecarlo(f_complexa, a=0, b=10, qte=20, plot=True
 
 print(f"Resultado da integral (qte=20): {resultado_plot}")
 ```
+----------------------------------------------------------------------------------
+
+### `integral_simpson38`
+
+Calcula a integral definida de uma função no intervalo [a, b] usando a Regra de Simpson 3/8, um método de Newton–Cotes de ordem 3.  
+Esse método utiliza polinômios cúbicos para aproximar a função em blocos de 3 subintervalos, sendo necessário que n(explicado abaixo) seja múltiplo de 3.
+
+### Parâmetros
+
+- **`function`** (callable):Função a ser integrada.
+- **`a`** (float):Limite inferior da integração.
+- **`b`** (float):Limite superior da integração.
+- **`n`** (int):Número de subintervalos.
+- **`plotar`** (bool, opcional):Se `True`, gera uma visualização gráfica da função e dos polinômios cúbicos usados na aproximação.O padrão é `False`.
+
+### Retorna
+
+- **`float`**:  
+  O valor aproximado da integral definida no intervalo [a, b].
+
+### Fórmula Matemática
+
+A Regra de Simpson 3/8 (composta) é dada por:
+
+$$
+\int_{a}^{b} f(x)\,dx \approx \frac{3h}{8}
+\left[
+f(x_0)
++ 3\sum_{\substack{i=1 \\ i \not\equiv 0 \, (\text{mod } 3)}}^{n-1} f(x_i)
++ 2\sum_{\substack{i=3 \\ i \equiv 0 \, (\text{mod } 3)}}^{n-3} f(x_i)
++ f(x_n)
+\right]
+$$
+
+Onde:  
+- \(h = \frac{b-a}{n}\)  
+- \(x_i = a + i h\)
+
+---
+
+## Exemplo de Uso
+
+```python
+import math
+from integracao import integral_simpson38
+
+f = lambda x: math.sin(x)
+
+resultado = integral_simpson38(f, a=0, b=math.pi, n=99)
+print(f"Integral por Simpson 3/8: {resultado}")
+#Deve exibir algo próximo a: ~2.00000
