@@ -141,6 +141,9 @@ def metodo_newton_raphson(função, tol=1e-6, max_iter=100, plotar = False, esti
     return raiz
     
 
+
+
+
 def metodo_bissecao(f, a, b, tol=1e-6, max_inter = 100, plotar = False):
     """Encontra a raiz de uma função pelo Método da Bisseção.
 
@@ -168,6 +171,7 @@ def metodo_bissecao(f, a, b, tol=1e-6, max_inter = 100, plotar = False):
     Raises:
         ValueError: Se f(a) e f(b) tiverem o mesmo sinal.
     """
+    a0, b0 = a, b  
     inter = 0
     if f(a) * f(b) >= 0:
         raise ValueError("f(a) e f(b) devem ter sinais opostos.")
@@ -187,19 +191,29 @@ def metodo_bissecao(f, a, b, tol=1e-6, max_inter = 100, plotar = False):
             a = c
         else:
             break
-    
+
     c_final = (a+b)/2
-        
+    #plotagem
     if plotar:
-        x = np.linspace(a, b, 400)
-        y = [f(xi) for xi in x]
+        import numpy as np 
+        import matplotlib.pyplot as plt
+
+        xs = np.linspace(a0, b0, 400)
+        ys = [f(x) for x in xs]
 
         plt.figure(figsize=(8, 5))
-        plt.axhline(0, color='black', linewidth=1)
-        plt.plot(x, y, label='f(x)', color='blue')
-        plt.scatter(pontos_c, pontos_f, color='red', s=40, label='Iterações')
-        plt.scatter(c_final, f(c_final), color='green', s=80, label=f'Raiz ≈ {c_final:.6f}')
-        plt.title('Método da Bisseção')
+        plt.plot(xs, ys, label='f(x)')                        
+        plt.axhline(0, linestyle='--', linewidth=0.8)         
+    
+        if pontos_c:
+            plt.scatter(pontos_c, pontos_f, zorder=5, label='iterações (c_k)')
+        
+            plt.scatter([pontos_c[-1]], [pontos_f[-1]], s=80, marker='x', zorder=6, label='última iteração')
+
+        plt.axvline(a, color='gray', linestyle=':', linewidth=0.8, label='a final')
+        plt.axvline(b, color='gray', linestyle='-.', linewidth=0.8, label='b final')
+
+        plt.title('Método da Bisseção — iterações')
         plt.xlabel('x')
         plt.ylabel('f(x)')
         plt.legend()
