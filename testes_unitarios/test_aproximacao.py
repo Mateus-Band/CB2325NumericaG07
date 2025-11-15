@@ -513,8 +513,8 @@ def test_avaliar_ajuste_modelo_desconhecido():
 # Teste para divisão por 0
 
 def test_avaliar_ajuste_divisao_zero():
-    x = [1, 2, 3]
-    y = [2, 4, 6]
+    x = [1, 2]
+    y = [2, 4]
 
     coeficientes = (2, 0)
     modelo = "linear"
