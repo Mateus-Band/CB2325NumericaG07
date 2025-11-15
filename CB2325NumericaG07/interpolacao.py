@@ -376,10 +376,15 @@ def interpolacao_polinomial(tupla_de_pontos, plotar = False) -> sp.Expr:
     # construir L_k(x), isto é, gerará os n Polinômios Construtores
     # Lagrangianos que apendaremos em L.
     for k in range(n):
+        # Converte o ponto X[k] para o tipo simbólico do SymPy
+        Xk_simbolico = sp.Float(X[k])
+
         # O loop interno (i) constrói o k-ésimo Polinômio 
         # Construtor L_k(x) via produtório, isto é:
         # L_k(x) = Prod_{i != k} [ (x - x_i) / (x_k - x_i) ]
         for i in range(n):
+            # Converte X[i] para o tipo simbólico do SymPy
+            Xi_simbolico = sp.Float(X[i])
             # Aqui aplicamos a condição i != k da fórmula de Lagrange,
             # visando evitar a divisão por zero, ou seja, 
             # evitamos que o denominador (X[k] - X[i]) se anule.
@@ -387,7 +392,7 @@ def interpolacao_polinomial(tupla_de_pontos, plotar = False) -> sp.Expr:
                 # Multiplimos cumulativamente: 
                 # L[k] = L[k] * proximo_termo
                 # O proximo_termo é (x - X_i) / (X_k - X_i).
-                L[k] *= (x - X[i])/(X[k] - X[i])
+                L[k] *= (x - Xi_simbolico) / (Xk_simbolico - Xi_simbolico)
                 
     
     # O loop final (j) soma os termos para obter o Polinômio 
@@ -537,8 +542,7 @@ def interp_vand(tupla_de_pontos, plotar=False):
         # Temos um erro caso a matriz seja singular (determinante 
         # próximo de zero), o que geralmente ocorre caso haja 
         # valores de X duplicados.
-        return ("A matriz de Vandermonde é singular (pontos x duplicados "
-                "ou erro de precisão). Não é possível resolver tal sistema")
+        return "A matriz de Vandermonde é singular (pontos x duplicados ou erro de precisão). Não é possível resolver tal sistema"
 
     # Vamos construir o polinômio simbólico
 
@@ -693,11 +697,6 @@ if __name__ == '__main__':
     print(interpolacao_de_hermite.__doc__ + '\n')
     print(interpolacao_polinomial.__doc__ + '\n')
     print(interpolacao_linear_por_partes.__doc__)
-
-
-
-
-
 
 
 
