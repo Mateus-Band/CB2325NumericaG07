@@ -238,14 +238,14 @@ $$
 
 **Critérios:**
 * **R² (Coef. de Determinação):** $R^2 = 1 - \frac{RSS}{RST}$
-* **R² Ajustado:** $R^2_{A} = 1 - \frac{(1 - R^2)(n - 1)}{n - k - 1}$
+* **R² Ajustado:** $R^2_{A} = 1 - \frac{(1 - R^2)(n - 1)}{n - k}$
 * **AIC (Critério de Akaike):** $AIC = n \cdot \ln\left(\frac{RSS}{n}\right) + 2k$
 * **BIC (Critério Bayesiano):** $BIC = n \cdot \ln\left(\frac{RSS}{n}\right) + k \cdot \ln(n)$
 * **AICc (AIC Corrigido):** $AICc = AIC + \frac{2k(k+1)}{n - k - 1}$
 
 Onde:
 * $n$ = número de amostras (pontos).
-* $k$ = número de coeficientes (parâmetros) do modelo.
+* $k$ = número de coeficientes (parâmetros) do modelo, incluindo o intercepto.
 * $y_i$ = valor observado; $\hat{y}_i$ = valor previsto pelo modelo; $\bar{y}$ = média dos valores observados.
 
 ---

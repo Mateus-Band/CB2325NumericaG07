@@ -603,14 +603,17 @@ def avaliar_ajuste(
 
     # Calcula os critérios
 
-    if (n - qtd_coeficientes - 1) <= 0 and criterio in ("R2A", "AICc", "all"):
+    if (n - qtd_coeficientes - 1) <= 0 and criterio in ("AICc", "all"):
+        raise ZeroDivisionError("Não é possível calcular o critério solicitado.")
+    
+    if (n - qtd_coeficientes) <= 0 and criterio in ("R2A", "all"):
         raise ZeroDivisionError("Não é possível calcular o critério solicitado.")
 
     if criterio == "R2":
         return R2
     
     elif criterio == "R2A":
-        return 1 - ((1- R2) * (n - 1) / (n - qtd_coeficientes - 1))
+        return 1 - ((1- R2) * (n - 1) / (n - qtd_coeficientes))
             
     elif criterio == "AIC":
         return n * np.log(RSS / n) + 2 * qtd_coeficientes
@@ -625,7 +628,7 @@ def avaliar_ajuste(
     elif criterio == "all":
         AIC = n * np.log(RSS / n) + 2 * qtd_coeficientes
         BIC = n * np.log(RSS / n) + qtd_coeficientes * np.log(n)
-        R2A = 1 - ((1 - R2) * (n - 1) / (n - qtd_coeficientes - 1))
+        R2A = 1 - ((1 - R2) * (n - 1) / (n - qtd_coeficientes))
         AICc = AIC + (2 * qtd_coeficientes * (qtd_coeficientes + 1)) / (n - qtd_coeficientes - 1)
 
         return (R2, R2A, AIC, AICc, BIC)
