@@ -111,7 +111,7 @@ CB2325NumericaG07/
 ├── testes_unitarios/     # Arquivos .py para test com pytest
 |   └── test_interpolacao.py
 ├── README.md             # Este arquivo
-├── pyprojec.toml              # Configuração do pacote
+├── pyproject.toml              # Configuração do pacote
 └── .gitignore
 ```
 
