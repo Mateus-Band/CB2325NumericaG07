@@ -197,7 +197,7 @@ Calcula a integral definida de uma função utilizando a Regra de Simpson 3/8 �
 A Regra de Simpson 3/8 composta é dada por:
 
 $$
-\int_{a}^{b} f(x)\, dx \approx \frac{3h}{8}\left[f(x_0)\;+\;3 \sum_{\substack{i=1 \\ i \not\equiv 0 \pmod{3}}}^{\,n-1} f(x_i)\;+\;2 \sum_{\substack{i=3 \\ i \equiv 0\pmod{3}}}^{\,n-3} f(x_i)\;+\;f(x_n)\right],
+\int_{a}^{b} f(x)\ dx \approx \frac{3h}{8}\left[f(x_0)+3 \sum_{\substack{i=1 \\ i \not\equiv 0 \pmod{3}}}^{n-1} f(x_i)+2 \sum_{\substack{i=3 \\ i \equiv 0\pmod{3}}}^{\,n-3}f(x_i)+f(x_n)\right]
 $$
 
 Onde:
@@ -285,7 +285,7 @@ Ele utiliza os zeros dos polinômios de Legendre como pontos de amostragem e pes
 #### Fórmula Matemática
 
 $$
-\int_{a}^{b} f(x)\, dx\approx\frac{b - a}{2}\sum_{i = 1}^{n}w_i \,f\!\left(\frac{b - a}{2}\, x_i+\frac{a + b}{2}\right).
+\int_{a}^{b} f(x)\ dx\approx\frac{b - a}{2}\sum_{i = 1}^{n}w_i f\Big(\frac{b - a}{2}\ x_i+\frac{a + b}{2}\Big).
 $$
 
 Onde:
