@@ -46,7 +46,7 @@ Veja como é simples encontrar raízes de funções ou interpolar uma nuvem de p
 
 ```python
 # Importando o módulo de raízes
-from CB2325NumericaG07.raizes import newton_raphson
+from CB2325NumericaG07.raizes import metodo_newton_raphson
 
 # Definindo a função f(x) = x² - 9x + 5
 função = lambda x: x**2 - 9*x + 5
