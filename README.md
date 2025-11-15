@@ -102,16 +102,16 @@ CB2325NumericaG07/
 ├── docs/                 # Documentação em Markdown
 │   └── aproximacao.md
 |   └── ...
-├── tests/                # Testes unitários (unittest)
-│   └── test_raizes.py
-│   └── ...
 ├── notebooks_demos/      # Notebooks Jupyter com exemplos de uso
 |   └── integracao_demo.ipynb
 |   └── ...
 ├── testes_unitarios/     # Arquivos .py para test com pytest
 |   └── test_interpolacao.py
+|   └── ...
 ├── README.md             # Este arquivo
-├── pyproject.toml              # Configuração do pacote
+├── pyproject.toml        # Configuração do pacote
+├── LICENSE
+├── MANIFEST.in           # Para pypi
 └── .gitignore
 ```
 
