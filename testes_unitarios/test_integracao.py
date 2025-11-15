@@ -24,6 +24,13 @@ from CB2325NumericaG07.integracao import (
 # Configura matplotlib para não abrir janelas durante os testes
 matplotlib.use('Agg')
 
+import warnings
+warnings.filterwarnings(
+    "ignore",
+    message="FigureCanvasAgg is non-interactive, and thus cannot be shown",
+    category=UserWarning
+)
+
 ###########
 # Testes - Regra do Trapézio
 ###########
@@ -58,7 +65,7 @@ def test_trapezio_sympy_lambda():
 
 def test_trapezio_erro_n():
     """Deve levantar ValueError se n < 1."""
-    with pytest.raises(ValueError, match="O número de subintervalos \(n\) deve ser pelo menos 1"):
+    with pytest.raises(ValueError, match=r"O número de subintervalos \(n\) deve ser pelo menos 1"):
         integral_trapezio(lambda x: x, 0, 1, n=0)
 
 def test_trapezio_erro_sympy_multiplas_vars():

@@ -368,39 +368,3 @@ def integral_de_montecarlo(func,a:float,b:float, c:int = None,d:int=None,qte = 1
         ax.text(-0.2,d-k*0.3,f'Pontos a baixo da função:{I} , Pontos totais : {qte}')
 
     return (c-d)*(b-a)*(I/qte) + d*(b-a)
-
-
-
-
-if __name__ == "__main__":
-
-    print("=== Documentação dos Métodos ===\n")
-    print(integral_trapezio.__doc__)
-    print(integral_simpson38.__doc__)
-    print(integral_de_montecarlo.__doc__)
-    print(integral_boole.__doc__)
-    print(integral_gauss_legendre.__doc__)
-
-    print("\n=== Exemplos de Uso ===\n")
-
-    f = lambda x: np.sin(x)
-
-    print("→ Regra dos Trapézios:")
-    area_t = integral_trapezio(f, 0, math.pi, n=100, plotar=True)
-    print(f"Resultado: {area_t:.6f}\n")
-
-    print("→ Regra de Simpson 3/8:")
-    area_s = integral_simpson38(f, 0, math.pi, n=99, plotar=True)
-    print(f"Resultado: {area_s:.6f}\n")
-
-    print("→ Regra de Boole:")
-    area_b = integral_boole(f, 0, math.pi, n=8, plotar=True)
-    print(f"Resultado: {area_b:.6f}\n")
-
-    print("→ Integração de Monte Carlo:")
-    area_m = integral_de_montecarlo(f, 0, math.pi, qte=5000, plot=True)
-    print(f"Resultado: {area_m:.6f}")
-
-    print("→ Quadratura de Gauss–Legendre:")
-    area_g = integral_gauss_legendre(f, 0, np.pi, n=3, plotar=True)
-    print(f"Resultado: {area_g:.6f}")
