@@ -166,7 +166,24 @@ else:
     print("O método não convergiu.")
 ```
 
-### Exemplo 3: grid search
+
+### Exemplo 3: Newton-Raphson com plot
+
+```python
+import matplotlib.pyplot as plt
+from CB2325NumericaG07.raizes import metodo_bissecao
+
+# Função: f(x) = 10x^3 - 200x + 432
+f = lambda x: 10*x**3 - 200*x + 432
+
+# Busca a raiz no intervalo
+raiz = metodo_newton_raphson(função, tol=1e-6, plotar=True)
+
+print(f"Raiz encontrada: {raiz:.6f}")
+# Saída esperada: aprox. −5.305019
+```
+
+### Exemplo 4: grid search
 ```python
 from CB2325NumericaG07.raizes import grid_search
 
