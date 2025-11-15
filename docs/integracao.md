@@ -11,7 +11,7 @@ Este módulo requer as seguintes bibliotecas Python para sua funcionalidade comp
 * **Matplotlib**: Para a visualização gráfica (opcional).
 
 ## Funções
-----------------------------------------------------------------------------------
+
 ### `integral_trapezio`
 
 Calcula a integral definida de uma função usando o método do trapézio (regra trapezoidal composta).
@@ -94,7 +94,7 @@ resultado_plot = integral_trapezio(f_complexa, a=0, b=10, n=20, plotar=True)
 
 print(f"Resultado da integral (n=20): {resultado_plot}")
 ```
-----------------------------------------------------------------------------------
+
 
 ### `integral_de_montecarlo`
 
@@ -172,54 +172,132 @@ resultado_plot = integral_de_montecarlo(f_complexa, a=0, b=10, qte=20, plot=True
 
 print(f"Resultado da integral (qte=20): {resultado_plot}")
 ```
-----------------------------------------------------------------------------------
 
 ### `integral_simpson38`
 
-Calcula a integral definida de uma função no intervalo [a, b] usando a Regra de Simpson 3/8, um método de Newton–Cotes de ordem 3.  
-Esse método utiliza polinômios cúbicos para aproximar a função em blocos de 3 subintervalos, sendo necessário que n(explicado abaixo) seja múltiplo de 3.
+Calcula a integral definida de uma função utilizando a Regra de Simpson 3/8 — um método numérico baseado em interpolação cúbica.
+É mais precisa que a Regra dos Trapézios e que a Simpson 1/3 em algumas situações.
 
-### Parâmetros
+#### Parâmetros
 
-- **`function`** (callable):Função a ser integrada.
-- **`a`** (float):Limite inferior da integração.
-- **`b`** (float):Limite superior da integração.
-- **`n`** (int):Número de subintervalos.
-- **`plotar`** (bool, opcional):Se `True`, gera uma visualização gráfica da função e dos polinômios cúbicos usados na aproximação.O padrão é `False`.
+* **`function`** (callable):Função Python que recebe um valor x e retorna f(x).
+* **`a`** (float): Limite inferior da integração.
+* **`b`** (float): Limite superior da integração.
+* **`n`** (int):
+    * Número de subintervalos.
+    * Deve ser múltiplo de 3, pois cada bloco da fórmula usa 3 subintervalos.
+**`plotar`** (bool, opcional): Se True, exibe um gráfico ilustrando a interpolação cúbica usada pelo método.
 
-### Retorna
+#### Retorna
 
-- **`float`**:  
-  O valor aproximado da integral definida no intervalo [a, b].
+* **`float`**: valor aproximado da integral definida.
 
-### Fórmula Matemática
+#### Fórmula Matemática
 
-A Regra de Simpson 3/8 (composta) é dada por:
+A Regra de Simpson 3/8 composta é dada por:
 
 $$
-\int_{a}^{b} f(x)\,dx \approx \frac{3h}{8}
-\left[
-f(x_0)
-+ 3\sum_{\substack{i=1 \\ i \not\equiv 0 \, (\text{mod } 3)}}^{n-1} f(x_i)
-+ 2\sum_{\substack{i=3 \\ i \equiv 0 \, (\text{mod } 3)}}^{n-3} f(x_i)
-+ f(x_n)
-\right]
+\int_{a}^{b} f(x)\, dx \approx \frac{3h}{8}\left[f(x_0)\;+\;3 \sum_{\substack{i=1 \\ i \not\equiv 0 \pmod{3}}}^{\,n-1} f(x_i)\;+\;2 \sum_{\substack{i=3 \\ i \equiv 0\pmod{3}}}^{\,n-3} f(x_i)\;+\;f(x_n)\right],
 $$
 
-Onde:  
-- \(h = \frac{b-a}{n}\)  
-- \(x_i = a + i h\)
+Onde:
+
+* $h = \frac{b-a}{n}$
+* $x_i = a + ih.$
 
 ---
 
-## Exemplo de Uso
+## Exemplos de Uso
+
+## Exemplo 1 — Função Python (lambda)
 
 ```python
-import math
-from integracao import integral_simpson38
 
-f = lambda x: math.sin(x)
+f = lambda x: np.sin(x)
+resultado = integral_simpson38(f, 0, np.pi, n=99)
+print(resultado)
+```
 
-resultado = integral_simpson38(f, a=0, b=math.pi, n=99)
-print(f"Integral por Simpson 3/8: {resultado}")
-#Deve exibir algo próximo a: ~2.00000
+## Exemplo 2 — Plotando
+
+```python
+
+f = lambda x: np.cos(x) * x
+resultado = integral_simpson38(f, 0, 3, n=99, plotar=True)
+```
+
+### `integral_boole`
+
+Calcula a integral definida de uma função usando a Regra de Boole, também chamada Newton–Cotes de 4ª ordem.
+Ela utiliza 5 pontos igualmente espaçados e um polinômio de grau 4 para aproximar a integral em cada bloco.
+
+#### Parâmetros
+
+* **`function`** (callable): Função a ser integrada.
+* **`a`** (float): Limite inferior.
+* **`b`** (float): Limite superior.
+* **`n`** (int): Número de subintervalos.
+*   * Deve ser múltiplo de 4, pois cada bloco da fórmula usa 4 subintervalos e 5 pontos.
+* **`plotar`** (bool): Se True, exibe gráfico da função e dos pontos utilizados.
+
+#### Retorna
+
+* **`float`**: aproximação da integral.
+
+#### Fórmula Matemática
+
+$$
+\int_{a}^{b} f(x)\, dx \approx \frac{2h}{45}\left[7f(x_0) + 32f(x_1) + 12f(x_2) + 32f(x_3)+ 7f(x_4)\right]
+$$
+
+Aplicada repetidamente em intervalos de 4 subintervalos.
+
+$h = \frac{b - a}{4}.$
+
+## Exemplos de Uso
+
+```python
+
+f = lambda x: np.sin(x)
+resultado = integral_boole(f, 0, np.pi, n=8)
+print(resultado)
+```
+
+### `integral_gauss_legendre`
+
+Calcula a integral definida usando o método de Quadratura de Gauss–Legendre, um dos mais precisos métodos de integração para funções suaves.
+Ele utiliza os zeros dos polinômios de Legendre como pontos de amostragem e pesos ideais que minimizam o erro.
+
+#### Parâmetros
+
+* **`function`** (callable): Função a integrar.
+* **`a, b`** (float): Limites da integral.
+* **`n`** (int, opcional):
+*   * Número de pontos da quadratura.
+*   * O método é exato para polinômios até grau 2n−1.
+*   * Valor padrão: 3.
+* **`plotar`** (bool): Se True, exibe gráfico com a função e os nós usados.
+
+#### Retorna
+
+* **`float`** – Valor aproximado da integral.
+
+#### Fórmula Matemática
+
+$$
+\int_{a}^{b} f(x)\, dx\approx\frac{b - a}{2}\sum_{i = 1}^{n}w_i \,f\!\left(\frac{b - a}{2}\, x_i+\frac{a + b}{2}\right).
+$$
+
+Onde:
+
+$x_i$: nós de Gauss (zeros do polinômio de Legendre)
+$w_i$: pesos correspondentes
+
+## Exemplos de Uso
+
+```python
+
+f = lambda x: np.sin(x)
+resultado = integral_gauss_legendre(f, 0, np.pi, n=3)
+print(resultado)
+```
