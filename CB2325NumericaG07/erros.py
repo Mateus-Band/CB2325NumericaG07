@@ -1,6 +1,7 @@
 def erro_absoluto(valor_real,valor_aprox):
     """
-    Calcula o erro absoluto entre o valor real/definido/sla e o valor aproximado.
+    Calcula o erro absoluto entre o valor real definido e o valor
+      aproximado.
 
     Parâmetros:
         valor_real(float): Valor considerado verdadeiro.
@@ -20,7 +21,8 @@ def erro_relativo(valor_real,valor_aprox):
         valor_aprox(float): Valor aproximado.
 
     Retorna:
-        float: O erro relativo, dado por |valor_real - valor_aprox| / |valor_real|.
+        float: O erro relativo, dado por 
+        |valor_real - valor_aprox| / |valor_real|.
     """
     if valor_real == 0:
         if valor_aprox == 0:

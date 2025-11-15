@@ -4,7 +4,9 @@ import matplotlib.pyplot as plt
 
 def diff_numerica(x,y) -> list:
     '''
-    Recebe duas listas de numeros que representam os pontos x e y, e retorna a derivada numerica em cada ponto,usando diferença central nos pontos centrais,
+    Recebe duas listas de numeros que representam os pontos x e y, e retorna
+      a derivada numerica em cada ponto,usando diferença central nos pontos
+        centrais,
     e diferença progressiva/regressiva nas pontas.
 
     Parâmetros:
@@ -47,7 +49,9 @@ def diff_numerica(x,y) -> list:
 
 def _function_definer(lista_x,lista_y,exception=None):
     '''
-    Essa função recebe duas listas e as vincula, retornando uma função vinculo que ao receber um ponto da lista_x retorna um ponto da lista_x
+    Essa função recebe duas listas e as vincula, retornando uma função
+      vinculo que ao receber um ponto da lista_x retorna um ponto da
+        lista_x
     '''
 
     if len(lista_x) != len(lista_y):
@@ -71,7 +75,8 @@ def _function_definer(lista_x,lista_y,exception=None):
 
 def _duplicate(lista) -> list:
         '''
-        Duplica cada elemento da lista e mantem a ordem, necessaria para o calculo por exemplo da interpolação de hermite,
+        Duplica cada elemento da lista e mantem a ordem, necessaria
+        para o calculo por exemplo da interpolação de hermite,
         recebe: [1,2,3,4] e retorna: [1,1,2,2,3,3,4,4]
         '''
         l = []
@@ -83,17 +88,23 @@ def _duplicate(lista) -> list:
 
 def _hermite_ddfunc(Point_list:list,derivada,func)-> list:
     '''
-    Recebe a lista de pontos, uma função que retorna as derivadas em cada ponto, e a função que queremos usar na interpolação,
-    e retorna as f[] necessarias para o calculo da intepolação de hermite em ordem,
+    Recebe a lista de pontos, uma função que retorna as derivadas em
+    cada ponto, e a função que queremos usar na interpolação,
+    e retorna as f[] necessarias para o calculo da intepolação de 
+    hermite em ordem,
     por exemplo [f[x_0],f[x_0,x_0],f[x_0,x_0,x_1],...] .
 
     Parâmetros:
-        Point_list (list): lista com os valores dos pontos na coordenada x
-        derivada (função): função que retorna a derivada de cada ponto da Point_list
-        func (função): função que retorna os valores dos pontos na coordenada y para cada ponto da coordenada y, func(x) = y
+        Point_list (list): lista com os valores dos pontos na coordenada
+          x
+        derivada (função): função que retorna a derivada de cada ponto
+          da Point_list
+        func (função): função que retorna os valores dos pontos na
+          coordenada y para cada ponto da coordenada y, func(x) = y
 
     Retorna:
-        list: Lista com os valores de cada f[] necessária para calcular o polinomio de hermite na ordem que o f[x] aparece
+        list: Lista com os valores de cada f[] necessária para calcular
+          o polinomio de hermite na ordem que o f[x] aparece
 
 
     '''
@@ -102,7 +113,8 @@ def _hermite_ddfunc(Point_list:list,derivada,func)-> list:
     
     def der(P_list): #funciona com uma redução de lista, seja x_i o elemento da nova lista e x1_i o elemento da lista antiga de posição i, x_i = (x1_(i+1) - x1_i)/(sublist[i]-sublist2[i]), da mesma forma que seria calcular a interpolação por tabela,  
         '''
-        Reduz uma lista usando o metodo de calcular os valores de f[], pelo método de tabela
+        Reduz uma lista usando o metodo de calcular os valores de f[], 
+        pelo método de tabela
         '''
 
 
@@ -128,17 +140,22 @@ def _hermite_ddfunc(Point_list:list,derivada,func)-> list:
 
 def interpolacao_de_hermite(x,y,plot=False, grid=True):
     '''
-    Essa função retorna, recebendo uma lista de valores de x e outra lista dos respectivos valores de f(x), uma função que interpola valores conforme f(x)
+    Essa função retorna, recebendo uma lista de valores de x e outra
+      lista dos respectivos valores de f(x), uma função que interpola
+        valores conforme f(x)
     
     Parâmetros:
         x (float): Lista de valores de x.
         y (float): Lista de valores conhecidos de f(x).
         (Ambos devem estar em ordem)
-        plot (bool): Determina se a função deve plotar as informações ou não
-        grid (bool): Determina se a função for plotar se a plotagem deve ter grid ou não
+        plot (bool): Determina se a função deve plotar as informações
+          ou não
+        grid (bool): Determina se a função for plotar se a plotagem deve
+          ter grid ou não
         
     Retorna:
-        Função: Essa nova função recebe valores de x e retorna os valores de f(x) interpolados.
+        Função: Essa nova função recebe valores de x e retorna os
+          valores de f(x) interpolados.
     '''
     
     #Cálculo final
@@ -152,12 +169,16 @@ def interpolacao_de_hermite(x,y,plot=False, grid=True):
 
     def interpolation(ponto,plt = plot): #função que será retornada
         '''
-        Essa função esta diretamente ligada a função original interpolação_de_hermite que a gerou, e seu resultado depende diretamente da função original
+        Essa função esta diretamente ligada a função original
+          interpolação_de_hermite que a gerou, e seu resultado
+            depende diretamente da função original
 
 
         Parâmetros:
             ponto (float): ponto x que será calculado o f(x)
-            plt: Determina se a função deve ou não plotar o ponto x (só funciona se na função interpolação de hermite o parametro: plot = True)
+            plt: Determina se a função deve ou não plotar o ponto x (só
+              funciona se na função interpolação de hermite o parametro:
+                plot = True)
         
         Retorna:
             float: Valor f(x)
@@ -213,8 +234,9 @@ def interpolacao_de_hermite(x,y,plot=False, grid=True):
 
 
 def _newton_ddfunc(Point_list:list,func)-> list:
-    '''Recebe a lista de pontos e a função que queremos usar na interpolação,
-    e retorna as f[] necessarias para o calculo da intepolação de newton em ordem,
+    '''Recebe a lista de pontos e a função que queremos usar na
+    interpolação, e retorna as f[] necessarias para o calculo de
+    intepolação de newton em ordem,
     por exemplo [f[x_0],f[x_0,x_1],f[x_0,x_1,x_2],...] .
     '''
     subslist1,subslist2 = list(Point_list.copy()),list(Point_list.copy())#sublist1 e sublist2 são listas que usarei para guardar quais valores serão subtraidos nos denomidaores
@@ -222,7 +244,8 @@ def _newton_ddfunc(Point_list:list,func)-> list:
     
     def der(P_list): #funciona com uma redução de lista, seja x_i o elemento da nova lista e x1_i o elemento da lista antiga de posição i, x_i = (x1_(i+1) - x1_i)/(sublist[i]-sublist2[i]), da mesma forma que seria calcular a interpolação por tabela,  
         '''
-        Reduz uma lista usando o metodo de calcular os valores de f[], pelo método de tabela
+        Reduz uma lista usando o metodo de calcular os valores de f[],
+          pelo método de tabela
         '''
         
 
@@ -244,7 +267,9 @@ def _newton_ddfunc(Point_list:list,func)-> list:
 
 
 def interpolacao_de_newton(x,y,plot:bool = False,grid:bool = True):
-    '''Essa função retorna, recebendo uma lista de valores de x e outra lista dos respectivos valores de f(x), uma função que interpola valores conforme f(x)
+    '''Essa função retorna, recebendo uma lista de valores de x e outra
+      lista dos respectivos valores de f(x), uma função que interpola 
+      valores conforme f(x)
     
     Parâmetros:
         x (float): Lista de valores de x.
@@ -252,7 +277,8 @@ def interpolacao_de_newton(x,y,plot:bool = False,grid:bool = True):
         Ambos devem estar em ordem
         
     Retorna:
-        Função: Essa nova função recebe valores de x e retorna os valores de f(x) interpolados.
+        Função: Essa nova função recebe valores de x e retorna os
+         valores de f(x) interpolados.
     
     
     '''
@@ -269,7 +295,8 @@ def interpolacao_de_newton(x,y,plot:bool = False,grid:bool = True):
             Ambos devem estar em ordem
         
         Retorna:
-            Função: Essa nova função recebe valores de x e retorna os valores de f(x) interpolados.'''
+            Função: Essa nova função recebe valores de x e retorna os
+              valores de f(x) interpolados.'''
         
         soma = 0 #para os (x - x_i), que crecem assim como os pontos da lista x_duplicate
         newton = 0 
@@ -634,11 +661,12 @@ def interp_vand(tupla_de_pontos, plotar=False):
 
 def interpolacao_linear_por_partes(x_vals:list, y_vals:list, plotar = False, x_test= None):
     """
-    Função que recebe uma lista x de abscissas, uma lista y de ordenadas, um
-    possível True para plotar um gráfico com os pontos recebidos e a interpolação 
-    linear por partes e um possível valor x_test para descobrir o valor de f(x_test)
-    a partir da interpolação. E retorna uma lista com os polinômios lineares,
-    podendo também plotar o gráfico e retornar o valor de f(x_text) junto aos
+    Função que recebe uma lista x de abscissas, uma lista y de
+    ordenadas, um possível True para plotar um gráfico com os pontos
+    recebidos e a interpolação linear por partes e um possível valor
+    x_test para descobrir o valor de f(x_test) a partir da interpolação.
+    E retorna uma lista com os polinômios lineares, podendo também
+    plotar o gráfico e retornar o valor de f(x_text) junto aos
     polinômios se receber True para plotar e algum valor para x_text.
     """
 
@@ -658,9 +686,10 @@ def interpolacao_linear_por_partes(x_vals:list, y_vals:list, plotar = False, x_t
 
     def p(x):
         '''
-        Função que recebe um valor x e retorna o valor de f(x) a partir da interpolação se 
-        ele não for nem menor do que o primeiro e nem maior do que o último porque não é
-        possível calcular nestes casos.
+        Função que recebe um valor x e retorna o valor de f(x) a partir
+        da interpolação se ele não for nem menor do que o primeiro e
+        nem maior do que o último porque não é possível calcular
+        nestes casos.
         '''
         if x < x_vals[0] or x > x_vals[n-1]:
             return "Fora do intervalo. Tente outro valor!"
