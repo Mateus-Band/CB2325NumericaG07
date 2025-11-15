@@ -519,7 +519,7 @@ def test_avaliar_ajuste_divisao_zero():
     coeficientes = (2, 0)
     modelo = "linear"
 
-    # n - qtd_coeficientes - 1 = 3 - 2 - 1 = 0. (Falha em R2A, AICc e all)
+    # n - qtd_coeficientes = 2 - 2 = 0. (Falha em R2A, AICc e all)
     
     with pytest.raises(ZeroDivisionError, match="Não é possível calcular o critério solicitado."):
         avaliar_ajuste(x, y, "R2A", modelo, coeficientes)
