@@ -8,27 +8,26 @@ def metodo_newton_raphson(função, tol=1e-6, max_iter=100, plotar = False, esti
     à função numa estimativa f(x). Tal estimativa pode ser um argumento
     ou o padrão, que é uma função que faz uma estimativa inicial grosseira.
     A busca é interrompida quando o erro, f(x) - 0, é menor que 'tol' ou
-    'max_inter' é atingido.
+    'max_iter' é atingido.
 
     Args:
         função (callable): A função para a qual a raiz está sendo procurada
             (deve receber um float e retornar um float).
-        tol (float): A tolerância (critério de parada). O loop para
+        tol (float, opcional): A tolerância (critério de parada). O loop para
             quando f(x) < tol. Default é 1e-6. Além disso, tol é usado
             para calcular a derivada numérica.
-        max_iter (int): O número máximo de iterações da função 'metodo_nr',
+        max_iter (int, opcional): O número máximo de iterações da função 'metodo_nr',
             acima dos quais a função retorna 'O método não convergiu.'.
             Default é 100.
         plotar (bool, optional): Se True, exibe um gráfico das
             iterações ao final. Default é False.
-        estimativa_inicial (float): Primeiro número que será aplicado
+        estimativa_inicial (float, opcional): Primeiro número que será aplicado
             na função para obter a reta tangente à f(x). Default é uma
             estimativa de baixa precisão automática. 
     
         
     Returns:
-        float: A aproximação da raiz da função.
-        None: Se o método atingir 'max_inter' antes de convergir.
+        float: A aproximação da raiz da função. Caso o método não convirja, imprime uma mensagem.
 
     Raises:
         ValueError: Se 'função' não for callable ou se max_iter/tol tiverem
