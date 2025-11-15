@@ -6,6 +6,7 @@ Este módulo implementa métodos numéricos fundamentais para a determinação d
 
 * **Método da Bisseção**: Método intervalar que garante a convergência (desde que o intervalo inicial contenha uma raiz).
 * **Método da Secante**: Método iterativo rápido que utiliza a inclinação da reta secante para aproximar a raiz.
+* **Método Newton-Raphson**: Método iterativo que utiliza a reta tangente para aproximar a raiz
 * **Visualização Gráfica**: Plotagem automática da função e dos pontos de iteração utilizando `matplotlib`.
 * **grid_search** :  Função que retorna intervalos menores para procura as raizes.
 
@@ -83,8 +84,36 @@ metodo_secante(f, x0, x1, tol=1e-6, max_inter=100, plotar=False)
   * `ValueError`: Se ocorrer divisão por zero (`f(x1) == f(x0)`) durante o cálculo.
 
 ------
+### 3\. `metodo_newton_raphson`
 
-### 3\. `grid_search`
+  Encontra a raiz de uma função $f(x)$ bisseccionando repetidamente um intervalo $[a, b]$ e selecionando o subintervalo onde a raiz deve estar.
+
+**Sintaxe:**
+
+```python
+metodo_newton_raphson(função, tol=1e-6, max_iter=100, plotar=False, estimativa_inicial=None)
+```
+
+**Parâmetros:**
+
+  * `função` (*callable*): A função objetiva $f(x)$.
+  * `tol` (*float*, opcional): Tolerância para o critério de parada. Número utilizado para derivação numérica. Padrão: `1e-6`.
+  * `max_iter` (*int*, opcional): Número máximo de iterações permitidas para evitar loops infinitos. Padrão: `100`.
+  * `plotar` (*bool*, opcional): Se `True`, gera e exibe um gráfico ao final da execução mostrando a função e os pontos médios calculados.
+  * `estimativa_inicial` (float, opcional): Primeira estimativa que o método irá testar para achar a raiz. O padrão é uma estimativa automática de baixa precisão. 
+
+**Retorno:**
+
+  * `float`: A aproximação da raiz encontrada. Caso o método não convirja, imprime uma mensagem.
+
+**Levanta Erros (Raises):**
+
+  * `ValueError`: Se 'função' não for callable ou se `max_iter`/`tol` tiverem valores inválidos.
+
+
+------
+
+### 4\. `grid_search`
 
 Encontra os intervalos para calcular as raizes de uma função em um intervalo grande.
 
