@@ -8,7 +8,8 @@ pi, sin, cos = sp.pi, sp.sin, sp.cos
 
 def integral_trapezio(function, a, b, n : int, plotar = False) -> float:
     '''
-    Calcula a integral definida de uma função usando o método do trapézio.
+    Calcula a integral definida de uma função usando o método do
+      trapézio.
     Compatível com funções do sympy e funções normais do python.
 
     Parâmetros:
@@ -21,7 +22,8 @@ def integral_trapezio(function, a, b, n : int, plotar = False) -> float:
     A aproximação da integral definida.
 
     Formula:
-        ∫[a,b] f(x) dx ≈ (h/2) * [f(x0) + 2*f(x1) + 2*f(x2) + ... + 2*f(x(n-1)) + f(xn]]
+        ∫[a,b] f(x) dx ≈ (h/2) * [f(x0) + 2*f(x1) + 2*f(x2) + ... +
+          2*f(x(n-1)) + f(xn]]
         onde h = (b - a) / n e xi = a + i*h para i = 0, 1, ..., n
     '''
     #Tratamento de erros
@@ -119,7 +121,8 @@ def integral_trapezio(function, a, b, n : int, plotar = False) -> float:
 
 def integral_simpson38(function, a, b, n : int, plotar = False) -> float:
     """
-    Calcula a integral de f no intervalo [a, b] usando a regra de Simpson 3/8.
+    Calcula a integral de f no intervalo [a, b] usando a regra de
+      Simpson 3/8.
     Parâmetros:
         f (function): Função a ser integrada
         a (float): Limite inferior da integração
@@ -184,7 +187,8 @@ def integral_simpson38(function, a, b, n : int, plotar = False) -> float:
     
 def integral_boole(function, a, b, n: int, plotar=False) -> float:
     """
-    Calcula a integral de f no intervalo [a, b] usando a Regra de Boole (Newton–Cotes de 4ª ordem).
+    Calcula a integral de f no intervalo [a, b] usando a Regra de Boole
+      (Newton-Cotes de 4ª ordem).
 
     Parâmetros
     ----------
@@ -203,7 +207,8 @@ def integral_boole(function, a, b, n: int, plotar=False) -> float:
         Valor aproximado da integral.
 
     Fórmula:
-        ∫[a,b] f(x) dx ≈ (2h/45) * [7f(x0) + 32f(x1) + 12f(x2) + 32f(x3) + 7f(x4)]
+        ∫[a,b] f(x) dx ≈ (2h/45) * [7f(x0) + 32f(x1) + 12f(x2) + 32f(x3)
+          + 7f(x4)]
         onde h = (b - a) / 4
     """
     if n % 4 != 0:
@@ -249,7 +254,8 @@ def integral_boole(function, a, b, n: int, plotar=False) -> float:
 
 def integral_gauss_legendre(function, a, b, n: int = 3, plotar=False) -> float:
     """
-    Calcula a integral de f(x) no intervalo [a, b] usando a Quadratura de Gauss-Legendre.
+    Calcula a integral de f(x) no intervalo [a, b] usando a Quadratura
+      de Gauss-Legendre.
 
     Parâmetros
     ----------
@@ -258,9 +264,11 @@ def integral_gauss_legendre(function, a, b, n: int = 3, plotar=False) -> float:
     a, b : float
         Limites de integração.
     n : int, opcional
-        Número de pontos da quadratura (grau do polinômio de Legendre). Padrão: 3.
+        Número de pontos da quadratura (grau do polinômio de Legendre).
+          Padrão: 3.
     plotar : bool, opcional
-        Se True, exibe o gráfico da função e os pontos de amostragem da quadratura.
+        Se True, exibe o gráfico da função e os pontos de amostragem da
+          quadratura.
 
     Retorna
     -------
@@ -268,7 +276,8 @@ def integral_gauss_legendre(function, a, b, n: int = 3, plotar=False) -> float:
         Valor aproximado da integral.
 
     Fórmula:
-        ∫[a,b] f(x) dx ≈ (b - a)/2 * Σ [ w_i * f( (b - a)/2 * x_i + (a + b)/2 ) ]
+        ∫[a,b] f(x) dx ≈ (b - a)/2 * Σ [ w_i * f( (b - a)/2 * x_i +
+          (a + b)/2 ) ]
 
     Observação:
         Este método é exato para polinômios de grau até (2n - 1).
@@ -310,10 +319,13 @@ def integral_de_montecarlo(func,a:float,b:float, c:int = None,d:int=None,qte = 1
            b: fim do intervalo de integraço
            c: limite superior do quadrado em que os pontos serão gerados
            d: limite inferior do quadrado em que os pontos serão gerados
-           qte: quantidade de pontos que serão gerados para calcular a integral, quanto mais pontos mais precisa mas mais tempo gasto.
+           qte: quantidade de pontos que serão gerados para calcular a
+            integral, quanto mais pontos mais precisa mas mais tempo
+              gasto.
            plot: plota a integração
 
-           obs: a função no intervalo de integração deve estar contida no quadrado formado por a,b,c,d. 
+           obs: a função no intervalo de integração deve estar contida no
+             quadrado formado por a,b,c,d. 
         
         Retorna:
             Float: retorna o valor calculado da integral.

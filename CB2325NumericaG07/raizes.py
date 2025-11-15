@@ -6,28 +6,32 @@ def metodo_newton_raphson(função, tol=1e-6, max_iter=100, plotar = False, esti
     Encontra a raíz de uma função pelo método Newton-Raphson.
     O método localiza uma raiz da função usando a reta tangente
     à função numa estimativa f(x). Tal estimativa pode ser um argumento
-    ou o padrão, que é uma função que faz uma estimativa inicial grosseira.
+    ou o padrão, que é uma função que faz uma estimativa inicial
+      grosseira.
     A busca é interrompida quando o erro, f(x) - 0, é menor que 'tol' ou
     'max_iter' é atingido.
 
     Args:
-        função (callable): A função para a qual a raiz está sendo procurada
+        função (callable): A função para a qual a raiz está sendo
+          procurada
             (deve receber um float e retornar um float).
-        tol (float, opcional): A tolerância (critério de parada). O loop para
-            quando f(x) < tol. Default é 1e-6. Além disso, tol é usado
-            para calcular a derivada numérica.
-        max_iter (int, opcional): O número máximo de iterações da função 'metodo_nr',
+        tol (float, opcional): A tolerância (critério de parada). O loop
+            para quando f(x) < tol. Default é 1e-6. Além disso, tol é
+            usado para calcular a derivada numérica.
+        max_iter (int, opcional): O número máximo de iterações da função
+        'metodo_nr',
             acima dos quais a função retorna 'O método não convergiu.'.
             Default é 100.
         plotar (bool, optional): Se True, exibe um gráfico das
             iterações ao final. Default é False.
-        estimativa_inicial (float, opcional): Primeiro número que será aplicado
-            na função para obter a reta tangente à f(x). Default é uma
-            estimativa de baixa precisão automática. 
+        estimativa_inicial (float, opcional): Primeiro número que será 
+            aplicado na função para obter a reta tangente à f(x). Default
+            é uma estimativa de baixa precisão automática. 
     
         
     Returns:
-        float: A aproximação da raiz da função. Caso o método não convirja, imprime uma mensagem.
+        float: A aproximação da raiz da função. Caso o método não convirja,
+          imprime uma mensagem.
 
     Raises:
         ValueError: Se 'função' não for callable ou se max_iter/tol tiverem
@@ -146,8 +150,8 @@ def metodo_newton_raphson(função, tol=1e-6, max_iter=100, plotar = False, esti
 def metodo_bissecao(f, a, b, tol=1e-6, max_inter = 100, plotar = False):
     """Encontra a raiz de uma função pelo Método da Bisseção.
 
-    O método localiza uma raiz da função 'f' dentro do intervalo [a, b],
-    desde que f(a) e f(b) tenham sinais opostos. A busca é
+    O método localiza uma raiz da função 'f' dentro do intervalo
+    [a, b], desde que f(a) e f(b) tenham sinais opostos. A busca é
     interrompida quando a largura do intervalo é menor que 'tol' ou
     'max_inter' é atingido.
 
@@ -156,8 +160,8 @@ def metodo_bissecao(f, a, b, tol=1e-6, max_inter = 100, plotar = False):
             (deve receber um float e retornar um float).
         a (float): O início do intervalo.
         b (float): O fim do intervalo.
-        tol (float, optional): A tolerância (critério de parada). O loop para
-            quando abs(a - b) < tol. Default é 1e-6.
+        tol (float, optional): A tolerância (critério de parada). O loop 
+            para quando abs(a - b) < tol. Default é 1e-6.
         max_inter (int, optional): O número máximo de iterações.
             Default é 100.
         plotar (bool, optional): Se True, exibe um gráfico das
@@ -235,8 +239,8 @@ def metodo_secante(f, x0, x1, tol = 1e-6, max_inter = 100, plotar= False):
             (deve receber um float e retornar um float).
         x0 (float): O primeiro ponto inicial.
         x1 (float): O segundo ponto inicial.
-        tol (float, optional): A tolerância (critério de parada). O loop para
-            quando abs(x1 - x0) < tol. Default é 1e-6.
+        tol (float, optional): A tolerância (critério de parada). O loop
+            para quando abs(x1 - x0) < tol. Default é 1e-6.
         max_inter (int, optional): O número máximo de iterações.
             Default é 100.
         plotar (bool, optional): Se True, exibe um gráfico das
