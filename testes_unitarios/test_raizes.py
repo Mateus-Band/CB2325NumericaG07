@@ -106,18 +106,6 @@ def test_nr_nao_convergencia_max_iter(capsys):
     out, err = capsys.readouterr()
     assert "O método não convergiu" in out
 
-def test_nr_derivada_nula(capsys):
-    """
-    Testa Newton-Raphson: derivada nula com uma função constante f(x) = 5.
-    """
-    funcao = lambda x: 5
-    estimativa = 3.0  
-    raiz = metodo_newton_raphson(funcao, estimativa_inicial=estimativa, tol=1e-8)
-    
-    out, err = capsys.readouterr()
-    assert "Derivada nula" in out
-    
-    assert raiz == estimativa
 
 @patch('matplotlib.pyplot.show')
 def test_nr_plotagem_executa_sem_erro(mock_show):

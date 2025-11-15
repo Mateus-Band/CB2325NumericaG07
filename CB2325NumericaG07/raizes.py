@@ -71,11 +71,12 @@ def metodo_newton_raphson(função, tol=1e-6, max_iter=100, plotar = False, esti
     def metodo_nr(função, estimativa, tol):
         derivada = derivar(função, tol)
         valor_derivada = derivada(estimativa)
+
         if abs(valor_derivada) < 1e-15:
             print(f"Derivada nula em x = {estimativa}")
-            return estimativa
-        proxima_estimativa = estimativa - função(estimativa)/derivada(estimativa)
-        return proxima_estimativa
+            return estimativa   # ← retorna a mesma estimativa sem tentar dividir
+
+        return estimativa - função(estimativa) / valor_derivada
               
     
     if estimativa_inicial is not None:
@@ -306,13 +307,31 @@ def grid_search(func,a,b,n= 1000):
     '''
 
 
-    intervals = []
-    vals = np.linspace(a,b,n)
-    for idx in range(1,len(vals)):
-        if func(vals[idx-1])*func(vals[idx]) <= 0:
-            intervals.append((vals[idx-1],vals[idx]))
+    roots = []
 
-    return intervals
+    # 1. Checar bordas explicitamente
+    if abs(f(a)) < tol:
+        roots.append((a, a))
+    if abs(f(b)) < tol:
+        roots.append((b, b))
+
+    # 2. Varredura no intervalo
+    x = a
+    while x + h <= b:
+        y1 = f(x)
+        y2 = f(x + h)
+
+        # Raiz exata num ponto intermediário
+        if abs(y1) < tol:
+            roots.append((x, x))
+
+        # Mudança de sinal → raiz no intervalo
+        if y1 * y2 < 0:
+            roots.append((x, x + h))
+
+        x += h
+
+    return roots
 
 
 

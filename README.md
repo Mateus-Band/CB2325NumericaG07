@@ -112,6 +112,7 @@ CB2325NumericaG07/
 ├── pyproject.toml        # Configuração do pacote
 ├── LICENSE
 ├── MANIFEST.in           # Para pypi
+├── requirements.txt      # Para pip
 └── .gitignore
 ```
 
