@@ -70,12 +70,13 @@ def metodo_newton_raphson(função, tol=1e-6, max_iter=100, plotar = False, esti
 
     def metodo_nr(função, estimativa, tol):
         derivada = derivar(função, tol)
-        try:
-            proxima_estimativa = estimativa - função(estimativa)/derivada(estimativa)
-            return proxima_estimativa
-        except ZeroDivisionError:
+        valor_derivada = derivada(estimativa)
+        if abs(valor_derivada) < 1e-15:
             print(f"Derivada nula em x = {estimativa}")
-            return estimativa  
+            return estimativa
+        proxima_estimativa = estimativa - função(estimativa)/derivada(estimativa)
+        return proxima_estimativa
+              
     
     if estimativa_inicial is not None:
         estimativa = float(estimativa_inicial)
