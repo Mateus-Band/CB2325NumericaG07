@@ -318,6 +318,7 @@ def grid_search(func,a,b,n= 1000):
 
 
 if __name__ == '_main_':
-    print(metodo_newton_raphson._doc_)
-    print(metodo_bissecao._doc_)
-    print(metodo_secante._doc_)
+    print(metodo_newton_raphson.__doc__)
+    print(metodo_bissecao.__doc__)
+    print(metodo_secante.__doc__)
+    print(grid_search.__doc__)

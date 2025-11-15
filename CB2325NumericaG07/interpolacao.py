@@ -726,6 +726,8 @@ if __name__ == '__main__':
     print(interpolacao_de_hermite.__doc__ + '\n')
     print(interpolacao_polinomial.__doc__ + '\n')
     print(interpolacao_linear_por_partes.__doc__)
+    print(interp_vand.__doc__)
+    print(interpolacao_de_newton.__doc__)
 
 
 

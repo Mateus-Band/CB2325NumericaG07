@@ -32,3 +32,6 @@ def erro_relativo(valor_real,valor_aprox):
 
     return abs(valor_real-valor_aprox)/abs(valor_real)
 
+if __name__ == '__main__':
+    print(erro_absoluto.__doc__)
+    print(erro_relativo.__doc__)

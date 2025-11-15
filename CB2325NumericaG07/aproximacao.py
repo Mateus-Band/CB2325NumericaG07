@@ -822,4 +822,6 @@ def melhor_ajuste(
 __all__ = ["ajuste", "ajuste_linear", "ajuste_polinomial", "ajuste_exponencial", "ajuste_logaritmo", "ajuste_senoidal", "ajuste_multiplo", "avaliar_ajuste", "melhor_ajuste"]
 
 if __name__ == '__main__':
-    ajuste([0, 1, 2, 3, 4, 5], [1.1, 1.7, 2.9, 5.1, 8.5, 14.2], 'exp', plt_grafico=True)
+    print(ajuste.__doc__)
+    print(avaliar_ajuste.__doc__)
+    print(melhor_ajuste.__doc__)

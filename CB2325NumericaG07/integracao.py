@@ -368,3 +368,13 @@ def integral_de_montecarlo(func,a:float,b:float, c:int = None,d:int=None,qte = 1
         ax.text(-0.2,d-k*0.3,f'Pontos a baixo da função:{I} , Pontos totais : {qte}')
 
     return (c-d)*(b-a)*(I/qte) + d*(b-a)
+
+if __name__ == '__main__':
+    print(integral_trapezio.__doc__)
+    print(integral_boole.__doc__)
+    print(integral_de_montecarlo.__doc__)
+    print(integral_gauss_legendre.__doc__)
+    print(integral_simpson38.__doc__)
+
+
+
