@@ -305,7 +305,11 @@ def grid_search(func,a,b,n= 1000):
     n (int) : numero de partições que serão checadas 
     
     '''
-
+    f = func # Usa a função passada como argumento
+    h = (b - a) / n # Passo do grid
+    tol = 1e-6 # Tolerância para checar se f(x) é uma raiz exata
+    y_a = f(a)
+    y_b = f(b)
 
     roots = []
 
